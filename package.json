@@ -1,0 +1,24 @@
+{
+  "name": "bookstore-nodejs",
+  "version": "1.0.0",
+  "description": "Website bán sách trực tuyến sử dụng Node.js và Express",
+  "keywords": [
+    "nodejs",
+    "express",
+    "bookstore"
+  ],
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "dotenv": "^17.2.3",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.1.5"
+  }
+}
