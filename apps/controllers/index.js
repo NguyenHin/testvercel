@@ -14,4 +14,7 @@ router.use("/product", require(__dirname + "/productcontroller"));
 // Đừng quên dòng này, nó rất quan trọng!
 router.use("/admin", require(__dirname + "/admin/admincontroller"));
 
+router.use("/auth", require(__dirname + "/authcontroller"));
+
+
 module.exports = router;
