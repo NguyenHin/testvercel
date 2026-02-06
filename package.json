@@ -20,6 +20,7 @@
     "dotenv": "^17.2.4",
     "ejs": "^4.0.1",
     "express": "^5.2.1",
+<<<<<<< HEAD
     "multer": "^2.0.2",
     "mysql2": "^3.16.3"
   },
@@ -31,4 +32,9 @@
     "url": "https://github.com/trungtin10/WebBookStore/issues"
   },
   "homepage": "https://github.com/trungtin10/WebBookStore#readme"
+=======
+    "express-session": "^1.19.0",
+    "mongoose": "^9.1.5"
+  }
+>>>>>>> 818086f3a5e7648cff072a20643f6dfa9bdd426d
 }

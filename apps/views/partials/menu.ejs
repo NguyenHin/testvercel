@@ -1,6 +1,27 @@
 <div class="menu" style="background: #eee; padding: 10px; margin-bottom: 20px;">
     <a href="/" style="margin-right: 15px; font-weight: bold;">Trang Chủ</a>
     <a href="/product" style="margin-right: 15px; font-weight: bold;">Sản Phẩm</a>
-    <a href="/admin/user" style="margin-right: 15px; font-weight: bold;">Quản lý User</a>
-    <a href="/admin/getuserlist" style="font-weight: bold;">API User List</a>
+
+    <% if (session && session.user) { %>
+        <span style="margin-right: 15px; font-weight: bold;">
+            Xin chào <%= session.user.username %>
+        </span>
+        <a href="/auth/logout" style="margin-right: 15px; font-weight: bold;">
+            Đăng xuất
+        </a>
+    <% } else { %>
+        <a href="/auth/login" style="margin-right: 15px; font-weight: bold;">
+            Đăng nhập
+        </a>
+        <a href="/auth/register" style="margin-right: 15px; font-weight: bold;">
+            Đăng ký
+        </a>
+    <% } %>
+
+    <a href="/admin/user" style="margin-right: 15px; font-weight: bold;">
+        Quản lý User
+    </a>
+    <a href="/admin/getuserlist" style="font-weight: bold;">
+        API User List
+    </a>
 </div>

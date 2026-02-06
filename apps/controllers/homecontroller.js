@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // apps/controllers/homecontroller.js
 const ProductModel = require('../models/product');
 
@@ -13,3 +14,14 @@ module.exports = {
         }
     }
 };
+=======
+// var express = require("express");
+// var router = express.Router();
+// router.use("/home", require(__dirname + "/homecontroller"));
+// router.use("/product", require(__dirname +
+// "/productcontroller"));
+// router.get("/", function(req,res){
+//     res.json({"message": "this is index page"});
+// });
+// module.exports = router;
+>>>>>>> 818086f3a5e7648cff072a20643f6dfa9bdd426d

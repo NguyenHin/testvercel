@@ -32,4 +32,7 @@ router.post("/admin/store", upload.single("image"), adminController.store);
 // Ví dụ: /product/detail/1
 router.use("/product", productController); 
 
+router.use("/auth", require(__dirname + "/authcontroller"));
+
+
 module.exports = router;
