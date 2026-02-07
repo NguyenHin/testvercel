@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title><%= product.name %> - Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+
+        .breadcrumb { background: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .breadcrumb a { text-decoration: none; color: #555; }
+        .breadcrumb a:hover { color: #C92127; }
+
+        .product-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .product-img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-title { font-size: 1.8rem; font-weight: 700; color: #333; margin-bottom: 10px; }
+        .product-author { color: #777; font-size: 1rem; margin-bottom: 20px; }
+
+        .price-box {
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        .current-price { font-size: 2rem; color: #C92127; font-weight: 800; }
+
+        .btn-add-cart {
+            background-color: white;
+            color: #C92127;
+            border: 2px solid #C92127;
+            font-weight: 700;
+            padding: 12px 30px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .btn-add-cart:hover { background-color: #fff5f5; }
+
+        .btn-buy-now {
+            background-color: #C92127;
+            color: white;
+            border: none;
+            font-weight: 700;
+            padding: 12px 40px;
+            border-radius: 8px;
+            transition: 0.3s;
+            margin-left: 15px;
+        }
+        .btn-buy-now:hover { background-color: #a11b20; color: white; }
+
+        .description-box {
+            margin-top: 40px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+        .section-header {
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Related Products */
+        .related-card {
+            border: none;
+            transition: 0.3s;
+        }
+        .related-card:hover { transform: translateY(-5px); }
+        .related-img { height: 200px; object-fit: cover; border-radius: 8px; }
+        .related-title { font-size: 0.95rem; font-weight: 600; margin-top: 10px; color: #333; }
+        .related-price { color: #C92127; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <%- include('partials/menu') %>
+
+    <div class="container mt-3">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb shadow-sm">
+            <a href="/">Trang chủ</a> <span class="mx-2">/</span>
+            <a href="#"><%= product.category_name || 'Sách' %></a> <span class="mx-2">/</span>
+            <span class="text-muted"><%= product.name %></span>
+        </div>
+
+        <!-- Product Info -->
+        <div class="product-container">
+            <div class="row">
+                <!-- Image -->
+                <div class="col-md-5 text-center">
+                    <%
+                        let imgSrc = product.image_url;
+                        if (imgSrc && !imgSrc.startsWith('http')) {
+                            imgSrc = '/images/' + imgSrc;
+                        }
+                    %>
+                    <img src="<%= imgSrc || '/images/default.jpg' %>"
+                         class="product-img"
+                         alt="<%= product.name %>"
+                         onerror="this.src='https://picsum.photos/400/600'">
+                </div>
+
+                <!-- Info -->
+                <div class="col-md-7">
+                    <h1 class="product-title"><%= product.name %></h1>
+                    <p class="product-author">
+                        Tác giả: <strong class="text-dark"><%= product.author %></strong>
+                        <span class="mx-3">|</span>
+                        Tình trạng: <span class="text-success fw-bold"><%= product.quantity > 0 ? 'Còn hàng' : 'Hết hàng' %></span>
+                    </p>
+
+                    <div class="price-box">
+                        <span class="current-price"><%= Number(product.price).toLocaleString('vi-VN') %> đ</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="fw-bold mb-2">Số lượng:</label>
+                        <div class="input-group" style="width: 140px;">
+                            <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">-</button>
+                            <input type="text" class="form-control text-center" value="1" id="qtyInput">
+                            <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">+</button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex">
+                        <button class="btn btn-add-cart">
+                            <i class="fas fa-cart-plus me-2"></i> Thêm vào giỏ hàng
+                        </button>
+                        <button class="btn btn-buy-now">
+                            Mua ngay
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="description-box shadow-sm">
+            <h3 class="section-header">Mô tả sản phẩm</h3>
+            <div class="text-muted" style="line-height: 1.8;">
+                <p><%= product.description || "Đang cập nhật nội dung..." %></p>
+            </div>
+        </div>
+
+        <!-- Related Products -->
+        <div class="mt-5 mb-5">
+            <h3 class="section-header">Sản phẩm liên quan</h3>
+            <div class="row row-cols-2 row-cols-md-5 g-4">
+                <% if (locals.relatedProducts) { %>
+                    <% relatedProducts.slice(0, 5).forEach(item => { %>
+                        <% if (item.id !== product.id) { %>
+                            <div class="col">
+                                <a href="/product/<%= item.id %>" class="text-decoration-none">
+                                    <div class="card related-card h-100">
+                                        <%
+                                            let rImg = item.image_url;
+                                            if (rImg && !rImg.startsWith('http')) rImg = '/images/' + rImg;
+                                        %>
+                                        <img src="<%= rImg || '/images/default.jpg' %>" class="related-img card-img-top" onerror="this.src='https://picsum.photos/200/300'">
+                                        <div class="card-body p-2">
+                                            <div class="related-title text-truncate"><%= item.name %></div>
+                                            <div class="related-price mt-1"><%= Number(item.price).toLocaleString('vi-VN') %> đ</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        <% } %>
+                    <% }); %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 Bookstore. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function increaseQty() {
+            let input = document.getElementById('qtyInput');
+            input.value = parseInt(input.value) + 1;
+        }
+        function decreaseQty() {
+            let input = document.getElementById('qtyInput');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+    </script>
+</body>
+</html>

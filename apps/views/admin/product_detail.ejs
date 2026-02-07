@@ -2,176 +2,70 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer">
-    <title>Quản Trị - Chi Tiết: <%= product.name %></title>
+    <title>Chi tiết Sản phẩm - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: #f0f2f5; font-family: 'Inter', sans-serif; }
-        .admin-header { 
-            background-color: #1a1a2e; 
-            color: white; 
-            padding: 18px 25px; 
-            border-bottom: 4px solid #c49b63;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .container { max-width: 1000px; margin-bottom: 50px; }
-        .detail-card {
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-            background: #fff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-        .card-header-title {
-            background-color: #fff;
-            padding: 25px 30px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .product-title {
-            font-size: 26px;
-            font-weight: 800;
-            color: #1a1a2e;
-            margin: 0;
-        }
-        .product-image-container {
-            background-color: #fafbfc;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        .img-main {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border: 3px solid #fff;
-            /* Cố định kích thước hiển thị cho đẹp */
-            max-height: 450px;
-            object-fit: contain;
-        }
-        .info-table th {
-            width: 35%;
-            color: #6c757d;
-            font-weight: 500;
-            padding: 15px 0;
-            border-bottom: 1px solid #f8f9fa;
-        }
-        .info-table td {
-            color: #1a1a2e;
-            font-weight: 600;
-            padding: 15px 0;
-            border-bottom: 1px solid #f8f9fa;
-        }
-        .price-tag {
-            color: #dc3545;
-            font-size: 22px;
-            font-weight: 800;
-        }
-        .description-box {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #c49b63;
-            margin-top: 15px;
-        }
-        .btn-edit-main {
-            background-color: #c49b63;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-weight: 700;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-        .btn-edit-main:hover {
-            background-color: #a68252;
-            color: white;
-            transform: translateY(-2px);
-        }
-    </style>
 </head>
 <body>
-
-    <div class="admin-header d-flex justify-content-between align-items-center">
-        <h2 class="m-0 fs-4 fw-bold"><i class="fas fa-info-circle me-2"></i> CHI TIẾT SẢN PHẨM</h2>
-        <a href="/admin" class="btn btn-outline-light btn-sm px-3">
-            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
-        </a>
-    </div>
-
     <div class="container mt-5">
-        <div class="detail-card">
-            <div class="card-header-title d-flex justify-content-between align-items-center">
-                <h4 class="product-title"><%= product.name %></h4>
-                <span class="badge bg-light text-dark border p-2">ID: #<%= product.id %></span>
+        <div class="card shadow">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Chi tiết Sản phẩm #<%= item.id %></h4>
+                <a href="/admin/products" class="btn btn-light btn-sm text-dark fw-bold">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
             </div>
-            
-            <div class="card-body p-4 p-md-5">
-                <div class="row g-5">
-                    <div class="col-md-5">
-                        <div class="product-image-container">
-                            <% 
-                                let finalSrc = product.image_url;
-                                // Kiểm tra nếu là link mạng (bắt đầu bằng http) thì giữ nguyên
-                                // Nếu là tên file nội bộ thì mới thêm /images/
-                                if (finalSrc && !finalSrc.startsWith('http')) {
-                                    finalSrc = '/images/' + finalSrc;
-                                }
-                            %>
-                            <img src="<%= finalSrc ? finalSrc : '/images/default.jpg' %>" 
-                                 class="img-main" 
-                                 alt="<%= product.name %>"
-                                 onerror="this.src='https://via.placeholder.com/350x450?text=No+Image'">
-                        </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <%
+                            let imgSrc = item.image_url;
+                            if (imgSrc && !imgSrc.startsWith('http')) {
+                                imgSrc = '/images/' + imgSrc;
+                            }
+                        %>
+                        <img src="<%= imgSrc ? imgSrc : '/images/default.jpg' %>"
+                             class="img-fluid rounded shadow-sm"
+                             style="max-height: 400px;"
+                             onerror="this.src='https://picsum.photos/200/300?random=<%= item.id %>'">
                     </div>
-                    
-                    <div class="col-md-7">
-                        <table class="table info-table">
-                            <tr>
-                                <th><i class="fas fa-user-edit me-2"></i>Tác giả</th>
-                                <td><%= product.author ? product.author : 'Chưa cập nhật' %></td>
-                            </tr>
-                            <tr>
-                                <th><i class="fas fa-tag me-2"></i>Giá niêm yết</th>
-                                <td class="price-tag">
-                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) %>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th><i class="fas fa-layer-group me-2"></i>Danh mục</th>
-                                <td><span class="badge bg-navy text-white p-2" style="background-color: #1a1a2e;">
-                                    <%= product.category_name ? product.category_name : 'Mã ngành: ' + product.category_id %>
-                                </span></td>
-                            </tr>
-                            <tr>
-                                <th><i class="fas fa-warehouse me-2"></i>Tình trạng kho</th>
-                                <td>
-                                    <% if(product.quantity > 0) { %>
-                                        <span class="badge bg-success px-3">Còn hàng (<%= product.quantity %>)</span>
-                                    <% } else { %>
-                                        <span class="badge bg-danger px-3">Hết hàng</span>
-                                    <% } %>
-                                </td>
-                            </tr>
-                        </table>
+                    <div class="col-md-8">
+                        <h3 class="text-primary"><%= item.name %></h3>
+                        <p class="text-muted">Tác giả: <strong><%= item.author %></strong></p>
 
-                        <div class="mt-4">
-                            <h6 class="fw-bold text-muted mb-2 text-uppercase small">Mô tả nội dung:</h6>
-                            <div class="description-box">
-                                <p class="m-0 text-secondary" style="line-height: 1.6;">
-                                    <%= product.description ? product.description : 'Không có mô tả cho sản phẩm này.' %>
-                                </p>
+                        <hr>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h5>Giá bán:</h5>
+                                <p class="text-danger fw-bold fs-4"><%= item.price.toLocaleString('vi-VN') %> đ</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Số lượng tồn kho:</h5>
+                                <p class="fw-bold fs-4"><%= item.quantity %></p>
                             </div>
                         </div>
-                        
-                        <div class="mt-5 d-flex gap-2">
-                            <a href="/admin/edit/<%= product.id %>" class="btn btn-edit-main shadow-sm">
-                                <i class="fas fa-pen-alt me-2"></i> CHỈNH SỬA THÔNG TIN
+
+                        <div class="mb-3">
+                            <h5>Mô tả:</h5>
+                            <p><%= item.description || "Chưa có mô tả." %></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <h5>Danh mục:</h5>
+                            <span class="badge bg-secondary"><%= item.category_name || "Chưa phân loại" %></span>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex gap-2">
+                            <a href="/admin/products/edit/<%= item.id %>" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Chỉnh sửa
                             </a>
-                            <a href="/admin" class="btn btn-light border px-4">
-                                ĐÓNG
+                            <a href="/admin/products/delete/<%= item.id %>"
+                               class="btn btn-danger"
+                               onclick="return confirm('Bạn có chắc muốn xóa sách này?');">
+                                <i class="fas fa-trash"></i> Xóa sản phẩm
                             </a>
                         </div>
                     </div>
@@ -179,7 +73,5 @@
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

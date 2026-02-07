@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Quản Trị - Danh Sách Người Dùng</title>
+    <title>Trang Quản Trị - Danh sách Người Dùng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
-        /* Đồng bộ Style với trang Sản phẩm */
         body { background-color: #f8f9fa; }
         .admin-header {
-            background-color: #1a1a2e; 
+            background-color: #1a1a2e;
             color: white;
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid #c49b63; 
+            border-bottom: 3px solid #c49b63;
         }
         .sidebar {
             min-height: 100vh;
@@ -50,107 +49,81 @@
             display: inline-block;
             padding-bottom: 5px;
         }
-        .action-btn { 
-            width: 32px; height: 32px; padding: 0;
-            display: inline-flex; align-items: center; justify-content: center;
-        }
-        .avatar-circle {
-            width: 40px; height: 40px;
-            background-color: #e9ecef;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: #1a1a2e; font-weight: bold;
-        }
     </style>
 </head>
 <body>
 
     <div class="admin-header">
-        <h2>Khu vực quản trị</h2>
-        <div class="user-info small">Xin chào, Admin <i class="fas fa-user-circle"></i></div>
+        <h2><a href="/admin" class="text-white text-decoration-none">Khu vực quản trị</a></h2>
+        <a href="/auth/logout" class="btn btn-sm btn-danger">Đăng xuất</a>
     </div>
 
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2 sidebar">
-                <a href="/admin"><i class="fas fa-box me-2"></i> Quản lý Sản phẩm</a>
-                <a href="/admin/user" class="active"><i class="fas fa-users me-2"></i> Quản lý Người dùng</a>
-                <a href="/admin/orders"><i class="fas fa-shopping-cart me-2"></i> Quản lý Đơn hàng</a>
-                <a href="/admin/statistics"><i class="fas fa-chart-line me-2"></i> Thống kê</a>
-                <a href="/admin/warehouse"><i class="fas fa-warehouse me-2"></i> Quản lý kho hàng</a>
+                <a href="/admin"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+                <a href="/admin/products"><i class="fas fa-box me-2"></i> Quản lý Sản phẩm</a>
+                <a href="/admin/users" class="active"><i class="fas fa-users me-2"></i> Quản lý Người dùng</a>
                 <hr>
                 <a href="/"><i class="fas fa-home me-2"></i> Về trang chủ</a>
             </div>
 
             <div class="col-md-10 main-content">
-                <h3 class="page-title"><i class="fas fa-user-shield"></i> Danh sách người dùng</h3>
-                
-                <div class="mb-3">
-                    <a href="/admin/user/add" class="btn btn-success">
-                        <i class="fas fa-user-plus"></i> Thêm người dùng mới
-                    </a>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="page-title"><i class="fas fa-list"></i> Danh sách Người dùng</h3>
+                    <a href="/admin/users/add" class="btn btn-success"><i class="fas fa-user-plus"></i> Thêm người dùng</a>
                 </div>
 
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm">
                     <div class="card-body p-0">
-                        <table class="table table-bordered table-hover mb-0 align-middle">
+                        <table class="table table-hover mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th style="width: 60px;">ID</th>
-                                    <th>Người dùng</th>
-                                    <th>Thông tin liên hệ</th>
-                                    <th>Họ và tên</th>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Họ tên</th>
+                                    <th>Email</th>
                                     <th>Vai trò</th>
-                                    <th style="width: 120px;" class="text-center">Thao tác</th>
+                                    <th class="text-end">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% if (users && users.length > 0) { %>
-                                    <% users.forEach(function(user) { %>
+                                    <% users.forEach(user => { %>
                                         <tr>
-                                            <td class="text-center text-muted small">#<%= user.id %></td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-circle me-2">
-                                                        <%= user.username.charAt(0).toUpperCase() %>
-                                                    </div>
-                                                    <div>
-                                                        <div class="fw-bold"><%= user.username %></div>
-                                                        <small class="text-muted">ID: <%= user.id %></small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div><i class="fas fa-envelope fa-xs text-muted me-1"></i> <%= user.email %></div>
-                                            </td>
+                                            <td><%= user.id %></td>
+                                            <td class="fw-bold"><%= user.username %></td>
                                             <td><%= user.full_name %></td>
+                                            <td><%= user.email %></td>
                                             <td>
-                                                <% if (user.role === 'ADMIN') { %>
-                                                    <span class="badge bg-danger"><i class="fas fa-user-cog"></i> Quản trị</span>
+                                                <% if (user.role && user.role.toLowerCase() === 'admin') { %>
+                                                    <span class="badge bg-danger">ADMIN</span>
                                                 <% } else { %>
-                                                    <span class="badge bg-primary"><i class="fas fa-user"></i> Khách hàng</span>
+                                                    <span class="badge bg-primary">USER</span>
                                                 <% } %>
                                             </td>
-                                            <td class="text-center">
-                                                <a href="/admin/user/delete/<%= user.id %>" 
-                                                   class="btn btn-danger btn-sm action-btn" 
-                                                   onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng <%= user.username %>?')"
-                                                   title="Xóa">
-                                                    <i class="fas fa-trash"></i>
+                                            <td class="text-end">
+                                                <a href="/admin/users/edit/<%= user.id %>" class="btn btn-primary btn-sm me-1">
+                                                    <i class="fas fa-edit"></i> Sửa
+                                                </a>
+                                                <a href="/admin/users/delete/<%= user.id %>"
+                                                   class="btn btn-danger btn-sm"
+                                                   onclick="return confirm('CẢNH BÁO: Bạn có chắc muốn xóa user này?');">
+                                                    <i class="fas fa-trash"></i> Xóa
                                                 </a>
                                             </td>
                                         </tr>
                                     <% }); %>
                                 <% } else { %>
                                     <tr>
-                                        <td colspan="6" class="text-center p-4">Chưa có người dùng nào được đăng ký.</td>
+                                        <td colspan="6" class="text-center py-4">Chưa có user nào.</td>
                                     </tr>
                                 <% } %>
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div> 
+            </div>
         </div>
     </div>
 </body>
