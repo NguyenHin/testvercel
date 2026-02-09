@@ -7,146 +7,204 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
-        .checkout-container { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 30px; }
-        .section-title { font-weight: 700; color: #333; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-        .order-summary { background: #fafafa; padding: 20px; border-radius: 8px; }
-        .btn-confirm { background-color: #C92127; color: white; font-weight: 700; width: 100%; padding: 12px; border: none; border-radius: 8px; transition: 0.3s; }
-        .btn-confirm:hover { background-color: #a11b20; color: white; }
 
-        .coupon-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; cursor: pointer; padding: 10px; border: 1px dashed #C92127; border-radius: 6px; background: #fff; }
-        .coupon-row:hover { background-color: #fff5f5; }
-        .coupon-label { font-weight: 600; font-size: 0.9rem; color: #333; }
-        .coupon-value { font-weight: 700; color: #C92127; font-size: 0.9rem; }
+        .checkout-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }
 
-        .coupon-card { border: 1px dashed #C92127; border-radius: 8px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; background-color: #fff; transition: 0.2s; }
-        .coupon-card:hover { background-color: #fff5f5; }
-        .coupon-info { flex: 1; }
-        .coupon-code { font-weight: 700; color: #C92127; font-size: 1.1rem; }
-        .coupon-desc { font-size: 0.9rem; color: #555; margin: 5px 0; }
-        .coupon-expiry { font-size: 0.8rem; color: #999; }
-        .btn-use-coupon { background-color: white; color: #C92127; border: 1px solid #C92127; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; transition: 0.2s; }
-        .btn-use-coupon:hover { background-color: #C92127; color: white; }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .form-label { font-weight: 600; color: #555; font-size: 0.9rem; }
+        .form-control, .form-select { padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd; }
+        .form-control:focus, .form-select:focus { border-color: #C92127; box-shadow: 0 0 0 3px rgba(201, 33, 39, 0.1); }
+
+        .order-summary {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #eee;
+        }
+
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
+        .summary-total { font-weight: 700; font-size: 1.2rem; color: #C92127; border-top: 1px solid #ddd; padding-top: 15px; margin-top: 10px; }
+
+        .btn-confirm {
+            background-color: #C92127;
+            color: white;
+            font-weight: 700;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            transition: 0.3s;
+            text-transform: uppercase;
+            margin-top: 20px;
+        }
+        .btn-confirm:hover { background-color: #a11b20; }
+
+        .payment-method-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .payment-method-item:hover { border-color: #C92127; background-color: #fff5f5; }
+        .payment-method-item input { margin-right: 15px; transform: scale(1.2); accent-color: #C92127; }
+        .payment-icon { width: 30px; margin-right: 10px; }
     </style>
 </head>
 <body>
     <%- include('partials/menu') %>
 
-    <div class="container mb-5">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="checkout-container">
-                    <h4 class="section-title">Thông tin giao hàng</h4>
-                    <form action="/order" method="POST" id="checkoutForm">
-                        <div class="mb-3">
-                            <label class="form-label">Họ và tên</label>
-                            <input type="text" class="form-control" name="full_name" value="<%= user ? user.full_name : '' %>" required>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+    <div class="container">
+        <form action="/order" method="POST" id="checkoutForm">
+            <div class="row">
+                <!-- CỘT TRÁI: THÔNG TIN GIAO HÀNG -->
+                <div class="col-lg-8">
+                    <div class="checkout-container">
+                        <h4 class="section-title"><i class="fas fa-map-marker-alt me-2 text-danger"></i> Địa chỉ giao hàng</h4>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Họ và tên người nhận</label>
+                                <input type="text" class="form-control" name="full_name" value="<%= locals.user ? user.full_name : '' %>" required placeholder="Nhập họ tên...">
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label">Số điện thoại</label>
-                                <input type="text" class="form-control" name="phone" required>
+                                <input type="tel" class="form-control" name="phone" value="<%= locals.user ? user.phone : '' %>" required placeholder="Nhập số điện thoại...">
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12">
                                 <label class="form-label">Email</label>
-                                <input type="email" class="form-control" name="email" value="<%= user ? user.email : '' %>" required>
+                                <input type="email" class="form-control" name="email" value="<%= locals.user ? user.email : '' %>" required placeholder="Nhập email...">
+                            </div>
+
+                            <!-- ĐỊA CHỈ CHI TIẾT (3 CẤP) -->
+                            <div class="col-md-4">
+                                <label class="form-label">Tỉnh/Thành phố</label>
+                                <select class="form-select" id="province" name="province" required onchange="loadDistricts()">
+                                    <option value="">Chọn Tỉnh/Thành</option>
+                                    <option value="Hồ Chí Minh">Hồ Chí Minh</option>
+                                    <option value="Hà Nội">Hà Nội</option>
+                                    <option value="Đà Nẵng">Đà Nẵng</option>
+                                    <option value="Cần Thơ">Cần Thơ</option>
+                                    <option value="Bình Dương">Bình Dương</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Quận/Huyện</label>
+                                <select class="form-select" id="district" name="district" required onchange="loadWards()" disabled>
+                                    <option value="">Chọn Quận/Huyện</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Phường/Xã</label>
+                                <select class="form-select" id="ward" name="ward" required disabled>
+                                    <option value="">Chọn Phường/Xã</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Địa chỉ cụ thể (Số nhà, tên đường)</label>
+                                <input type="text" class="form-control" name="address_detail" required placeholder="VD: 123 Nguyễn Văn Linh...">
+                            </div>
+
+                            <!-- Input ẩn để gom địa chỉ gửi lên server -->
+                            <input type="hidden" name="address" id="fullAddress">
+
+                            <div class="col-12">
+                                <label class="form-label">Ghi chú đơn hàng (Tùy chọn)</label>
+                                <textarea class="form-control" name="note" rows="2" placeholder="VD: Giao hàng giờ hành chính..."></textarea>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Địa chỉ nhận hàng</label>
-                            <textarea class="form-control" name="address" rows="3" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Ghi chú (Tùy chọn)</label>
-                            <textarea class="form-control" name="note" rows="2"></textarea>
-                        </div>
+                    </div>
 
-                        <h4 class="section-title mt-4">Phương thức thanh toán</h4>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="payment_method" id="cod" value="cod" checked>
-                            <label class="form-check-label" for="cod">
-                                <i class="fas fa-money-bill-wave text-success me-2"></i> Thanh toán khi nhận hàng (COD)
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="payment_method" id="bank" value="bank">
-                            <label class="form-check-label" for="bank">
-                                <i class="fas fa-university text-primary me-2"></i> Chuyển khoản ngân hàng
-                            </label>
-                        </div>
+                    <div class="checkout-container">
+                        <h4 class="section-title"><i class="fas fa-credit-card me-2 text-danger"></i> Phương thức thanh toán</h4>
 
-                        <!-- Input ẩn để gửi thông tin giảm giá -->
-                        <input type="hidden" name="shipping_discount_code" id="hiddenShippingCode" value="">
+                        <label class="payment-method-item">
+                            <input type="radio" name="payment_method" value="COD" checked>
+                            <i class="fas fa-money-bill-wave payment-icon text-success"></i>
+                            <span>Thanh toán khi nhận hàng (COD)</span>
+                        </label>
 
-                        <button type="submit" class="btn btn-confirm mt-4">XÁC NHẬN ĐẶT HÀNG</button>
-                    </form>
+                        <label class="payment-method-item">
+                            <input type="radio" name="payment_method" value="VNPAY">
+                            <i class="fas fa-qrcode payment-icon text-primary"></i>
+                            <span>Ví VNPAY / QR Code</span>
+                        </label>
+
+                        <label class="payment-method-item">
+                            <input type="radio" name="payment_method" value="MOMO">
+                            <i class="fas fa-wallet payment-icon text-danger"></i>
+                            <span>Ví MoMo</span>
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-lg-4">
-                <div class="checkout-container order-summary">
-                    <h5 class="section-title">Đơn hàng của bạn</h5>
-                    <% if (cart && cart.length > 0) { %>
-                        <% cart.forEach(item => { %>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span><%= item.name %> (x<%= item.quantity %>)</span>
-                                <span class="fw-bold"><%= (item.price * item.quantity).toLocaleString('vi-VN') %> đ</span>
+                <!-- CỘT PHẢI: TỔNG QUAN ĐƠN HÀNG -->
+                <div class="col-lg-4">
+                    <div class="checkout-container">
+                        <h4 class="section-title">Đơn hàng của bạn</h4>
+
+                        <div class="order-summary">
+                            <% cart.forEach(item => { %>
+                                <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                                    <div style="font-size: 0.9rem;">
+                                        <div class="fw-bold text-truncate" style="max-width: 180px;"><%= item.name %></div>
+                                        <div class="text-muted small">x <%= item.quantity %></div>
+                                    </div>
+                                    <div class="fw-bold"><%= (item.price * item.quantity).toLocaleString('vi-VN') %> đ</div>
+                                </div>
+                            <% }); %>
+
+                            <div class="summary-row mt-3">
+                                <span>Tạm tính:</span>
+                                <span><%= totalAmount.toLocaleString('vi-VN') %> đ</span>
                             </div>
-                        <% }); %>
-                        <hr>
+                            <div class="summary-row">
+                                <span>Phí vận chuyển:</span>
+                                <span><%= shippingFee.toLocaleString('vi-VN') %> đ</span>
+                            </div>
+                            <% if (productDiscount > 0) { %>
+                                <div class="summary-row text-success">
+                                    <span>Giảm giá sản phẩm:</span>
+                                    <span>-<%= productDiscount.toLocaleString('vi-VN') %> đ</span>
+                                </div>
+                            <% } %>
 
-                        <!-- Chọn mã vận chuyển -->
-                        <div class="coupon-row" data-bs-toggle="modal" data-bs-target="#couponModal" onclick="loadCoupons()">
-                            <span class="coupon-label"><i class="fas fa-truck me-2 text-info"></i> Mã vận chuyển</span>
-                            <span class="coupon-value" id="shippingDiscountText">Chọn mã ></span>
+                            <div class="summary-row summary-total">
+                                <span>Tổng cộng:</span>
+                                <span><%= (totalAmount + shippingFee - productDiscount).toLocaleString('vi-VN') %> đ</span>
+                            </div>
                         </div>
 
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Tạm tính:</span>
-                            <span class="fw-bold"><%= totalAmount.toLocaleString('vi-VN') %> đ</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Phí vận chuyển:</span>
-                            <span class="fw-bold" id="shippingFeeText"><%= shippingFee.toLocaleString('vi-VN') %> đ</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Giảm giá hàng:</span>
-                            <span class="text-success">-<%= productDiscount.toLocaleString('vi-VN') %> đ</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Giảm giá ship:</span>
-                            <span class="text-success" id="shippingDiscountAmount">-0 đ</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between">
-                            <span class="fw-bold fs-5">Tổng cộng:</span>
-                            <span class="fw-bold fs-4 text-danger" id="finalTotal">
-                                <%= (totalAmount + shippingFee - productDiscount).toLocaleString('vi-VN') %> đ
-                            </span>
-                        </div>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Coupon -->
-    <div class="modal fade" id="couponModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-info">Chọn mã vận chuyển</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body bg-light" id="couponList">
-                    <div class="text-center py-3">
-                        <div class="spinner-border text-info" role="status"></div>
+                        <button type="submit" class="btn-confirm" onclick="prepareAddress()">
+                            XÁC NHẬN ĐẶT HÀNG
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 
-    <footer class="bg-dark text-white text-center py-4 mt-5">
+    <footer class="bg-dark text-white text-center py-4 mt-auto">
         <div class="container">
             <p class="mb-0">&copy; 2024 Bookstore. All rights reserved.</p>
         </div>
@@ -154,75 +212,76 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const totalAmount = <%= totalAmount %>;
-        const productDiscount = <%= productDiscount %>;
-        const shippingFee = <%= shippingFee %>;
-        let currentShippingDiscount = 0;
+        // Dữ liệu giả lập Quận/Huyện
+        const districtsData = {
+            "Hồ Chí Minh": ["Quận 1", "Quận 3", "Quận 5", "Quận 7", "Thủ Đức", "Bình Thạnh"],
+            "Hà Nội": ["Hoàn Kiếm", "Ba Đình", "Cầu Giấy", "Đống Đa", "Tây Hồ"],
+            "Đà Nẵng": ["Hải Châu", "Thanh Khê", "Sơn Trà"],
+            "Cần Thơ": ["Ninh Kiều", "Bình Thủy", "Cái Răng"],
+            "Bình Dương": ["Thủ Dầu Một", "Dĩ An", "Thuận An"]
+        };
 
-        function formatMoney(amount) {
-            return amount.toLocaleString('vi-VN') + ' đ';
+        // Dữ liệu giả lập Phường/Xã
+        const wardsData = {
+            "Quận 1": ["Phường Bến Nghé", "Phường Bến Thành", "Phường Đa Kao"],
+            "Thủ Đức": ["Phường Linh Trung", "Phường Linh Xuân", "Phường Hiệp Bình Chánh"],
+            "Hoàn Kiếm": ["Phường Hàng Bài", "Phường Tràng Tiền"],
+            "default": ["Phường 1", "Phường 2", "Xã A", "Xã B"]
+        };
+
+        function loadDistricts() {
+            const province = document.getElementById('province').value;
+            const districtSelect = document.getElementById('district');
+            const wardSelect = document.getElementById('ward');
+
+            districtSelect.innerHTML = '<option value="">Chọn Quận/Huyện</option>';
+            wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+            wardSelect.disabled = true;
+
+            if (province && districtsData[province]) {
+                districtsData[province].forEach(d => {
+                    const option = document.createElement('option');
+                    option.value = d;
+                    option.text = d;
+                    districtSelect.appendChild(option);
+                });
+                districtSelect.disabled = false;
+            } else {
+                districtSelect.disabled = true;
+            }
         }
 
-        function calculateFinalTotal() {
-            let final = totalAmount + shippingFee - productDiscount - currentShippingDiscount;
-            if (final < 0) final = 0;
-            document.getElementById('finalTotal').innerText = formatMoney(final);
+        function loadWards() {
+            const district = document.getElementById('district').value;
+            const wardSelect = document.getElementById('ward');
+
+            wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+
+            const wards = wardsData[district] || wardsData["default"];
+
+            if (district) {
+                wards.forEach(w => {
+                    const option = document.createElement('option');
+                    option.value = w;
+                    option.text = w;
+                    wardSelect.appendChild(option);
+                });
+                wardSelect.disabled = false;
+            } else {
+                wardSelect.disabled = true;
+            }
         }
 
-        function loadCoupons() {
-            fetch('/api/coupons')
-            .then(res => res.json())
-            .then(data => {
-                const list = document.getElementById('couponList');
-                if (data.success) {
-                    const coupons = data.data.shipping;
+        function prepareAddress() {
+            const province = document.getElementById('province').value;
+            const district = document.getElementById('district').value;
+            const ward = document.getElementById('ward').value;
+            const detail = document.querySelector('input[name="address_detail"]').value;
 
-                    if (coupons.length > 0) {
-                        let html = '';
-                        coupons.forEach(c => {
-                            let desc = `Giảm ${c.discount_value.toLocaleString()}đ phí ship`;
-                            let condition = c.min_order_value > 0 ? `Đơn tối thiểu ${c.min_order_value.toLocaleString()}đ` : 'Không giới hạn';
-
-                            html += `
-                                <div class="coupon-card">
-                                    <div class="coupon-info">
-                                        <div class="coupon-code">${c.code}</div>
-                                        <div class="coupon-desc">${desc}</div>
-                                        <div class="coupon-expiry text-muted small">${condition}</div>
-                                    </div>
-                                    <button class="btn-use-coupon" onclick="applyCoupon('${c.code}')" data-bs-dismiss="modal">Dùng ngay</button>
-                                </div>
-                            `;
-                        });
-                        list.innerHTML = html;
-                    } else {
-                        list.innerHTML = '<p class="text-center text-muted">Không có mã Freeship nào.</p>';
-                    }
-                }
-            });
-        }
-
-        function applyCoupon(code) {
-            fetch('/api/coupon/check', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: code, totalAmount: totalAmount, shippingFee: shippingFee })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.type === 'shipping') {
-                    currentShippingDiscount = data.discount;
-                    document.getElementById('shippingDiscountText').innerText = data.code;
-                    document.getElementById('shippingDiscountAmount').innerText = `-${formatMoney(data.discount)}`;
-                    document.getElementById('hiddenShippingCode').value = data.code;
-
-                    calculateFinalTotal();
-                    alert(data.message);
-                } else {
-                    alert(data.message || "Mã không hợp lệ cho vận chuyển.");
-                }
-            })
-            .catch(err => console.error(err));
+            if (province && district && ward && detail) {
+                const fullAddress = `${detail}, ${ward}, ${district}, ${province}`;
+                document.getElementById('fullAddress').value = fullAddress;
+            }
         }
     </script>
 </body>

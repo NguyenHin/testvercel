@@ -18,84 +18,93 @@
 
         .cart-container {
             background: white;
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-top: 30px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            margin-top: 20px;
         }
 
-        .cart-header {
-            font-weight: 700;
-            color: #333;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
+        /* --- LAYOUT CỘT GIỎ HÀNG --- */
+        /* Định nghĩa độ rộng các cột để Header và Item thẳng hàng */
+        .col-check { width: 40px; display: flex; align-items: center; justify-content: center; }
+        .col-product { flex: 1; padding-left: 10px; } /* Ảnh + Tên */
+        .col-qty { width: 140px; display: flex; justify-content: center; align-items: center; }
+        .col-total { width: 140px; text-align: right; display: flex; align-items: center; justify-content: flex-end; font-weight: 700; color: #C92127; }
+        .col-action { width: 50px; display: flex; justify-content: flex-end; align-items: center; }
 
-        .cart-item {
-            border-bottom: 1px solid #f0f0f0;
-            padding: 15px 0;
+        /* HEADER ROW (Khung trên) */
+        .cart-header-row {
             display: flex;
             align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+
+            /* Style chữ đen theo yêu cầu */
+            color: #000;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
         }
 
+        /* ITEM ROW (Khung sản phẩm dưới) */
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
         .cart-item:last-child { border-bottom: none; }
 
-        .item-checkbox {
-            width: 18px;
-            height: 18px;
-            margin-right: 15px;
-            cursor: pointer;
-        }
+        /* Chi tiết bên trong Item */
+        .item-checkbox { width: 18px; height: 18px; cursor: pointer; }
 
-        .item-img {
-            width: 60px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-right: 15px;
-        }
+        .product-info-flex { display: flex; align-items: center; gap: 15px; }
+        .item-img { width: 80px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #eee; }
+        .item-name { font-weight: 600; color: #333; font-size: 1rem; line-height: 1.4; margin-bottom: 5px; }
+        .item-price-single { color: #777; font-size: 0.9rem; }
 
-        .item-info { flex: 1; }
-        .item-name { font-weight: 600; color: #333; font-size: 1rem; margin-bottom: 4px; }
-        .item-price { color: #C92127; font-weight: 700; font-size: 0.95rem; }
-
+        /* Nút số lượng */
         .qty-control {
             display: flex;
             align-items: center;
             border: 1px solid #ddd;
             border-radius: 4px;
-            width: 90px;
+            width: 110px;
             height: 32px;
         }
         .qty-btn {
-            background: none;
-            border: none;
-            padding: 0 10px;
-            cursor: pointer;
-            color: #555;
-            text-decoration: none;
-            font-size: 1.2rem;
-            line-height: 1;
-        }
-        .qty-input {
             width: 30px;
+            height: 100%;
+            border: none;
+            background: #f8f9fa;
+            color: #333;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .qty-btn:hover { background: #e9ecef; color: #C92127; }
+        .qty-input {
+            flex: 1;
             text-align: center;
             border: none;
-            outline: none;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
             font-weight: 600;
             font-size: 0.9rem;
-            padding: 0;
+            height: 100%;
+            width: 100%;
         }
 
-        .item-total {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #333;
-            min-width: 100px;
-            text-align: right;
-        }
+        /* Nút xóa */
+        .btn-delete { color: #999; font-size: 1.1rem; transition: 0.2s; }
+        .btn-delete:hover { color: #C92127; transform: scale(1.1); }
+
+        /* Cột phải: Thanh toán */
+        .cart-summary-header { font-weight: 700; color: #000; margin-bottom: 15px; font-size: 1.1rem; }
 
         .btn-checkout {
             background-color: #C92127;
@@ -114,91 +123,25 @@
         .btn-checkout:hover { background-color: #a11b20; color: white; }
         .btn-checkout:disabled { background-color: #ccc; cursor: not-allowed; }
 
-        /* Coupon Box Style Fahasa */
-        .coupon-section {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background-color: #fff;
-        }
-
-        .coupon-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-
+        .coupon-section { border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #fff; }
+        .coupon-row { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .coupon-row:hover { color: #C92127; }
-
-        .coupon-label {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .coupon-value {
-            font-weight: 700;
-            color: #C92127;
-            font-size: 0.9rem;
-        }
+        .coupon-label { font-weight: 600; font-size: 0.9rem; }
+        .coupon-value { font-weight: 700; color: #C92127; font-size: 0.9rem; }
 
         /* Modal Coupon */
-        .coupon-card {
-            border: 1px dashed #C92127;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #fff;
-            transition: 0.2s;
-        }
-
+        .coupon-card { border: 1px dashed #C92127; border-radius: 8px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; background-color: #fff; transition: 0.2s; }
         .coupon-card:hover { background-color: #fff5f5; }
-
         .coupon-info { flex: 1; }
         .coupon-code { font-weight: 700; color: #C92127; font-size: 1.1rem; }
         .coupon-desc { font-size: 0.9rem; color: #555; margin: 5px 0; }
         .coupon-expiry { font-size: 0.8rem; color: #999; }
-
-        .btn-use-coupon {
-            background-color: white;
-            color: #C92127;
-            border: 1px solid #C92127;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-
+        .btn-use-coupon { background-color: white; color: #C92127; border: 1px solid #C92127; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; transition: 0.2s; }
         .btn-use-coupon:hover { background-color: #C92127; color: white; }
 
-        .empty-cart-container {
-            text-align: center;
-            padding: 60px 20px;
-            background: white;
-            border-radius: 12px;
-            margin-top: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
+        .empty-cart-container { text-align: center; padding: 60px 20px; background: white; border-radius: 12px; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .empty-cart-icon { font-size: 5rem; color: #ddd; margin-bottom: 20px; }
-
-        .btn-shop-now {
-            background-color: #C92127;
-            color: white;
-            padding: 10px 30px;
-            border-radius: 25px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: 0.3s;
-            display: inline-block;
-            margin-top: 15px;
-        }
+        .btn-shop-now { background-color: #C92127; color: white; padding: 10px 30px; border-radius: 25px; font-weight: 600; text-decoration: none; transition: 0.3s; display: inline-block; margin-top: 15px; }
         .btn-shop-now:hover { background-color: #a11b20; color: white; transform: translateY(-2px); }
     </style>
 </head>
@@ -209,44 +152,72 @@
         <% if (cart && cart.length > 0) { %>
             <form action="/checkout" method="POST" id="cartForm">
                 <div class="row">
+                    <!-- CỘT TRÁI: DANH SÁCH SẢN PHẨM -->
                     <div class="col-lg-8">
                         <div class="cart-container">
-                            <div class="d-flex align-items-center border-bottom pb-3 mb-3">
-                                <input type="checkbox" id="selectAll" class="item-checkbox" checked onchange="toggleAll(this)">
-                                <label for="selectAll" class="fw-bold cursor-pointer">Chọn tất cả (<%= cart.length %> sản phẩm)</label>
+
+                            <!-- HEADER ROW (Khung trên - Chữ đen) -->
+                            <div class="cart-header-row">
+                                <div class="col-check">
+                                    <input type="checkbox" id="selectAll" class="item-checkbox" checked onchange="toggleAll(this)">
+                                </div>
+                                <div class="col-product">
+                                    Chọn tất cả (<%= cart.length %> sản phẩm)
+                                </div>
+                                <div class="col-qty">Số lượng</div>
+                                <div class="col-total">Thành tiền</div>
+                                <div class="col-action"></div>
                             </div>
 
+                            <!-- ITEM ROWS (Khung sản phẩm dưới) -->
                             <% cart.forEach(item => { %>
                                 <div class="cart-item">
-                                    <input type="checkbox" name="selected_items[]" value="<%= item.id %>"
-                                           class="item-checkbox product-checkbox"
-                                           data-price="<%= item.price %>"
-                                           data-qty="<%= item.quantity %>"
-                                           checked onchange="updateTotal()">
-
-                                    <%
-                                        let imgSrc = item.image_url;
-                                        if (imgSrc && !imgSrc.startsWith('http')) imgSrc = '/images/' + imgSrc;
-                                    %>
-                                    <img src="<%= imgSrc || '/images/default.jpg' %>" class="item-img" onerror="this.src='https://picsum.photos/200/300'">
-
-                                    <div class="item-info">
-                                        <div class="item-name"><%= item.name %></div>
-                                        <div class="item-price"><%= Number(item.price).toLocaleString('vi-VN') %> đ</div>
+                                    <!-- Checkbox -->
+                                    <div class="col-check">
+                                        <input type="checkbox" name="selected_items[]" value="<%= item.id %>"
+                                               class="item-checkbox product-checkbox"
+                                               data-price="<%= item.price %>"
+                                               data-qty="<%= item.quantity %>"
+                                               checked onchange="updateTotal()">
                                     </div>
 
-                                    <div class="qty-control mx-3">
-                                        <a href="/cart/update/<%= item.id %>?action=decrease" class="qty-btn">-</a>
-                                        <input type="text" class="qty-input" value="<%= item.quantity %>" readonly>
-                                        <a href="/cart/update/<%= item.id %>?action=increase" class="qty-btn">+</a>
-                                    </div>
-
-                                    <div class="text-end">
-                                        <div class="item-total">
-                                            <%= (item.price * item.quantity).toLocaleString('vi-VN') %> đ
+                                    <!-- Ảnh & Tên -->
+                                    <div class="col-product">
+                                        <div class="product-info-flex">
+                                            <%
+                                                let imgSrc = item.image_url;
+                                                if (imgSrc && !imgSrc.startsWith('http')) imgSrc = '/images/' + imgSrc;
+                                            %>
+                                            <img src="<%= imgSrc || '/images/default.jpg' %>" class="item-img" onerror="this.src='https://picsum.photos/200/300'">
+                                            <div>
+                                                <div class="item-name"><%= item.name %></div>
+                                                <div class="item-price-single"><%= Number(item.price).toLocaleString('vi-VN') %> đ</div>
+                                            </div>
                                         </div>
-                                        <a href="/cart/remove/<%= item.id %>" class="text-danger text-decoration-none small mt-1 d-inline-block">
-                                            <i class="fas fa-trash"></i> Xóa
+                                    </div>
+
+                                    <!-- Số lượng -->
+                                    <div class="col-qty">
+                                        <div class="qty-control">
+                                            <% if (item.quantity > 1) { %>
+                                                <a href="/cart/update/<%= item.id %>?action=decrease" class="qty-btn">-</a>
+                                            <% } else { %>
+                                                <span class="qty-btn text-muted" style="cursor: not-allowed;">-</span>
+                                            <% } %>
+                                            <input type="text" class="qty-input" value="<%= item.quantity %>" readonly>
+                                            <a href="/cart/update/<%= item.id %>?action=increase" class="qty-btn">+</a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Thành tiền -->
+                                    <div class="col-total">
+                                        <%= (item.price * item.quantity).toLocaleString('vi-VN') %> đ
+                                    </div>
+
+                                    <!-- Xóa -->
+                                    <div class="col-action">
+                                        <a href="/cart/remove/<%= item.id %>" class="btn-delete" title="Xóa sản phẩm">
+                                            <i class="fas fa-trash-alt"></i>
                                         </a>
                                     </div>
                                 </div>
@@ -254,14 +225,15 @@
                         </div>
                     </div>
 
+                    <!-- CỘT PHẢI: THANH TOÁN -->
                     <div class="col-lg-4">
                         <div class="cart-container">
-                            <h5 class="cart-header">Thanh toán</h5>
+                            <h5 class="cart-summary-header">Thanh toán</h5>
 
                             <div class="coupon-section">
                                 <div class="coupon-row" data-bs-toggle="modal" data-bs-target="#couponModal" onclick="loadCoupons('product')">
                                     <span class="coupon-label"><i class="fas fa-ticket-alt me-2 text-warning"></i> Mã giảm giá</span>
-                                    <span class="coupon-value" id="productDiscountText">Chọn mã ></span>
+                                    <span class="coupon-value" id="productDiscountText">Xem Thêm ></span>
                                 </div>
                             </div>
 
@@ -303,7 +275,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-danger" id="couponModalTitle">Chọn mã giảm giá</h5>
+                    <h5 class="modal-title fw-bold text-danger">Chọn mã giảm giá</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body bg-light" id="couponList">

@@ -42,34 +42,34 @@ router.get('/admin/products', requireAdmin, async (req, res) => {
 router.get('/admin/products/add', requireAdmin, async (req, res) => {
     try {
         const categories = await Product.getCategories();
-        const authors = await Product.getAuthors();
-        const publishers = await Product.getPublishers();
-        res.render('admin/product_add', {
-            categories: categories,
-            authors: authors,
-            publishers: publishers
-        });
+        res.render('admin/product_add', { categories: categories });
     } catch (err) {
-        res.status(500).send("Lỗi lấy dữ liệu danh mục/tác giả");
+        res.status(500).send("Lỗi lấy dữ liệu danh mục");
     }
 });
 
 router.post('/admin/products/add', requireAdmin, upload.single('image'), async (req, res) => {
     try {
         const data = req.body;
+
+        if (!data.name || data.name.trim() === "") {
+            return res.send(`<script>alert("Product name is required"); window.history.back();</script>`);
+        }
+
+        data.price = parseInt(data.price) || 0;
+        if (data.price <= 0) {
+            return res.send(`<script>alert("Price must be greater than 0"); window.history.back();</script>`);
+        }
+
         if (req.file) data.image_url = req.file.filename;
         else data.image_url = 'default.jpg';
 
-        // Xử lý dữ liệu số an toàn
-        data.price = parseInt(data.price) || 0;
         data.quantity = parseInt(data.quantity) || 0;
         data.pages = data.pages ? parseInt(data.pages) : null;
         data.publication_year = data.publication_year ? parseInt(data.publication_year) : null;
-
-        // Quan trọng: Nếu không chọn (value rỗng hoặc 0), gán là NULL để tránh lỗi khóa ngoại
-        data.publisher_id = (data.publisher_id && parseInt(data.publisher_id) > 0) ? parseInt(data.publisher_id) : null;
-        data.author_id = (data.author_id && parseInt(data.author_id) > 0) ? parseInt(data.author_id) : null;
         data.category_id = (data.category_id && parseInt(data.category_id) > 0) ? parseInt(data.category_id) : null;
+
+        // author_name, publisher_name, supplier_name được truyền nguyên văn
 
         await Product.createProduct(data);
         res.redirect('/admin/products');
@@ -83,16 +83,12 @@ router.get('/admin/products/edit/:id', requireAdmin, async (req, res) => {
     try {
         const product = await Product.getProductById(req.params.id);
         const categories = await Product.getCategories();
-        const authors = await Product.getAuthors();
-        const publishers = await Product.getPublishers();
 
         if (!product) return res.status(404).send("Không tìm thấy sản phẩm này");
 
         res.render('admin/product_edit', {
             product: product,
-            categories: categories,
-            authors: authors,
-            publishers: publishers
+            categories: categories
         });
     } catch (err) {
         res.status(500).send("Lỗi server khi tìm sản phẩm");
@@ -102,18 +98,23 @@ router.get('/admin/products/edit/:id', requireAdmin, async (req, res) => {
 router.post('/admin/products/edit/:id', requireAdmin, upload.single('image'), async (req, res) => {
     try {
         const data = req.body;
+
+        if (!data.name || data.name.trim() === "") {
+            return res.send(`<script>alert("Product name is required"); window.history.back();</script>`);
+        }
+
+        data.price = parseInt(data.price) || 0;
+        if (data.price <= 0) {
+            return res.send(`<script>alert("Price must be greater than 0"); window.history.back();</script>`);
+        }
+
         if (req.file) data.image_url = req.file.filename;
         else data.image_url = req.body.old_image;
         delete data.old_image;
 
-        data.price = parseInt(data.price) || 0;
         data.quantity = parseInt(data.quantity) || 0;
         data.pages = data.pages ? parseInt(data.pages) : null;
         data.publication_year = data.publication_year ? parseInt(data.publication_year) : null;
-
-        // Xử lý khóa ngoại an toàn
-        data.publisher_id = (data.publisher_id && parseInt(data.publisher_id) > 0) ? parseInt(data.publisher_id) : null;
-        data.author_id = (data.author_id && parseInt(data.author_id) > 0) ? parseInt(data.author_id) : null;
         data.category_id = (data.category_id && parseInt(data.category_id) > 0) ? parseInt(data.category_id) : null;
 
         await Product.updateProduct(req.params.id, data);
@@ -173,6 +174,33 @@ router.get('/admin/user/delete/:id', requireAdmin, async (req, res) => {
         res.redirect('/admin/user');
     } catch (err) {
         res.status(500).send("Lỗi khi xóa user");
+    }
+});
+
+router.get('/admin/reviews', requireAdmin, async (req, res) => {
+    try {
+        const reviews = await Product.getAllReviewsForAdmin();
+        res.render('admin/review_list', { reviews: reviews });
+    } catch (err) {
+        res.status(500).send("Lỗi lấy danh sách đánh giá");
+    }
+});
+
+router.get('/admin/reviews/approve/:id', requireAdmin, async (req, res) => {
+    try {
+        await Product.updateReviewStatus(req.params.id, 'APPROVED');
+        res.redirect('/admin/reviews');
+    } catch (err) {
+        res.status(500).send("Lỗi duyệt đánh giá");
+    }
+});
+
+router.get('/admin/reviews/delete/:id', requireAdmin, async (req, res) => {
+    try {
+        await Product.deleteReview(req.params.id);
+        res.redirect('/admin/reviews');
+    } catch (err) {
+        res.status(500).send("Lỗi xóa đánh giá");
     }
 });
 

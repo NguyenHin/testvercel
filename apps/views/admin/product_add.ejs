@@ -40,14 +40,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Tác giả <span class="text-danger">*</span></label>
-                                    <select name="author_id" class="form-select" required>
-                                        <option value="">-- Chọn Tác giả --</option>
-                                        <% if (locals.authors) { %>
-                                            <% authors.forEach(a => { %>
-                                                <option value="<%= a.id %>"><%= a.name %></option>
-                                            <% }); %>
-                                        <% } %>
-                                    </select>
+                                    <input type="text" name="author_name" class="form-control" placeholder="Nhập tên tác giả..." required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Danh mục <span class="text-danger">*</span></label>
@@ -74,30 +67,40 @@
                         <div class="card-body p-4">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nhà xuất bản</label>
-                                    <select name="publisher_id" class="form-select">
-                                        <option value="">-- Chọn NXB --</option>
-                                        <% if (locals.publishers) { %>
-                                            <% publishers.forEach(p => { %>
-                                                <option value="<%= p.id %>"><%= p.name %></option>
-                                            <% }); %>
-                                        <% } %>
-                                    </select>
+                                    <label class="form-label">Nhà cung cấp</label>
+                                    <input type="text" name="supplier_name" class="form-control" placeholder="Nhập tên Nhà cung cấp...">
                                 </div>
                                 <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nhà xuất bản</label>
+                                    <input type="text" name="publisher_name" class="form-control" placeholder="Nhập tên NXB...">
+                                </div>
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Năm xuất bản</label>
                                     <input type="number" name="publication_year" class="form-control" placeholder="VD: 2024" min="1900" max="2099">
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Số trang</label>
                                     <input type="number" name="pages" class="form-control" placeholder="VD: 300" min="1">
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Loại bìa</label>
                                     <select name="cover_type" class="form-select">
                                         <option value="Bìa mềm">Bìa mềm</option>
                                         <option value="Bìa cứng">Bìa cứng</option>
                                     </select>
+                                </div>
+                                <!-- SỬA: NGÔN NGỮ THÀNH DROPDOWN -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Ngôn ngữ</label>
+                                    <select name="language" class="form-select">
+                                        <option value="Tiếng Việt">Tiếng Việt</option>
+                                        <option value="Tiếng Anh">Tiếng Anh</option>
+                                        <option value="Khác">Khác</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Kích thước bao bì</label>
+                                    <input type="text" name="dimensions" class="form-control" placeholder="VD: 13 x 20 cm">
                                 </div>
                             </div>
                         </div>

@@ -40,16 +40,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Tác giả <span class="text-danger">*</span></label>
-                                    <select name="author_id" class="form-select" required>
-                                        <option value="">-- Chọn Tác giả --</option>
-                                        <% if (locals.authors) { %>
-                                            <% authors.forEach(a => { %>
-                                                <option value="<%= a.id %>" <%= product.author_id === a.id ? 'selected' : '' %>>
-                                                    <%= a.name %>
-                                                </option>
-                                            <% }); %>
-                                        <% } %>
-                                    </select>
+                                    <input type="text" name="author_name" class="form-control" value="<%= product.author_name %>" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Danh mục <span class="text-danger">*</span></label>
@@ -78,32 +69,36 @@
                         <div class="card-body p-4">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nhà xuất bản</label>
-                                    <select name="publisher_id" class="form-select">
-                                        <option value="">-- Chọn NXB --</option>
-                                        <% if (locals.publishers) { %>
-                                            <% publishers.forEach(p => { %>
-                                                <option value="<%= p.id %>" <%= product.publisher_id === p.id ? 'selected' : '' %>>
-                                                    <%= p.name %>
-                                                </option>
-                                            <% }); %>
-                                        <% } %>
-                                    </select>
+                                    <label class="form-label">Nhà cung cấp</label>
+                                    <input type="text" name="supplier_name" class="form-control" value="<%= product.supplier_name %>">
                                 </div>
                                 <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nhà xuất bản</label>
+                                    <input type="text" name="publisher_name" class="form-control" value="<%= product.publisher_name %>">
+                                </div>
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Năm xuất bản</label>
                                     <input type="number" name="publication_year" class="form-control" value="<%= product.publication_year %>" min="1900" max="2099">
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Số trang</label>
                                     <input type="number" name="pages" class="form-control" value="<%= product.pages %>" min="1">
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label">Loại bìa</label>
                                     <select name="cover_type" class="form-select">
                                         <option value="Bìa mềm" <%= product.cover_type === 'Bìa mềm' ? 'selected' : '' %>>Bìa mềm</option>
                                         <option value="Bìa cứng" <%= product.cover_type === 'Bìa cứng' ? 'selected' : '' %>>Bìa cứng</option>
                                     </select>
+                                </div>
+                                <!-- THÊM 2 TRƯỜNG MỚI -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Ngôn ngữ</label>
+                                    <input type="text" name="language" class="form-control" value="<%= product.language %>">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Kích thước bao bì</label>
+                                    <input type="text" name="dimensions" class="form-control" value="<%= product.dimensions %>">
                                 </div>
                             </div>
                         </div>
@@ -136,9 +131,9 @@
                                     let imgSrc = product.image_url;
                                     if (imgSrc && !imgSrc.startsWith('http')) imgSrc = '/images/' + imgSrc;
                                 %>
-                                <img id="previewImg" src="<%= imgSrc || '#' %>" alt="Preview">
+                                <img id="previewImg" src="<%= imgSrc || '#' %>" alt="Preview" style="<%= imgSrc ? 'display:block' : 'display:none' %>">
 
-                                <div id="uploadPlaceholder">
+                                <div id="uploadPlaceholder" style="<%= imgSrc ? 'display:none' : 'display:block' %>">
                                     <i class="fas fa-cloud-upload-alt fa-3x text-secondary mb-2"></i>
                                     <p class="text-muted small mb-0">Click để thay đổi ảnh</p>
                                 </div>

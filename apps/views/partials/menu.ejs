@@ -1,341 +1,320 @@
 <style>
-    /* CSS cho Menu giống Fahasa */
-    .menu-container {
+    /* --- CẤU HÌNH CHUNG --- */
+    :root {
+        --primary-color: #1a1a2e; /* Xanh than (Admin) */
+        --accent-color: #c49b63;  /* Vàng đồng (Admin) */
+        --text-color: #333;
+    }
+
+    /* --- KHUNG 1: MAIN HEADER (Logo, Search, Actions) --- */
+    .main-header {
         background-color: white;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        padding: 10px 0;
+        padding: 20px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+    }
+
+    /* Logo */
+    .brand-logo {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        text-decoration: none;
+        letter-spacing: -1px;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+
+    /* Thanh tìm kiếm */
+    .search-container {
+        flex-grow: 1;
+        position: relative;
+        max-width: 600px;
+    }
+    .search-input {
+        width: 100%;
+        padding: 12px 50px 12px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 50px; /* Bo tròn mềm mại */
+        outline: none;
+        font-size: 0.95rem;
+        transition: 0.3s;
+    }
+    .search-input:focus {
+        border-color: var(--primary-color);
+    }
+    .search-btn {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .search-btn:hover { background-color: var(--accent-color); }
+
+    /* Actions (Giỏ hàng, User) */
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+    .action-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: #555;
+        font-size: 0.8rem;
+        position: relative;
+        cursor: pointer;
+        font-weight: 600;
+        padding: 10px 0; /* Tăng vùng hover */
+    }
+    .action-item i { font-size: 1.5rem; margin-bottom: 4px; color: var(--primary-color); transition: 0.2s; }
+    .action-item:hover i, .action-item:hover span { color: var(--accent-color); }
+
+    .cart-badge {
+        position: absolute;
+        top: 0;
+        right: -5px;
+        background-color: var(--accent-color);
+        color: white;
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 50%;
+        font-weight: bold;
+        border: 2px solid white;
+    }
+
+    /* --- KHUNG 2: NAVIGATION BAR (Menu Danh mục) --- */
+    .nav-bar {
+        background-color: var(--primary-color);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         position: sticky;
         top: 0;
         z-index: 1000;
     }
 
-    .menu-content {
+    .nav-container {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        gap: 20px;
     }
 
-    .brand-logo {
-        font-size: 1.8rem;
-        font-weight: 800;
-        color: #C92127;
-        text-decoration: none;
-        letter-spacing: -1px;
-        white-space: nowrap;
-    }
-
-    /* Nút Danh mục */
-    .category-btn {
+    /* Nút "Danh mục sản phẩm" (Dropdown chính) */
+    .cat-menu-btn {
+        background-color: var(--accent-color);
+        color: white;
+        padding: 15px 25px;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.95rem;
+        cursor: pointer;
         display: flex;
         align-items: center;
         gap: 10px;
-        cursor: pointer;
         position: relative;
-        padding: 8px 15px;
-        border-radius: 8px;
-        transition: 0.2s;
-        height: 100%;
+        width: 280px;
     }
+    .cat-menu-btn:hover { background-color: #b08b55; }
 
-    .category-btn:hover { background-color: #f8f9fa; }
-
-    .category-icon {
-        font-size: 1.5rem;
-        color: #555;
-    }
-
-    .category-btn:hover .category-icon { color: #C92127; }
-
-    /* Dropdown Danh mục */
-    .category-dropdown {
+    /* Dropdown Menu */
+    .cat-dropdown {
         display: none;
         position: absolute;
         top: 100%;
         left: 0;
-        background: white;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        border-radius: 8px;
-        width: 280px;
-        padding: 10px 0;
-        z-index: 1001;
-        margin-top: 0;
-        border-top: 3px solid #C92127;
-        padding-top: 5px;
-    }
-
-    .category-btn::after {
-        content: '';
-        position: absolute;
-        top: 100%;
-        left: 0;
         width: 100%;
-        height: 10px;
-        background: transparent;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        border-radius: 0 0 8px 8px;
+        z-index: 1001;
     }
+    .cat-menu-btn:hover .cat-dropdown { display: block; }
 
-    .category-btn:hover .category-dropdown { display: block; }
-
-    .category-item {
-        display: flex;
-        align-items: center;
+    .cat-item {
+        display: block;
         padding: 12px 20px;
         color: #333;
         text-decoration: none;
-        transition: 0.2s;
+        border-bottom: 1px solid #f0f0f0;
         font-weight: 500;
-        border-bottom: 1px solid #f5f5f5;
+        transition: 0.2s;
+        text-transform: none;
     }
+    .cat-item:last-child { border-bottom: none; }
+    .cat-item:hover { color: var(--accent-color); background-color: #f9f9f9; padding-left: 25px; }
 
-    .category-item:last-child { border-bottom: none; }
-
-    .category-item:hover {
-        background-color: #fff5f5;
-        color: #C92127;
-        padding-left: 25px;
+    /* Horizontal Menu Links */
+    .nav-links {
+        display: flex;
+        gap: 5px;
+        margin-left: 20px;
     }
-
-    .category-item i {
-        width: 25px;
-        color: #999;
-        margin-right: 10px;
-    }
-
-    .category-item:hover i { color: #C92127; }
-
-    /* Thanh tìm kiếm */
-    .search-form {
-        flex-grow: 0;
-        width: 400px;
-        position: relative;
-    }
-
-    .search-input {
-        width: 100%;
-        padding: 10px 40px 10px 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        outline: none;
-    }
-
-    .search-btn {
-        position: absolute;
-        right: 5px;
-        top: 5px;
-        background: #C92127;
+    .nav-link-item {
         color: white;
-        border: none;
-        padding: 5px 15px;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    .user-actions {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        margin-left: auto;
-    }
-
-    .action-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        color: #333;
         text-decoration: none;
-        font-size: 0.85rem;
-        cursor: pointer;
-        position: relative;
-        white-space: nowrap;
-        padding: 5px;
+        padding: 15px 20px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: 0.2s;
+        border-radius: 4px;
     }
+    .nav-link-item:hover { background-color: rgba(255,255,255,0.1); color: var(--accent-color); }
 
-    .action-item i {
-        font-size: 1.4rem;
-        margin-bottom: 4px;
-        color: #555;
-    }
-
-    .action-item:hover i, .action-item:hover span {
-        color: #C92127;
-    }
-
-    /* Dropdown Menu User */
-    .dropdown-menu-custom {
+    /* User Dropdown (Sửa lại để không bị mất khi hover) */
+    .user-dropdown {
         display: none;
         position: absolute;
         top: 100%;
         right: 0;
         background: white;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         border-radius: 8px;
-        width: 240px;
-        padding: 15px;
+        width: 220px;
+        padding: 10px;
         z-index: 1001;
-        margin-top: 5px;
+        margin-top: 0; /* Bỏ margin top để dính liền */
     }
 
+    /* Vùng đệm vô hình để nối liền icon và menu */
     .action-item::after {
         content: '';
         position: absolute;
         top: 100%;
         left: 0;
         width: 100%;
-        height: 10px;
+        height: 10px; /* Vùng đệm 10px */
         background: transparent;
     }
 
-    .dropdown-menu-custom::before {
+    .user-dropdown::before {
         content: '';
         position: absolute;
-        top: -8px;
-        right: 20px;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        border-bottom: 8px solid white;
+        top: -8px; right: 10px; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 8px solid white;
     }
 
-    .action-item:hover .dropdown-menu-custom {
-        display: block;
+    .action-item:hover .user-dropdown { display: block; }
+
+    .btn-auth {
+        display: block; width: 100%; padding: 8px; text-align: center; border-radius: 5px; font-weight: 600; text-decoration: none; margin-bottom: 5px; font-size: 0.9rem; cursor: pointer;
     }
+    .btn-login { background-color: var(--primary-color); color: white; border: none; }
+    .btn-login:hover { background-color: #2c2c4e; }
+    .btn-register { border: 1px solid var(--primary-color); color: var(--primary-color); background: white; }
+    .btn-register:hover { background-color: #f0f0f0; }
 
-    .dropdown-item-custom {
-        display: block;
-        padding: 10px 0;
-        color: #333;
-        text-decoration: none;
-        transition: 0.2s;
-        text-align: left;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .dropdown-item-custom:last-child { border-bottom: none; }
-
-    .dropdown-item-custom:hover {
-        color: #C92127;
-        padding-left: 5px;
-    }
-
-    .btn-login-popup {
-        background-color: #C92127;
-        color: white !important;
-        text-align: center;
-        border-radius: 5px;
-        padding: 10px 0;
-        font-weight: bold;
-        display: block;
-        width: 100%;
-        margin-bottom: 10px;
-        cursor: pointer;
-        border: none;
-        text-decoration: none;
-    }
-
-    .btn-login-popup:hover {
-        background-color: #a11b20;
-        opacity: 1;
-    }
-
-    .btn-register-popup {
-        color: #C92127;
-        text-align: center;
-        display: block;
-        font-size: 0.9rem;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .btn-register-popup:hover { text-decoration: underline; }
-
-    .cart-badge {
-        position: absolute;
-        top: -5px;
-        right: 0;
-        background-color: #C92127;
-        color: white;
-        font-size: 0.7rem;
-        padding: 2px 6px;
-        border-radius: 50%;
-        font-weight: bold;
-    }
+    .user-menu-link { display: block; padding: 8px 10px; color: #333; text-decoration: none; border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; }
+    .user-menu-link:hover { color: var(--accent-color); background-color: #f9f9f9; }
 </style>
 
-<div class="menu-container">
-    <div class="container menu-content">
+<!-- KHUNG 1: MAIN HEADER (Logo, Search, Actions) -->
+<div class="main-header">
+    <div class="container header-content">
         <!-- Logo -->
-        <a href="/" class="brand-logo">BOOKSTORE</a>
+        <a href="/" class="brand-logo">BOOKTOTAL</a>
 
-        <!-- Nút Danh mục -->
-        <div class="category-btn">
-            <i class="fas fa-th-large category-icon"></i>
-            <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: #999;"></i>
-
-            <div class="category-dropdown">
-                <% if (locals.globalCategories && globalCategories.length > 0) { %>
-                    <% globalCategories.forEach(cat => { %>
-                        <a href="/category/<%= cat.id %>" class="category-item">
-                            <i class="fas fa-book"></i> <%= cat.name %>
-                        </a>
-                    <% }); %>
-                <% } else { %>
-                    <a href="#" class="category-item"><i class="fas fa-book"></i> Văn học</a>
-                <% } %>
-            </div>
-        </div>
-
-        <!-- Search Form -->
-        <form action="/search" method="GET" class="search-form">
+        <!-- Tìm kiếm -->
+        <form action="/search" method="GET" class="search-container">
             <input type="text" name="q" class="search-input" placeholder="Tìm kiếm sách, tác giả..." required>
             <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
         </form>
 
-        <!-- User Actions -->
-        <div class="user-actions">
+        <!-- Actions -->
+        <div class="header-actions">
 
-            <!-- Nút Admin (Sửa lại điều kiện kiểm tra) -->
-            <% if (locals.user && locals.user.role && locals.user.role.toLowerCase() === 'admin') { %>
-                <a href="/admin" class="action-item text-danger">
-                    <i class="fas fa-user-shield" style="color: #C92127;"></i>
-                    <span style="color: #C92127; font-weight: bold;">Quản trị</span>
+            <!-- 1. Nút Admin (Chỉ hiện khi là Admin) -->
+            <% if (locals.user && locals.user.role === 'admin') { %>
+                <a href="/admin" class="action-item">
+                    <i class="fas fa-user-shield" style="color: #c49b63;"></i>
+                    <span style="color: #c49b63;">Quản trị</span>
                 </a>
             <% } %>
 
-            <!-- Giỏ hàng -->
+            <!-- 2. Thông báo -->
+            <a href="#" class="action-item">
+                <i class="far fa-bell"></i>
+                <span>Thông báo</span>
+            </a>
+
+            <!-- 3. Giỏ hàng -->
             <a href="/cart" class="action-item">
-                <i class="fas fa-shopping-cart"></i>
+                <i class="fas fa-shopping-bag"></i>
                 <span>Giỏ hàng</span>
                 <% if (locals.cartCount && cartCount > 0) { %>
                     <span class="cart-badge"><%= cartCount %></span>
                 <% } %>
             </a>
 
-            <!-- Tài khoản -->
+            <!-- 4. Tài khoản -->
             <div class="action-item">
-                <% if (locals.user) { %>
-                    <!-- ĐÃ ĐĂNG NHẬP -->
-                    <i class="far fa-user"></i>
-                    <span>Xin chào, <%= user.username %></span>
-                    <div class="dropdown-menu-custom">
-                        <a href="#" class="dropdown-item-custom">Đơn hàng của tôi</a>
-                        <a href="#" class="dropdown-item-custom">Thông tin tài khoản</a>
-                        <a href="/auth/logout" class="dropdown-item-custom text-danger">
-                            <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
-                        </a>
-                    </div>
+                <i class="fas fa-user-circle"></i>
+                <span><%= locals.user ? (user.full_name || user.username) : 'Tài khoản' %></span>
+
+                <div class="user-dropdown">
+                    <% if (locals.user) { %>
+                        <div class="text-center mb-2 pb-2 border-bottom">
+                            <div class="fw-bold text-dark"><%= user.username %></div>
+                            <div class="small text-muted"><%= user.role === 'admin' ? 'Quản trị viên' : 'Thành viên' %></div>
+                        </div>
+
+                        <!-- Chỉ hiện Đơn hàng nếu KHÔNG phải là Admin -->
+                        <% if (user.role !== 'admin') { %>
+                            <a href="#" class="user-menu-link"><i class="fas fa-box-open me-2"></i> Đơn hàng</a>
+                        <% } %>
+
+                        <a href="/auth/logout" class="user-menu-link text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a>
+                    <% } else { %>
+                        <button class="btn-auth btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">Đăng nhập</button>
+                        <button class="btn-auth btn-register" data-bs-toggle="modal" data-bs-target="#registerModal">Đăng ký</button>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KHUNG 2: NAVIGATION BAR (Menu Danh mục) -->
+<div class="nav-bar">
+    <div class="container nav-container">
+        <!-- Danh mục sản phẩm (Dropdown) -->
+        <div class="cat-menu-btn">
+            <i class="fas fa-bars"></i> Danh mục sản phẩm
+
+            <div class="cat-dropdown">
+                <% if (locals.globalCategories && globalCategories.length > 0) { %>
+                    <% globalCategories.forEach(cat => { %>
+                        <a href="/category/<%= cat.id %>" class="cat-item"><%= cat.name %></a>
+                    <% }); %>
                 <% } else { %>
-                    <!-- CHƯA ĐĂNG NHẬP -->
-                    <i class="far fa-user"></i>
-                    <span>Tài khoản</span>
-                    <div class="dropdown-menu-custom">
-                        <div class="btn-login-popup" data-bs-toggle="modal" data-bs-target="#loginModal">
-                            Đăng nhập
-                        </div>
-                        <div class="btn-register-popup" data-bs-toggle="modal" data-bs-target="#registerModal">
-                            Đăng ký tài khoản
-                        </div>
-                    </div>
+                    <a href="#" class="cat-item">Văn học</a>
+                    <a href="#" class="cat-item">Kinh tế</a>
                 <% } %>
             </div>
+        </div>
+
+        <!-- Menu ngang -->
+        <div class="nav-links">
+            <a href="/" class="nav-link-item">Trang chủ</a>
+            <a href="#" class="nav-link-item">Sách bán chạy</a>
+            <a href="#" class="nav-link-item">Sách mới</a>
+            <a href="#" class="nav-link-item">Khuyến mãi</a>
         </div>
     </div>
 </div>
@@ -348,31 +327,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body px-5 pb-5">
-                <h3 class="text-center fw-bold mb-4" style="color: #C92127;">ĐĂNG NHẬP</h3>
-
+                <h3 class="text-center fw-bold mb-4" style="color: #1a1a2e;">ĐĂNG NHẬP</h3>
                 <div id="loginAlert" class="alert d-none" role="alert"></div>
-
                 <form action="/login" method="POST" autocomplete="off">
-                    <input type="text" style="display:none">
-                    <input type="password" style="display:none">
-
+                    <input type="hidden" name="returnUrl" value="">
                     <div class="mb-3">
                         <label class="form-label">Tên đăng nhập</label>
-                        <input type="text" class="form-control" name="username" required autocomplete="new-password">
+                        <input type="text" class="form-control" name="username" required>
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Mật khẩu</label>
-                        <input type="password" class="form-control" name="password" required autocomplete="new-password">
+                        <input type="password" class="form-control" name="password" required>
                     </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn text-white fw-bold" style="background-color: #C92127;">Đăng nhập</button>
+                        <button type="submit" class="btn text-white fw-bold" style="background-color: #1a1a2e;">Đăng nhập</button>
                     </div>
                 </form>
-
                 <div class="text-center mt-3">
-                    <p class="small">Chưa có tài khoản?
-                        <a href="#" class="text-decoration-none" style="color: #C92127;" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Đăng ký ngay</a>
-                    </p>
+                    <p class="small">Chưa có tài khoản? <a href="#" class="text-decoration-none" style="color: #c49b63;" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Đăng ký ngay</a></p>
                 </div>
             </div>
         </div>
@@ -387,39 +359,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body px-5 pb-5">
-                <h3 class="text-center fw-bold mb-4" style="color: #C92127;">ĐĂNG KÝ</h3>
-
+                <h3 class="text-center fw-bold mb-4" style="color: #1a1a2e;">ĐĂNG KÝ</h3>
                 <div id="registerAlert" class="alert alert-danger d-none" role="alert"></div>
-
                 <form action="/register" method="POST" autocomplete="off">
-                    <div class="mb-3">
-                        <label class="form-label">Họ và tên</label>
-                        <input type="text" class="form-control" name="full_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tên đăng nhập</label>
-                        <input type="text" class="form-control" name="username" required>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Mật khẩu</label>
-                        <input type="password" class="form-control" name="password" required>
-                    </div>
-
+                    <div class="mb-3"><label class="form-label">Họ và tên</label><input type="text" class="form-control" name="full_name" required></div>
+                    <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" name="email" required></div>
+                    <div class="mb-3"><label class="form-label">Tên đăng nhập</label><input type="text" class="form-control" name="username" required></div>
+                    <div class="mb-4"><label class="form-label">Mật khẩu</label><input type="password" class="form-control" name="password" required></div>
                     <input type="hidden" name="role" value="user">
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn text-white fw-bold" style="background-color: #C92127;">Đăng ký</button>
-                    </div>
+                    <div class="d-grid"><button type="submit" class="btn text-white fw-bold" style="background-color: #1a1a2e;">Đăng ký</button></div>
                 </form>
-
                 <div class="text-center mt-3">
-                    <p class="small">Đã có tài khoản?
-                        <a href="#" class="text-decoration-none" style="color: #C92127;" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Đăng nhập ngay</a>
-                    </p>
+                    <p class="small">Đã có tài khoản? <a href="#" class="text-decoration-none" style="color: #c49b63;" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Đăng nhập ngay</a></p>
                 </div>
             </div>
         </div>
@@ -427,43 +378,23 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
-
         if (urlParams.has('loginError')) {
-            const errorMsg = urlParams.get('loginError');
             const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
             const alertBox = document.getElementById('loginAlert');
-
-            alertBox.textContent = errorMsg;
+            alertBox.textContent = urlParams.get('loginError');
             alertBox.classList.remove('d-none', 'alert-success');
             alertBox.classList.add('alert-danger');
-
             loginModal.show();
         }
-
-        if (urlParams.has('registerError')) {
-            const errorMsg = urlParams.get('registerError');
-            const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
-            const alertBox = document.getElementById('registerAlert');
-
-            alertBox.textContent = errorMsg;
-            alertBox.classList.remove('d-none');
-
-            registerModal.show();
-        }
-
         if (urlParams.has('registerSuccess')) {
-            const successMsg = urlParams.get('registerSuccess');
             const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
             const alertBox = document.getElementById('loginAlert');
-
-            alertBox.textContent = successMsg;
+            alertBox.textContent = urlParams.get('registerSuccess');
             alertBox.classList.remove('d-none', 'alert-danger');
             alertBox.classList.add('alert-success');
-
             loginModal.show();
         }
     });

@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// --- LOGIN (Phân luồng Admin/User) ---
+// --- LOGIN ---
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     try {
@@ -260,17 +260,13 @@ router.get('/product/:id', async (req, res) => {
         const relatedProducts = await Product.getAllProducts();
         const reviews = await Product.getReviews(productId);
 
+        // Logic mới: Chỉ cần đăng nhập là được đánh giá
         let canReview = false;
         let reviewMessage = "Vui lòng đăng nhập để đánh giá.";
 
         if (res.locals.user) {
-            const hasPurchased = await Product.hasPurchased(res.locals.user.id, productId);
-            if (hasPurchased) {
-                canReview = true;
-                reviewMessage = "";
-            } else {
-                reviewMessage = "Bạn cần mua sản phẩm này mới có thể đánh giá.";
-            }
+            canReview = true; // Luôn cho phép nếu đã login
+            reviewMessage = "";
         }
 
         res.render('product_detail', {
@@ -292,10 +288,17 @@ router.post('/product/:id/review', async (req, res) => {
         const { rating, comment } = req.body;
         const productId = req.params.id;
         const userId = res.locals.user.id;
-        const hasPurchased = await Product.hasPurchased(userId, productId);
-        if (!hasPurchased) return res.send("Bạn chưa mua sản phẩm này!");
+
+        // Không cần check hasPurchased nữa
         await Product.addReview(userId, productId, rating, comment);
-        res.redirect(`/product/${productId}`);
+
+        // Thông báo chờ duyệt (có thể làm trang riêng, ở đây redirect tạm)
+        res.send(`
+            <script>
+                alert('Đánh giá của bạn đã được gửi và đang chờ duyệt!');
+                window.location.href = '/product/${productId}';
+            </script>
+        `);
     } catch (err) {
         console.error(err);
         res.status(500).send("Lỗi khi gửi đánh giá");

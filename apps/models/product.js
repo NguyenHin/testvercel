@@ -16,21 +16,19 @@ module.exports = {
         return rows;
     },
 
-    // Sửa lại hàm này để lấy đầy đủ thông tin cho trang Edit và Detail
     getProductById: async (id) => {
         const query = `
             SELECT
                 p.*,
                 pub.name as publisher_name,
+                sup.name as supplier_name,
                 GROUP_CONCAT(DISTINCT c.name SEPARATOR ', ') as category_name,
                 GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') as author_name,
-
-                -- Lấy ID để binding vào form edit (Lấy giá trị đầu tiên tìm thấy)
                 (SELECT category_id FROM product_categories WHERE product_id = p.id LIMIT 1) as category_id,
                 (SELECT author_id FROM product_authors WHERE product_id = p.id LIMIT 1) as author_id
-
             FROM products p
             LEFT JOIN publishers pub ON p.publisher_id = pub.id
+            LEFT JOIN suppliers sup ON p.supplier_id = sup.id
             LEFT JOIN product_categories pc ON p.id = pc.product_id
             LEFT JOIN categories c ON pc.category_id = c.id
             LEFT JOIN product_authors pa ON p.id = pa.product_id
@@ -59,45 +57,72 @@ module.exports = {
         return rows;
     },
 
+    getOrCreateAuthor: async (authorName) => {
+        if (!authorName) return null;
+        const [rows] = await db.query('SELECT id FROM authors WHERE name = ?', [authorName.trim()]);
+        if (rows.length > 0) return rows[0].id;
+        const [result] = await db.query('INSERT INTO authors (name) VALUES (?)', [authorName.trim()]);
+        return result.insertId;
+    },
+
+    getOrCreatePublisher: async (publisherName) => {
+        if (!publisherName) return null;
+        const [rows] = await db.query('SELECT id FROM publishers WHERE name = ?', [publisherName.trim()]);
+        if (rows.length > 0) return rows[0].id;
+        const [result] = await db.query('INSERT INTO publishers (name) VALUES (?)', [publisherName.trim()]);
+        return result.insertId;
+    },
+
+    getOrCreateSupplier: async (supplierName) => {
+        if (!supplierName) return null;
+        const [rows] = await db.query('SELECT id FROM suppliers WHERE name = ?', [supplierName.trim()]);
+        if (rows.length > 0) return rows[0].id;
+        const [result] = await db.query('INSERT INTO suppliers (name) VALUES (?)', [supplierName.trim()]);
+        return result.insertId;
+    },
+
     createProduct: async (data) => {
-        const { name, price, description, image_url, quantity, publisher_id, publication_year, pages, cover_type, category_id, author_id } = data;
+        const authorId = await module.exports.getOrCreateAuthor(data.author_name);
+        const publisherId = await module.exports.getOrCreatePublisher(data.publisher_name);
+        const supplierId = await module.exports.getOrCreateSupplier(data.supplier_name);
+
+        const { name, price, description, image_url, quantity, publication_year, pages, cover_type, category_id, language, dimensions } = data;
 
         const productQuery = `
-            INSERT INTO products (name, price, description, image_url, quantity, publisher_id, publication_year, pages, cover_type)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO products (name, price, description, image_url, quantity, publisher_id, supplier_id, publication_year, pages, cover_type, language, dimensions)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        const [result] = await db.query(productQuery, [name, price, description, image_url, quantity, publisher_id, publication_year, pages, cover_type]);
+        const [result] = await db.query(productQuery, [name, price, description, image_url, quantity, publisherId, supplierId, publication_year, pages, cover_type, language, dimensions]);
         const productId = result.insertId;
 
-        if (category_id) {
-            await db.query('INSERT INTO product_categories (product_id, category_id) VALUES (?, ?)', [productId, category_id]);
-        }
-
-        if (author_id) {
-            await db.query('INSERT INTO product_authors (product_id, author_id) VALUES (?, ?)', [productId, author_id]);
-        }
+        if (category_id) await db.query('INSERT INTO product_categories (product_id, category_id) VALUES (?, ?)', [productId, category_id]);
+        if (authorId) await db.query('INSERT INTO product_authors (product_id, author_id) VALUES (?, ?)', [productId, authorId]);
 
         return result;
     },
 
     updateProduct: async (id, data) => {
-        const { name, price, description, image_url, quantity, publisher_id, publication_year, pages, cover_type, category_id, author_id } = data;
+        const authorId = await module.exports.getOrCreateAuthor(data.author_name);
+        const publisherId = await module.exports.getOrCreatePublisher(data.publisher_name);
+        const supplierId = await module.exports.getOrCreateSupplier(data.supplier_name);
+
+        const { name, price, description, image_url, quantity, publication_year, pages, cover_type, category_id, language, dimensions } = data;
 
         const productQuery = `
             UPDATE products SET
-            name = ?, price = ?, description = ?, image_url = ?, quantity = ?, publisher_id = ?,
-            publication_year = ?, pages = ?, cover_type = ?
+            name = ?, price = ?, description = ?, image_url = ?, quantity = ?, publisher_id = ?, supplier_id = ?,
+            publication_year = ?, pages = ?, cover_type = ?, language = ?, dimensions = ?
             WHERE id = ?
         `;
-        await db.query(productQuery, [name, price, description, image_url, quantity, publisher_id, publication_year, pages, cover_type, id]);
+        await db.query(productQuery, [name, price, description, image_url, quantity, publisherId, supplierId, publication_year, pages, cover_type, language, dimensions, id]);
 
         if (category_id) {
             await db.query('DELETE FROM product_categories WHERE product_id = ?', [id]);
             await db.query('INSERT INTO product_categories (product_id, category_id) VALUES (?, ?)', [id, category_id]);
         }
-        if (author_id) {
+        if (authorId) {
             await db.query('DELETE FROM product_authors WHERE product_id = ?', [id]);
-            await db.query('INSERT INTO product_authors (product_id, author_id) VALUES (?, ?)', [id, author_id]);
+            await db.query('INSERT INTO product_authors (product_id, author_id) VALUES (?, ?)', [id, authorId]);
         }
     },
 
@@ -132,7 +157,7 @@ module.exports = {
             SELECT reviews.*, users.full_name
             FROM reviews
             JOIN users ON reviews.user_id = users.id
-            WHERE reviews.product_id = ?
+            WHERE reviews.product_id = ? AND reviews.status = 'APPROVED'
             ORDER BY reviews.created_at DESC
         `;
         const [rows] = await db.query(query, [productId]);
@@ -140,23 +165,28 @@ module.exports = {
     },
 
     addReview: async (userId, productId, rating, comment) => {
-        const query = `INSERT INTO reviews (user_id, product_id, rating, comment) VALUES (?, ?, ?, ?)`;
+        const query = `INSERT INTO reviews (user_id, product_id, rating, comment, status) VALUES (?, ?, ?, ?, 'PENDING')`;
         const [result] = await db.query(query, [userId, productId, rating, comment]);
         return result;
     },
 
-    hasPurchased: async (userId, productId) => {
-        try {
-            const query = `
-                SELECT COUNT(*) as count
-                FROM orders o
-                JOIN order_details od ON o.id = od.order_id
-                WHERE o.user_id = ? AND od.product_id = ? AND o.status = 'COMPLETED'
-            `;
-            const [rows] = await db.query(query, [userId, productId]);
-            return rows[0].count > 0;
-        } catch (error) {
-            return false;
-        }
+    getAllReviewsForAdmin: async () => {
+        const query = `
+            SELECT r.*, u.username, p.name as product_name
+            FROM reviews r
+            JOIN users u ON r.user_id = u.id
+            JOIN products p ON r.product_id = p.id
+            ORDER BY r.created_at DESC
+        `;
+        const [rows] = await db.query(query);
+        return rows;
+    },
+
+    updateReviewStatus: async (id, status) => {
+        await db.query('UPDATE reviews SET status = ? WHERE id = ?', [status, id]);
+    },
+
+    deleteReview: async (id) => {
+        await db.query('DELETE FROM reviews WHERE id = ?', [id]);
     }
 };
