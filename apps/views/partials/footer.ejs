@@ -1,0 +1,190 @@
+<style>
+    .footer {
+        background-color: #fff;
+        border-top: 4px solid #C92127; /* Viền đỏ thương hiệu */
+        padding-top: 50px;
+        margin-top: 50px;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .footer-title {
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        color: #333;
+        position: relative;
+    }
+
+    .footer-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-list li {
+        margin-bottom: 10px;
+    }
+
+    .footer-list a {
+        color: #555;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+    .footer-list a:hover {
+        color: #C92127;
+        padding-left: 5px;
+    }
+
+    .footer-contact i {
+        width: 20px;
+        color: #C92127;
+        margin-right: 5px;
+    }
+
+    .social-icons a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        color: #555;
+        margin-right: 10px;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+
+    .social-icons a:hover {
+        background-color: #C92127;
+        color: white;
+        transform: translateY(-3px);
+    }
+
+    .payment-methods img {
+        height: 25px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        filter: grayscale(100%);
+        transition: 0.3s;
+        opacity: 0.7;
+    }
+
+    .payment-methods img:hover {
+        filter: grayscale(0%);
+        opacity: 1;
+    }
+
+    .newsletter-form .form-control {
+        border-radius: 20px 0 0 20px;
+        border: 1px solid #ddd;
+        font-size: 13px;
+    }
+
+    .newsletter-form .btn {
+        border-radius: 0 20px 20px 0;
+        background-color: #C92127;
+        color: white;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .copyright {
+        background-color: #f8f9fa;
+        padding: 20px 0;
+        margin-top: 40px;
+        border-top: 1px solid #eee;
+        text-align: center;
+        color: #777;
+        font-size: 13px;
+    }
+</style>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <!-- Cột 1: Giới thiệu -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="mb-3">
+                    <a href="/" class="text-decoration-none">
+                        <span style="font-size: 24px; font-weight: 800; color: #C92127;">BOOKTOTAL</span>
+                    </a>
+                </div>
+                <p class="text-muted mb-4" style="line-height: 1.6;">
+                    BookTotal là nền tảng thương mại điện tử chuyên cung cấp sách chính hãng, văn phòng phẩm và quà tặng với dịch vụ chất lượng cao. Chúng tôi cam kết mang đến trải nghiệm mua sắm tuyệt vời nhất cho khách hàng.
+                </p>
+                <ul class="footer-list footer-contact">
+                    <li><i class="fas fa-map-marker-alt"></i> 123 Đường Nguyễn Văn Linh, Q.7, TP.HCM</li>
+                    <li><i class="fas fa-envelope"></i> support@booktotal.com</li>
+                    <li><i class="fas fa-phone-alt"></i> 1900 636 467</li>
+                </ul>
+            </div>
+
+            <!-- Cột 2: Dịch vụ -->
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5 class="footer-title">DỊCH VỤ</h5>
+                <ul class="footer-list">
+                    <li><a href="/page/terms">Điều khoản sử dụng</a></li>
+                    <li><a href="/page/privacy">Chính sách bảo mật thông tin cá nhân</a></li>
+                    <li><a href="/page/privacy">Chính sách bảo mật thanh toán</a></li>
+                    <li><a href="/page/about">Giới thiệu BookTotal</a></li>
+                    <!-- SỬA LINK -->
+                    <li><a href="/page/store-system">Hệ thống trung tâm - nhà sách</a></li>
+                </ul>
+            </div>
+
+            <!-- Cột 3: Hỗ trợ -->
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5 class="footer-title">HỖ TRỢ</h5>
+                <ul class="footer-list">
+                    <li><a href="/page/return-policy">Chính sách đổi - trả - hoàn tiền</a></li>
+                    <li><a href="/page/return-policy">Chính sách bảo hành - bồi hoàn</a></li>
+                    <li><a href="/page/shipping-policy">Chính sách vận chuyển</a></li>
+                    <!-- SỬA LINK -->
+                    <li><a href="/page/wholesale-policy">Chính sách khách sỉ</a></li>
+                    <!-- SỬA LINK -->
+                    <li><a href="/page/payment-methods">Phương thức thanh toán và xuất HĐ</a></li>
+                </ul>
+            </div>
+
+            <!-- Cột 4: Kết nối -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h5 class="footer-title">KẾT NỐI VỚI CHÚNG TÔI</h5>
+                <div class="social-icons mb-4">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-pinterest"></i></a>
+                </div>
+
+                <h5 class="footer-title" style="font-size: 14px;">ĐĂNG KÝ NHẬN TIN</h5>
+                <form class="newsletter-form d-flex">
+                    <input type="email" class="form-control" placeholder="Nhập email của bạn...">
+                    <button class="btn" type="button">GỬI</button>
+                </form>
+
+                <div class="mt-4">
+                    <div class="payment-methods">
+                        <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" alt="Visa">
+                        <img src="https://cdn-icons-png.flaticon.com/512/196/196566.png" alt="Mastercard">
+                        <img src="https://cdn-icons-png.flaticon.com/512/196/196565.png" alt="Paypal">
+                        <img src="https://cdn-icons-png.flaticon.com/512/888/888870.png" alt="COD">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968269.png" alt="Momo">
+                        <img src="https://cdn-icons-png.flaticon.com/512/217/217425.png" alt="ZaloPay">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copyright">
+        <div class="container">
+            <p class="mb-0">&copy; 2024 <b>BookTotal Corporation</b>. All rights reserved.</p>
+            <p class="mb-0 small mt-1">Giấy chứng nhận ĐKKD số 0304132047 do Sở Kế hoạch và Đầu tư TP.HCM cấp ngày 20/12/2005</p>
+        </div>
+    </div>
+</footer>

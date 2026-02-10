@@ -146,9 +146,17 @@ module.exports = {
         return rows;
     },
 
+    // Hàm này dùng cho BÁN HÀNG (Trừ kho, Tăng đã bán)
     updateStock: async (id, quantitySold) => {
         const query = `UPDATE products SET quantity = quantity - ?, sold_count = sold_count + ? WHERE id = ?`;
         const [result] = await db.query(query, [quantitySold, quantitySold, id]);
+        return result;
+    },
+
+    // Hàm MỚI dùng cho NHẬP HÀNG (Chỉ Tăng kho)
+    importStock: async (id, quantityImport) => {
+        const query = `UPDATE products SET quantity = quantity + ? WHERE id = ?`;
+        const [result] = await db.query(query, [quantityImport, id]);
         return result;
     },
 
@@ -188,5 +196,10 @@ module.exports = {
 
     deleteReview: async (id) => {
         await db.query('DELETE FROM reviews WHERE id = ?', [id]);
+    },
+
+    addAdminReply: async (reviewId, replyText) => {
+        const query = `UPDATE reviews SET admin_reply = ?, replied_at = NOW() WHERE id = ?`;
+        await db.query(query, [replyText, reviewId]);
     }
 };

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản Lý Đơn Hàng - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+        .admin-header { background-color: #1a1a2e; color: white; padding: 15px 0; margin-bottom: 30px; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .status-pending { background-color: #fff3cd; color: #ffc107; }
+        .status-completed { background-color: #d1e7dd; color: #198754; }
+        .status-cancelled { background-color: #f8d7da; color: #dc3545; }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 fw-bold"><i class="fas fa-shopping-cart me-2"></i> QUẢN LÝ ĐƠN HÀNG</h4>
+            <a href="/admin" class="btn btn-sm btn-outline-light"><i class="fas fa-home me-1"></i> Dashboard</a>
+        </div>
+    </header>
+
+    <div class="container pb-5">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Mã ĐH</th>
+                            <th>Khách hàng</th>
+                            <th>Tổng tiền</th>
+                            <th>Ngày đặt</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (orders && orders.length > 0) { %>
+                            <% orders.forEach(order => { %>
+                                <tr>
+                                    <td>#<%= order.id %></td>
+                                    <td><%= order.full_name || 'Khách vãng lai' %></td>
+                                    <td class="fw-bold text-danger"><%= Number(order.final_total).toLocaleString('vi-VN') %> đ</td>
+                                    <td><%= new Date(order.order_date).toLocaleDateString('vi-VN') %></td>
+                                    <td>
+                                        <% if (order.status === 'COMPLETED') { %>
+                                            <span class="status-badge status-completed">Hoàn thành</span>
+                                        <% } else if (order.status === 'CANCELLED') { %>
+                                            <span class="status-badge status-cancelled">Đã hủy</span>
+                                        <% } else { %>
+                                            <span class="status-badge status-pending">Chờ xử lý</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                Cập nhật
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="/admin/orders/update/<%= order.id %>/COMPLETED">Hoàn thành</a></li>
+                                                <li><a class="dropdown-item" href="/admin/orders/update/<%= order.id %>/CANCELLED">Hủy đơn</a></li>
+                                                <li><a class="dropdown-item" href="/admin/orders/update/<%= order.id %>/PENDING">Chờ xử lý</a></li>
+                                            </ul>
+
+                                            <!-- Nút Xóa dùng Modal -->
+                                            <button class="btn btn-sm btn-danger ms-2" title="Xóa đơn hàng" onclick="showConfirmModal('/admin/orders/delete/<%= order.id %>', 'Bạn có chắc chắn muốn xóa vĩnh viễn đơn hàng này?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr><td colspan="6" class="text-center py-4 text-muted">Chưa có đơn hàng nào.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/confirm_modal') %>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

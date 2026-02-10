@@ -25,29 +25,26 @@
         }
 
         /* --- LAYOUT CỘT GIỎ HÀNG --- */
-        /* Định nghĩa độ rộng các cột để Header và Item thẳng hàng */
         .col-check { width: 40px; display: flex; align-items: center; justify-content: center; }
-        .col-product { flex: 1; padding-left: 10px; } /* Ảnh + Tên */
+        .col-product { flex: 1; padding-left: 10px; }
         .col-qty { width: 140px; display: flex; justify-content: center; align-items: center; }
         .col-total { width: 140px; text-align: right; display: flex; align-items: center; justify-content: flex-end; font-weight: 700; color: #C92127; }
         .col-action { width: 50px; display: flex; justify-content: flex-end; align-items: center; }
 
-        /* HEADER ROW (Khung trên) */
+        /* HEADER ROW */
         .cart-header-row {
             display: flex;
             align-items: center;
             padding: 15px 0;
             border-bottom: 1px solid #ddd;
             margin-bottom: 10px;
-
-            /* Style chữ đen theo yêu cầu */
             color: #000;
             font-weight: 700;
             font-size: 0.95rem;
             text-transform: uppercase;
         }
 
-        /* ITEM ROW (Khung sản phẩm dưới) */
+        /* ITEM ROW */
         .cart-item {
             display: flex;
             align-items: center;
@@ -56,7 +53,6 @@
         }
         .cart-item:last-child { border-bottom: none; }
 
-        /* Chi tiết bên trong Item */
         .item-checkbox { width: 18px; height: 18px; cursor: pointer; }
 
         .product-info-flex { display: flex; align-items: center; gap: 15px; }
@@ -64,7 +60,6 @@
         .item-name { font-weight: 600; color: #333; font-size: 1rem; line-height: 1.4; margin-bottom: 5px; }
         .item-price-single { color: #777; font-size: 0.9rem; }
 
-        /* Nút số lượng */
         .qty-control {
             display: flex;
             align-items: center;
@@ -99,11 +94,9 @@
             width: 100%;
         }
 
-        /* Nút xóa */
         .btn-delete { color: #999; font-size: 1.1rem; transition: 0.2s; }
         .btn-delete:hover { color: #C92127; transform: scale(1.1); }
 
-        /* Cột phải: Thanh toán */
         .cart-summary-header { font-weight: 700; color: #000; margin-bottom: 15px; font-size: 1.1rem; }
 
         .btn-checkout {
@@ -129,7 +122,6 @@
         .coupon-label { font-weight: 600; font-size: 0.9rem; }
         .coupon-value { font-weight: 700; color: #C92127; font-size: 0.9rem; }
 
-        /* Modal Coupon */
         .coupon-card { border: 1px dashed #C92127; border-radius: 8px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; background-color: #fff; transition: 0.2s; }
         .coupon-card:hover { background-color: #fff5f5; }
         .coupon-info { flex: 1; }
@@ -152,11 +144,8 @@
         <% if (cart && cart.length > 0) { %>
             <form action="/checkout" method="POST" id="cartForm">
                 <div class="row">
-                    <!-- CỘT TRÁI: DANH SÁCH SẢN PHẨM -->
                     <div class="col-lg-8">
                         <div class="cart-container">
-
-                            <!-- HEADER ROW (Khung trên - Chữ đen) -->
                             <div class="cart-header-row">
                                 <div class="col-check">
                                     <input type="checkbox" id="selectAll" class="item-checkbox" checked onchange="toggleAll(this)">
@@ -169,10 +158,8 @@
                                 <div class="col-action"></div>
                             </div>
 
-                            <!-- ITEM ROWS (Khung sản phẩm dưới) -->
                             <% cart.forEach(item => { %>
                                 <div class="cart-item">
-                                    <!-- Checkbox -->
                                     <div class="col-check">
                                         <input type="checkbox" name="selected_items[]" value="<%= item.id %>"
                                                class="item-checkbox product-checkbox"
@@ -181,7 +168,6 @@
                                                checked onchange="updateTotal()">
                                     </div>
 
-                                    <!-- Ảnh & Tên -->
                                     <div class="col-product">
                                         <div class="product-info-flex">
                                             <%
@@ -196,7 +182,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Số lượng -->
                                     <div class="col-qty">
                                         <div class="qty-control">
                                             <% if (item.quantity > 1) { %>
@@ -209,12 +194,10 @@
                                         </div>
                                     </div>
 
-                                    <!-- Thành tiền -->
                                     <div class="col-total">
                                         <%= (item.price * item.quantity).toLocaleString('vi-VN') %> đ
                                     </div>
 
-                                    <!-- Xóa -->
                                     <div class="col-action">
                                         <a href="/cart/remove/<%= item.id %>" class="btn-delete" title="Xóa sản phẩm">
                                             <i class="fas fa-trash-alt"></i>
@@ -225,7 +208,6 @@
                         </div>
                     </div>
 
-                    <!-- CỘT PHẢI: THANH TOÁN -->
                     <div class="col-lg-4">
                         <div class="cart-container">
                             <h5 class="cart-summary-header">Thanh toán</h5>
@@ -233,7 +215,7 @@
                             <div class="coupon-section">
                                 <div class="coupon-row" data-bs-toggle="modal" data-bs-target="#couponModal" onclick="loadCoupons('product')">
                                     <span class="coupon-label"><i class="fas fa-ticket-alt me-2 text-warning"></i> Mã giảm giá</span>
-                                    <span class="coupon-value" id="productDiscountText">Xem Thêm ></span>
+                                    <span class="coupon-value" id="productDiscountText">Chọn mã ></span>
                                 </div>
                             </div>
 
@@ -287,11 +269,7 @@
         </div>
     </div>
 
-    <footer class="bg-dark text-white text-center py-4 mt-auto">
-        <div class="container">
-            <p class="mb-0">&copy; 2024 Bookstore. All rights reserved.</p>
-        </div>
-    </footer>
+    <%- include('partials/footer') %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
