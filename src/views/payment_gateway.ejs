@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cổng thanh toán - Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .payment-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .logo {
+            height: 50px;
+            margin-bottom: 20px;
+        }
+
+        .qr-code {
+            width: 250px;
+            height: 250px;
+            margin: 20px 0;
+            border: 1px solid #eee;
+            padding: 10px;
+        }
+
+        .amount {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #C92127;
+            margin-bottom: 10px;
+        }
+
+        .timer {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .btn-confirm {
+            background-color: #28a745;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .btn-cancel {
+            background-color: #dc3545;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="payment-card">
+        <% if (method==='MOMO' ) { %>
+            <img src="https://developers.momo.vn/v3/assets/images/square-8c08a00f550e40a2efafea4a005b1232.png"
+                class="logo" alt="MoMo" style="border-radius: 8px;">
+            <h4>Thanh toán qua Ví MoMo</h4>
+            <% } else { %>
+                <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg"
+                    class="logo" alt="VNPAY">
+                <h4>Thanh toán qua VNPAY</h4>
+                <% } %>
+
+                    <p>Đơn hàng: <b>#<%= orderId %></b></p>
+                    <div class="amount">
+                        <%= Number(amount).toLocaleString('vi-VN') %> đ
+                    </div>
+
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=PAYMENT_<%= method %>_<%= orderId %>_<%= amount %>"
+                        class="qr-code" alt="QR Code">
+
+                    <p class="small text-muted">Vui lòng mở ứng dụng <%= method %> và quét mã QR để thanh toán.</p>
+                    <div class="timer">Giao dịch hết hạn sau: <span id="countdown">10:00</span></div>
+
+                    <form action="/payment/confirm" method="POST">
+                        <input type="hidden" name="orderId" value="<%= orderId %>">
+                        <input type="hidden" name="status" value="SUCCESS">
+                        <button type="submit" class="btn-confirm">XÁC NHẬN ĐÃ THANH TOÁN</button>
+                    </form>
+
+                    <form action="/payment/confirm" method="POST">
+                        <input type="hidden" name="orderId" value="<%= orderId %>">
+                        <input type="hidden" name="status" value="FAILED">
+                        <button type="submit" class="btn-cancel">HỦY GIAO DỊCH</button>
+                    </form>
+    </div>
+
+    <script>
+        let time = 600; // 10 phút
+        const countdownEl = document.getElementById('countdown');
+
+        setInterval(() => {
+            const minutes = Math.floor(time / 60);
+            let seconds = time % 60;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            countdownEl.innerHTML = `${minutes}:${seconds}`;
+            if (time > 0) time--;
+        }, 1000);
+    </script>
+</body>
+
+</html>
