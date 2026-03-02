@@ -16,12 +16,22 @@ router.get('/', requireAdmin, async (req, res) => {
 
 router.post('/import', requireAdmin, async (req, res) => {
     try {
-        const { product_id, quantity } = req.body;
-        // Gọi hàm importStock chuyên dụng (chỉ tăng kho, không tăng đã bán)
-        await Product.importStock(product_id, parseInt(quantity));
+        const { product_id, quantity, note } = req.body;
+        await Product.importStock(product_id, parseInt(quantity), note);
         res.redirect('/admin/inventory');
     } catch (err) {
+        console.error(err);
         res.status(500).send("Lỗi nhập kho");
+    }
+});
+
+// Route xem lịch sử nhập hàng (API trả về JSON cho Modal)
+router.get('/logs/:id', requireAdmin, async (req, res) => {
+    try {
+        const logs = await Product.getInventoryLogs(req.params.id);
+        res.json({ success: true, data: logs });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Lỗi lấy lịch sử" });
     }
 });
 

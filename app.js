@@ -1,16 +1,21 @@
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const session = require('express-session'); // Thêm session
-const flash = require('connect-flash');     // Thêm flash
+const session = require('express-session');
+const flash = require('connect-flash');
+// const expressLayouts = require('express-ejs-layouts'); // ĐÃ XÓA
 
 const db = require("./db");
 const Product = require("./apps/models/product");
+const Notification = require("./apps/models/notification");
 const { checkUser } = require("./middleware/auth");
+const startOrderAutomation = require('./utils/order_automation');
 
 const app = express();
 
-// 1. Cấu hình View Engine
+// 1. Cấu hình View Engine (ĐÃ XÓA LAYOUT)
+// app.use(expressLayouts);
+// app.set('layout', 'layout');
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "apps", "views"));
 
@@ -22,7 +27,7 @@ app.use(cookieParser());
 
 // Cấu hình Session và Flash
 app.use(session({
-    secret: 'your_secret_key', // Thay bằng một chuỗi bí mật
+    secret: 'your_secret_key',
     resave: false,
     saveUninitialized: true
 }));
@@ -32,31 +37,47 @@ app.use(flash());
 app.use((req, res, next) => {
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
-    res.locals.error = req.flash('error'); // Dùng cho passport (nếu có)
+    res.locals.error = req.flash('error');
     next();
 });
 
-
-// 3. Global Middleware (Chạy sau session)
+// 3. Global Middleware
 app.use(checkUser);
 
 app.use(async (req, res, next) => {
+    // Giỏ hàng
     let cart = [];
     if (req.cookies.cart) {
-        try {
-            cart = JSON.parse(req.cookies.cart);
-        } catch(e) { cart = []; }
+        try { cart = JSON.parse(req.cookies.cart); } catch(e) { cart = []; }
     }
     req.cart = cart;
+    res.locals.cart = cart;
 
     const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
     res.locals.cartCount = totalQty;
 
+    // Danh mục
     try {
         const categories = await Product.getCategories();
         res.locals.globalCategories = categories;
     } catch (err) {
         res.locals.globalCategories = [];
+    }
+
+    // THÔNG BÁO
+    if (res.locals.user) {
+        try {
+            const unreadCount = await Notification.getUnreadCount(res.locals.user.id);
+            const allNotifs = await Notification.getUserNotifications(res.locals.user.id);
+            res.locals.unreadNotifications = unreadCount;
+            res.locals.recentNotifications = allNotifs.slice(0, 5);
+        } catch (err) {
+            res.locals.unreadNotifications = 0;
+            res.locals.recentNotifications = [];
+        }
+    } else {
+        res.locals.unreadNotifications = 0;
+        res.locals.recentNotifications = [];
     }
 
     next();
@@ -87,8 +108,9 @@ app.use((err, req, res, next) => {
 });
 
 // SỬA LẠI CỔNG CHẠY SERVER
-const PORT = 3002; // Đổi từ 3001 sang 3002
+const PORT = 3003; // Đổi từ 3002 sang 3003
 
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
+    startOrderAutomation();
 });

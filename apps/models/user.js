@@ -1,92 +1,59 @@
 const db = require('../../db');
 const bcrypt = require('bcrypt');
 
-const getUserByUsername = async (username) => {
-    try {
-        const [rows] = await db.query("SELECT * FROM users WHERE username = ?", [username]);
-        return rows[0];
-    } catch (error) {
-        throw error;
-    }
-};
-
-const User = {
+module.exports = {
     getAllUsers: async () => {
-        try {
-            const [rows] = await db.query("SELECT * FROM users ORDER BY id DESC");
-            return rows;
-        } catch (error) {
-            throw error;
-        }
+        const [rows] = await db.query('SELECT * FROM users');
+        return rows;
     },
 
-    getUserByUsername: getUserByUsername,
-
-    getUserById: async (id) => {
-        try {
-            const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [id]);
-            return rows[0];
-        } catch (error) {
-            throw error;
-        }
+    getUserByUsername: async (username) => {
+        const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+        return rows[0];
     },
 
-    addUser: async (data) => {
-        try {
-            const salt = await bcrypt.genSalt();
-            const hashedPassword = await bcrypt.hash(data.password, salt);
-
-            const sql = "INSERT INTO users (username, password, email, full_name, role) VALUES (?, ?, ?, ?, ?)";
-            const params = [data.username, hashedPassword, data.email, data.full_name, data.role];
-            const [result] = await db.execute(sql, params);
-            return result;
-        } catch (error) {
-            throw error;
-        }
+    getUserByEmail: async (email) => {
+        const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        return rows[0];
     },
 
-    updateUser: async (id, data) => {
-        try {
-            const oldUser = await User.getUserById(id);
-            let passwordToSave = oldUser.password;
-
-            if (data.password && data.password !== oldUser.password) {
-                const salt = await bcrypt.genSalt();
-                passwordToSave = await bcrypt.hash(data.password, salt);
-            }
-
-            const sql = "UPDATE users SET username = ?, password = ?, email = ?, full_name = ?, role = ? WHERE id = ?";
-            const params = [data.username, passwordToSave, data.email, data.full_name, data.role, id];
-            const [result] = await db.execute(sql, params);
-            return result;
-        } catch (error) {
-            throw error;
-        }
-    },
-
-    deleteUser: async (id) => {
-        try {
-            const [result] = await db.execute("DELETE FROM users WHERE id = ?", [id]);
-            return result;
-        } catch (error) {
-            throw error;
-        }
+    addUser: async (user) => {
+        const hashedPassword = await bcrypt.hash(user.password, 10);
+        const role = user.role || 'user';
+        const query = `INSERT INTO users (username, password, email, full_name, role) VALUES (?, ?, ?, ?, ?)`;
+        await db.query(query, [user.username, hashedPassword, user.email, user.full_name, role]);
     },
 
     login: async (username, password) => {
-        try {
-            const user = await getUserByUsername(username);
-            if (user) {
-                const auth = await bcrypt.compare(password, user.password);
-                if (auth) {
-                    return user;
-                }
-            }
-            return null;
-        } catch (error) {
-            throw error;
+        const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+        const user = rows[0];
+        if (user) {
+            const match = await bcrypt.compare(password, user.password);
+            if (match) return user;
         }
+        return null;
+    },
+
+    deleteUser: async (id) => {
+        await db.query('DELETE FROM users WHERE id = ?', [id]);
+    },
+
+    // --- CÁC HÀM MỚI CHO QUÊN MẬT KHẨU ---
+
+    // Lưu token reset vào DB
+    saveResetToken: async (email, token, expiry) => {
+        await db.query('UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE email = ?', [token, expiry, email]);
+    },
+
+    // Tìm user bằng token còn hạn
+    getUserByResetToken: async (token) => {
+        const [rows] = await db.query('SELECT * FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()', [token]);
+        return rows[0];
+    },
+
+    // Cập nhật mật khẩu mới và xóa token
+    resetPassword: async (userId, newPassword) => {
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await db.query('UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?', [hashedPassword, userId]);
     }
 };
-
-module.exports = User;

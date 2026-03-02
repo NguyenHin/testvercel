@@ -9,10 +9,22 @@
         body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
         .admin-header { background-color: #1a1a2e; color: white; padding: 15px 0; margin-bottom: 30px; }
         .card { border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+
         .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-        .status-pending { background-color: #fff3cd; color: #ffc107; }
-        .status-completed { background-color: #d1e7dd; color: #198754; }
-        .status-cancelled { background-color: #f8d7da; color: #dc3545; }
+        .status-PENDING { background-color: #fff3cd; color: #ffc107; }
+        .status-CONFIRMED { background-color: #cfe2ff; color: #084298; }
+        .status-PROCESSING { background-color: #e2e3e5; color: #41464b; }
+        .status-SHIPPED { background-color: #d1e7dd; color: #0f5132; }
+        .status-DELIVERING { background-color: #cff4fc; color: #055160; }
+        .status-COMPLETED { background-color: #198754; color: white; }
+        .status-CANCELLED { background-color: #f8d7da; color: #842029; }
+
+        .nav-tabs .nav-link { color: #555; font-weight: 600; border: none; border-bottom: 3px solid transparent; }
+        .nav-tabs .nav-link.active { color: #1a1a2e; border-bottom-color: #1a1a2e; background: none; }
+        .nav-tabs .nav-link:hover { color: #1a1a2e; }
+
+        .order-row { cursor: pointer; transition: 0.2s; }
+        .order-row:hover { background-color: #f8f9fa; }
     </style>
 </head>
 <body>
@@ -25,56 +37,71 @@
 
     <div class="container pb-5">
         <div class="card">
+            <div class="card-header bg-white pt-3 pb-0 border-bottom-0">
+                <ul class="nav nav-tabs" id="orderTabs">
+                    <li class="nav-item"><a class="nav-link active" onclick="filterOrders('all')">Tất cả</a></li>
+                    <li class="nav-item"><a class="nav-link" onclick="filterOrders('PENDING')">Chờ xác nhận</a></li>
+                    <li class="nav-item"><a class="nav-link" onclick="filterOrders('CONFIRMED')">Đã xác nhận</a></li>
+                    <li class="nav-item"><a class="nav-link" onclick="filterOrders('DELIVERING')">Đang giao</a></li>
+                    <li class="nav-item"><a class="nav-link" onclick="filterOrders('COMPLETED')">Hoàn thành</a></li>
+                    <li class="nav-item"><a class="nav-link" onclick="filterOrders('CANCELLED')">Đã hủy</a></li>
+                </ul>
+            </div>
             <div class="card-body">
-                <table class="table table-hover align-middle">
+                <table class="table align-middle">
                     <thead>
                         <tr>
                             <th>Mã ĐH</th>
                             <th>Khách hàng</th>
-                            <th>Tổng tiền</th>
                             <th>Ngày đặt</th>
+                            <th>Tổng tiền</th>
+                            <th>Thanh toán</th>
                             <th>Trạng thái</th>
+                            <th>Vận đơn</th>
                             <th>Hành động</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="orderTableBody">
                         <% if (orders && orders.length > 0) { %>
-                            <% orders.forEach(order => { %>
-                                <tr>
-                                    <td>#<%= order.id %></td>
-                                    <td><%= order.full_name || 'Khách vãng lai' %></td>
-                                    <td class="fw-bold text-danger"><%= Number(order.final_total).toLocaleString('vi-VN') %> đ</td>
-                                    <td><%= new Date(order.order_date).toLocaleDateString('vi-VN') %></td>
+                            <% orders.forEach(order => {
+                                let statusText = 'Chờ xác nhận';
+                                switch(order.status) {
+                                    case 'CONFIRMED': statusText = 'Đã xác nhận'; break;
+                                    case 'PROCESSING': statusText = 'Đang xử lý'; break;
+                                    case 'SHIPPED': statusText = 'Đã giao VC'; break;
+                                    case 'DELIVERING': statusText = 'Đang giao hàng'; break;
+                                    case 'COMPLETED': statusText = 'Hoàn thành'; break;
+                                    case 'CANCELLED': statusText = 'Đã hủy'; break;
+                                }
+                            %>
+                                <tr class="order-row" data-status="<%= order.status %>">
+                                    <td class="fw-bold text-primary" onclick="showOrderDetail('<%= order.id %>')">#<%= order.id %></td>
                                     <td>
-                                        <% if (order.status === 'COMPLETED') { %>
-                                            <span class="status-badge status-completed">Hoàn thành</span>
-                                        <% } else if (order.status === 'CANCELLED') { %>
-                                            <span class="status-badge status-cancelled">Đã hủy</span>
-                                        <% } else { %>
-                                            <span class="status-badge status-pending">Chờ xử lý</span>
-                                        <% } %>
+                                        <div class="fw-bold"><%= order.full_name || 'Khách vãng lai' %></div>
+                                        <div class="small text-muted"><%= order.shipping_address ? order.shipping_address.split(',')[0] : '' %></div>
                                     </td>
+                                    <td><%= new Date(order.order_date).toLocaleDateString('vi-VN') %> <br> <small class="text-muted"><%= new Date(order.order_date).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) %></small></td>
+                                    <td class="fw-bold"><%= Number(order.final_total).toLocaleString('vi-VN') %> đ</td>
+                                    <td><span class="badge bg-light text-dark border"><%= order.payment_method || 'COD' %></span></td>
+                                    <td><span class="status-badge status-<%= order.status %>"><%= statusText %></span></td>
+                                    <td><%= order.tracking_code || '---' %></td>
                                     <td>
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                Cập nhật
-                                            </button>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
                                             <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="/admin/orders/update/<%= order.id %>/CONFIRMED">Xác nhận đơn</a></li>
+                                                <li><a class="dropdown-item" href="/admin/orders/update/<%= order.id %>/SHIPPED">Giao vận chuyển</a></li>
                                                 <li><a class="dropdown-item" href="/admin/orders/update/<%= order.id %>/COMPLETED">Hoàn thành</a></li>
-                                                <li><a class="dropdown-item" href="/admin/orders/update/<%= order.id %>/CANCELLED">Hủy đơn</a></li>
-                                                <li><a class="dropdown-item" href="/admin/orders/update/<%= order.id %>/PENDING">Chờ xử lý</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="/admin/orders/update/<%= order.id %>/CANCELLED">Hủy đơn hàng</a></li>
+                                                <li><a class="dropdown-item text-danger" href="#" onclick="showConfirmModal('/admin/orders/delete/<%= order.id %>', 'Xóa vĩnh viễn đơn hàng này?')">Xóa khỏi hệ thống</a></li>
                                             </ul>
-
-                                            <!-- Nút Xóa dùng Modal -->
-                                            <button class="btn btn-sm btn-danger ms-2" title="Xóa đơn hàng" onclick="showConfirmModal('/admin/orders/delete/<%= order.id %>', 'Bạn có chắc chắn muốn xóa vĩnh viễn đơn hàng này?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
                                         </div>
                                     </td>
                                 </tr>
                             <% }); %>
                         <% } else { %>
-                            <tr><td colspan="6" class="text-center py-4 text-muted">Chưa có đơn hàng nào.</td></tr>
+                            <tr><td colspan="8" class="text-center py-4 text-muted">Chưa có đơn hàng nào.</td></tr>
                         <% } %>
                     </tbody>
                 </table>
@@ -82,7 +109,93 @@
         </div>
     </div>
 
+    <!-- Modal Chi Tiết Đơn Hàng -->
+    <div class="modal fade" id="orderDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Chi tiết đơn hàng <span id="modalOrderId" class="text-primary"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modalOrderContent">
+                    <div class="text-center py-3"><div class="spinner-border text-primary"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <%- include('partials/confirm_modal') %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function filterOrders(status) {
+            // Active tab
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Filter rows
+            const rows = document.querySelectorAll('.order-row');
+            rows.forEach(row => {
+                if (status === 'all' || row.getAttribute('data-status') === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function showOrderDetail(orderId) {
+            const modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+            document.getElementById('modalOrderId').innerText = '#' + orderId;
+            modal.show();
+
+            // Gọi API lấy chi tiết đơn hàng (Cần tạo API này)
+            fetch(`/api/orders/${orderId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        const order = data.data;
+                        let itemsHtml = '';
+                        order.items.forEach(item => {
+                            itemsHtml += `
+                                <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                                    <img src="/images/${item.image_url || 'default.jpg'}" width="50" height="70" class="me-3 rounded border">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold">${item.name}</div>
+                                        <div class="text-muted small">x${item.quantity}</div>
+                                    </div>
+                                    <div class="fw-bold">${Number(item.price_at_purchase).toLocaleString('vi-VN')} đ</div>
+                                </div>
+                            `;
+                        });
+
+                        const html = `
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p><strong>Khách hàng:</strong> ${order.full_name || 'Khách vãng lai'}</p>
+                                    <p><strong>SĐT:</strong> ${order.phone || '---'}</p>
+                                    <p><strong>Địa chỉ:</strong> ${order.shipping_address}</p>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <p><strong>Ngày đặt:</strong> ${new Date(order.order_date).toLocaleString('vi-VN')}</p>
+                                    <p><strong>Trạng thái:</strong> <span class="badge bg-info text-dark">${order.status}</span></p>
+                                    <p><strong>Vận đơn:</strong> ${order.tracking_code || 'Chưa có'}</p>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold border-bottom pb-2">Sản phẩm</h6>
+                            ${itemsHtml}
+                            <div class="text-end mt-3">
+                                <h5 class="fw-bold text-danger">Tổng cộng: ${Number(order.final_total).toLocaleString('vi-VN')} đ</h5>
+                            </div>
+                        `;
+                        document.getElementById('modalOrderContent').innerHTML = html;
+                    } else {
+                        document.getElementById('modalOrderContent').innerHTML = '<p class="text-danger text-center">Không tải được dữ liệu.</p>';
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('modalOrderContent').innerHTML = '<p class="text-danger text-center">Lỗi kết nối.</p>';
+                });
+        }
+    </script>
 </body>
 </html>

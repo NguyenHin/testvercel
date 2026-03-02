@@ -1,54 +1,61 @@
 <style>
     /* --- CẤU HÌNH CHUNG --- */
     :root {
-        --primary-color: #1a1a2e; /* Xanh than (Admin) */
-        --accent-color: #c49b63;  /* Vàng đồng (Admin) */
+        --primary-color: #1a1a2e;
+        --accent-color: #c49b63;
         --text-color: #333;
     }
 
-    /* --- KHUNG 1: MAIN HEADER (Logo, Search, Actions) --- */
+    /* ADMIN BANNER */
+    .admin-mode-banner {
+        background-color: #ffc107;
+        color: #333;
+        text-align: center;
+        padding: 5px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+    .admin-mode-banner a { color: #333; text-decoration: underline; }
+
+    /* MAIN HEADER */
     .main-header {
-        background-color: white;
-        padding: 20px 0;
+        padding: 15px 0;
         border-bottom: 1px solid #eee;
+        background: white;
     }
 
     .header-content {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 30px;
+        gap: 20px;
     }
 
-    /* Logo */
     .brand-logo {
-        font-size: 2.2rem;
+        font-size: 2rem;
         font-weight: 800;
         color: var(--primary-color);
         text-decoration: none;
-        letter-spacing: -1px;
-        line-height: 1;
         text-transform: uppercase;
+        white-space: nowrap;
     }
+    .brand-logo:hover { color: var(--primary-color); }
 
-    /* Thanh tìm kiếm */
+    /* SEARCH */
     .search-container {
         flex-grow: 1;
         position: relative;
-        max-width: 600px;
+        max-width: 500px;
     }
     .search-input {
         width: 100%;
-        padding: 12px 50px 12px 20px;
+        padding: 10px 45px 10px 20px;
         border: 2px solid #e0e0e0;
-        border-radius: 50px; /* Bo tròn mềm mại */
+        border-radius: 50px;
         outline: none;
-        font-size: 0.95rem;
         transition: 0.3s;
     }
-    .search-input:focus {
-        border-color: var(--primary-color);
-    }
+    .search-input:focus { border-color: var(--primary-color); }
     .search-btn {
         position: absolute;
         right: 5px;
@@ -57,19 +64,17 @@
         background: var(--primary-color);
         color: white;
         border: none;
-        width: 40px;
-        height: 40px;
+        width: 35px;
+        height: 35px;
         border-radius: 50%;
         cursor: pointer;
-        font-size: 1rem;
-        transition: 0.2s;
         display: flex;
         align-items: center;
         justify-content: center;
     }
     .search-btn:hover { background-color: var(--accent-color); }
 
-    /* Actions (Giỏ hàng, User) */
+    /* ACTIONS */
     .header-actions {
         display: flex;
         align-items: center;
@@ -85,15 +90,16 @@
         position: relative;
         cursor: pointer;
         font-weight: 600;
-        padding: 10px 0; /* Tăng vùng hover */
+        padding: 5px 0;
     }
-    .action-item i { font-size: 1.5rem; margin-bottom: 4px; color: var(--primary-color); transition: 0.2s; }
-    .action-item:hover i, .action-item:hover span { color: var(--accent-color); }
+    .action-item:hover { color: var(--accent-color); }
+    .action-item i { font-size: 1.4rem; margin-bottom: 3px; color: var(--primary-color); transition: 0.2s; }
+    .action-item:hover i { color: var(--accent-color); }
 
     .cart-badge {
         position: absolute;
-        top: 0;
-        right: -5px;
+        top: -5px;
+        right: -8px;
         background-color: var(--accent-color);
         color: white;
         font-size: 0.7rem;
@@ -103,38 +109,34 @@
         border: 2px solid white;
     }
 
-    /* --- KHUNG 2: NAVIGATION BAR (Menu Danh mục) --- */
+    /* NAV BAR */
     .nav-bar {
         background-color: var(--primary-color);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        position: sticky;
+        color: white;
+        position: sticky; /* Dính khi cuộn */
         top: 0;
         z-index: 1000;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+    .nav-container { display: flex; align-items: center; }
 
-    .nav-container {
-        display: flex;
-        align-items: center;
-    }
-
-    /* Nút "Danh mục sản phẩm" (Dropdown chính) */
+    /* CATEGORY MENU */
     .cat-menu-btn {
         background-color: var(--accent-color);
         color: white;
-        padding: 15px 25px;
+        padding: 12px 20px;
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         cursor: pointer;
         display: flex;
         align-items: center;
         gap: 10px;
         position: relative;
-        width: 280px;
+        width: 260px;
     }
     .cat-menu-btn:hover { background-color: #b08b55; }
 
-    /* Dropdown Menu */
     .cat-dropdown {
         display: none;
         position: absolute;
@@ -150,36 +152,31 @@
 
     .cat-item {
         display: block;
-        padding: 12px 20px;
+        padding: 10px 20px;
         color: #333;
         text-decoration: none;
         border-bottom: 1px solid #f0f0f0;
         font-weight: 500;
         transition: 0.2s;
-        text-transform: none;
     }
     .cat-item:last-child { border-bottom: none; }
     .cat-item:hover { color: var(--accent-color); background-color: #f9f9f9; padding-left: 25px; }
 
-    /* Horizontal Menu Links */
-    .nav-links {
-        display: flex;
-        gap: 5px;
-        margin-left: 20px;
-    }
+    /* NAV LINKS */
+    .nav-links { display: flex; gap: 10px; margin-left: 20px; }
     .nav-link-item {
         color: white;
         text-decoration: none;
-        padding: 15px 20px;
+        padding: 12px 15px;
         font-weight: 500;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         transition: 0.2s;
         border-radius: 4px;
     }
     .nav-link-item:hover { background-color: rgba(255,255,255,0.1); color: var(--accent-color); }
 
-    /* User Dropdown (Sửa lại để không bị mất khi hover) */
-    .user-dropdown {
+    /* DROPDOWNS (User, Notif, Cart) */
+    .dropdown-menu-custom {
         display: none;
         position: absolute;
         top: 100%;
@@ -187,139 +184,249 @@
         background: white;
         box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         border-radius: 8px;
-        width: 220px;
-        padding: 10px;
+        padding: 0;
         z-index: 1001;
-        margin-top: 0; /* Bỏ margin top để dính liền */
+        margin-top: 10px;
+        min-width: 200px;
+        overflow: hidden;
     }
 
-    /* Vùng đệm vô hình để nối liền icon và menu */
+    .dropdown-menu-custom::before {
+        content: '';
+        position: absolute;
+        top: -8px; right: 15px;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-bottom: 8px solid white;
+    }
+
     .action-item::after {
         content: '';
         position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        height: 10px; /* Vùng đệm 10px */
-        background: transparent;
+        top: 100%; left: 0; width: 100%; height: 15px; background: transparent;
     }
 
-    .user-dropdown::before {
-        content: '';
-        position: absolute;
-        top: -8px; right: 10px; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 8px solid white;
-    }
+    .action-item:hover .dropdown-menu-custom { display: block; }
 
-    .action-item:hover .user-dropdown { display: block; }
+    /* Specific Dropdowns */
+    .notif-dropdown { width: 320px; right: -60px; }
+    .notif-dropdown::before { right: 70px; }
 
-    .btn-auth {
-        display: block; width: 100%; padding: 8px; text-align: center; border-radius: 5px; font-weight: 600; text-decoration: none; margin-bottom: 5px; font-size: 0.9rem; cursor: pointer;
-    }
+    .cart-dropdown { width: 350px; right: -20px; }
+    .cart-dropdown::before { right: 30px; }
+
+    /* Notif Items */
+    .notif-header { padding: 10px 15px; border-bottom: 1px solid #eee; font-weight: 700; color: #333; font-size: 0.9rem; background: #f8f9fa; }
+    .notif-list { max-height: 300px; overflow-y: auto; }
+    .notif-item { display: flex; padding: 10px 15px; border-bottom: 1px solid #f5f5f5; text-decoration: none; color: #333; align-items: start; transition: 0.2s; }
+    .notif-item:hover { background-color: #f9f9f9; }
+    .notif-item.unread { background-color: #e8f4fd; }
+    .notif-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; flex-shrink: 0; font-size: 0.8rem; }
+    .notif-content { flex: 1; }
+    .notif-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 2px; }
+    .notif-desc { font-size: 0.8rem; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .notif-footer { padding: 10px; text-align: center; border-top: 1px solid #eee; background: #f8f9fa; }
+    .notif-footer a { font-size: 0.85rem; font-weight: 600; color: var(--accent-color); text-decoration: none; }
+
+    /* Cart Items */
+    .cart-list { max-height: 300px; overflow-y: auto; }
+    .cart-item-row { display: flex; padding: 10px 15px; border-bottom: 1px solid #f5f5f5; align-items: center; }
+    .cart-img { width: 50px; height: 70px; object-fit: cover; border-radius: 4px; margin-right: 10px; border: 1px solid #eee; }
+    .cart-info { flex: 1; }
+    .cart-name { font-size: 0.9rem; font-weight: 600; color: #333; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 3px; }
+    .cart-price { font-size: 0.9rem; color: #C92127; font-weight: 700; }
+    .cart-footer { padding: 15px; background-color: #f9f9f9; border-top: 1px solid #eee; }
+    .cart-total-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 700; color: #333; }
+    .cart-total-val { color: #C92127; font-size: 1.1rem; }
+    .btn-view-cart { display: block; width: 100%; background-color: #C92127; color: white; text-align: center; padding: 8px; border-radius: 5px; text-decoration: none; font-weight: 700; transition: 0.2s; }
+    .btn-view-cart:hover { background-color: #a11b20; color: white; }
+
+    /* User Menu */
+    .user-menu-link { display: block; padding: 10px 15px; color: #333; text-decoration: none; border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; }
+    .user-menu-link:hover { color: var(--accent-color); background-color: #f9f9f9; }
+    .btn-auth { display: block; width: 100%; padding: 8px; text-align: center; border-radius: 5px; font-weight: 600; text-decoration: none; margin-bottom: 5px; font-size: 0.9rem; cursor: pointer; }
     .btn-login { background-color: var(--primary-color); color: white; border: none; }
     .btn-login:hover { background-color: #2c2c4e; }
     .btn-register { border: 1px solid var(--primary-color); color: var(--primary-color); background: white; }
     .btn-register:hover { background-color: #f0f0f0; }
-
-    .user-menu-link { display: block; padding: 8px 10px; color: #333; text-decoration: none; border-bottom: 1px solid #f5f5f5; font-size: 0.9rem; }
-    .user-menu-link:hover { color: var(--accent-color); background-color: #f9f9f9; }
 </style>
 
-<!-- KHUNG 1: MAIN HEADER (Logo, Search, Actions) -->
-<div class="main-header">
-    <div class="container header-content">
-        <!-- Logo -->
-        <a href="/" class="brand-logo">BOOKTOTAL</a>
+<!-- HEADER WRAPPER (Gom nhóm để sticky) -->
+<div class="header-wrapper">
 
-        <!-- Tìm kiếm -->
-        <form action="/search" method="GET" class="search-container">
-            <input type="text" name="q" class="search-input" placeholder="Tìm kiếm sách, tác giả..." required>
-            <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
-        </form>
+    <!-- ADMIN BANNER -->
+    <% if (locals.user && user.role === 'admin') { %>
+        <div class="admin-mode-banner">
+            <i class="fas fa-eye me-2"></i> Bạn đang xem website dưới quyền <b>Quản trị viên</b>.
+            <a href="/admin" class="ms-2">Quay lại Dashboard</a>
+        </div>
+    <% } %>
 
-        <!-- Actions -->
-        <div class="header-actions">
+    <!-- MAIN HEADER -->
+    <div class="main-header">
+        <div class="container header-content">
+            <a href="/" class="brand-logo">BOOKTOTAL</a>
 
-            <!-- 1. Nút Admin (Chỉ hiện khi là Admin) -->
-            <% if (locals.user && locals.user.role === 'admin') { %>
-                <a href="/admin" class="action-item">
-                    <i class="fas fa-user-shield" style="color: #c49b63;"></i>
-                    <span style="color: #c49b63;">Quản trị</span>
-                </a>
-            <% } %>
+            <form action="/search" method="GET" class="search-container">
+                <input type="text" name="q" class="search-input" placeholder="Tìm kiếm sách, tác giả..." required>
+                <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+            </form>
 
-            <!-- 2. Thông báo -->
-            <a href="#" class="action-item">
-                <i class="far fa-bell"></i>
-                <span>Thông báo</span>
-            </a>
-
-            <!-- 3. Giỏ hàng -->
-            <a href="/cart" class="action-item">
-                <i class="fas fa-shopping-bag"></i>
-                <span>Giỏ hàng</span>
-                <% if (locals.cartCount && cartCount > 0) { %>
-                    <span class="cart-badge"><%= cartCount %></span>
+            <div class="header-actions">
+                <!-- Admin Link -->
+                <% if (locals.user && user.role === 'admin') { %>
+                    <a href="/admin" class="action-item">
+                        <i class="fas fa-user-shield" style="color: #c49b63;"></i>
+                        <span style="color: #c49b63;">Quản trị</span>
+                    </a>
                 <% } %>
-            </a>
 
-            <!-- 4. Tài khoản -->
-            <div class="action-item">
-                <i class="fas fa-user-circle"></i>
-                <span><%= locals.user ? (user.full_name || user.username) : 'Tài khoản' %></span>
-
-                <div class="user-dropdown">
+                <!-- Notifications -->
+                <div class="action-item">
                     <% if (locals.user) { %>
-                        <div class="text-center mb-2 pb-2 border-bottom">
-                            <div class="fw-bold text-dark"><%= user.username %></div>
-                            <div class="small text-muted"><%= user.role === 'admin' ? 'Quản trị viên' : 'Thành viên' %></div>
+                        <a href="/notifications" class="text-decoration-none text-dark d-flex flex-column align-items-center">
+                            <i class="far fa-bell"></i>
+                            <span>Thông báo</span>
+                            <% if (locals.unreadNotifications && unreadNotifications > 0) { %>
+                                <span class="cart-badge bg-danger"><%= unreadNotifications %></span>
+                            <% } %>
+                        </a>
+                        <div class="dropdown-menu-custom notif-dropdown">
+                            <div class="notif-header">Thông báo mới nhận</div>
+                            <div class="notif-list">
+                                <% if (locals.recentNotifications && recentNotifications.length > 0) { %>
+                                    <% recentNotifications.forEach(notif => {
+                                        let iconClass = 'bg-info text-white';
+                                        let iconName = 'fa-info';
+                                        if (notif.type === 'success') { iconClass = 'bg-success text-white'; iconName = 'fa-check'; }
+                                        else if (notif.type === 'warning') { iconClass = 'bg-warning text-dark'; iconName = 'fa-exclamation'; }
+                                        else if (notif.type === 'danger') { iconClass = 'bg-danger text-white'; iconName = 'fa-times'; }
+                                    %>
+                                        <a href="/notifications" class="notif-item <%= notif.is_read ? '' : 'unread' %>">
+                                            <div class="notif-icon <%= iconClass %>"><i class="fas <%= iconName %>"></i></div>
+                                            <div class="notif-content">
+                                                <div class="notif-title"><%= notif.title %></div>
+                                                <div class="notif-desc"><%= notif.message %></div>
+                                            </div>
+                                        </a>
+                                    <% }); %>
+                                <% } else { %>
+                                    <div class="text-center py-4 text-muted small">Chưa có thông báo nào.</div>
+                                <% } %>
+                            </div>
+                            <div class="notif-footer"><a href="/notifications">Xem tất cả</a></div>
                         </div>
-
-                        <!-- Chỉ hiện Đơn hàng nếu KHÔNG phải là Admin -->
-                        <% if (user.role !== 'admin') { %>
-                            <a href="#" class="user-menu-link"><i class="fas fa-box-open me-2"></i> Đơn hàng</a>
-                        <% } %>
-
-                        <a href="/auth/logout" class="user-menu-link text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a>
                     <% } else { %>
-                        <button class="btn-auth btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">Đăng nhập</button>
-                        <button class="btn-auth btn-register" data-bs-toggle="modal" data-bs-target="#registerModal">Đăng ký</button>
+                        <div class="d-flex flex-column align-items-center" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#loginModal">
+                            <i class="far fa-bell"></i>
+                            <span>Thông báo</span>
+                        </div>
                     <% } %>
+                </div>
+
+                <!-- Cart -->
+                <div class="action-item">
+                    <a href="/cart" class="text-decoration-none text-dark d-flex flex-column align-items-center">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Giỏ hàng</span>
+                        <% if (locals.cartCount && cartCount > 0) { %>
+                            <span class="cart-badge"><%= cartCount %></span>
+                        <% } %>
+                    </a>
+                    <div class="dropdown-menu-custom cart-dropdown">
+                        <% if (locals.cart && cart.length > 0) { %>
+                            <div class="cart-list">
+                                <% cart.slice(0, 5).forEach(item => { %>
+                                    <div class="cart-item-row">
+                                        <%
+                                            let imgSrc = item.image_url;
+                                            if (imgSrc && !imgSrc.startsWith('http')) imgSrc = '/images/' + imgSrc;
+                                        %>
+                                        <img src="<%= imgSrc || '/images/default.jpg' %>" class="cart-img" onerror="this.src='https://picsum.photos/50/70'">
+                                        <div class="cart-info">
+                                            <div class="cart-name"><%= item.name %></div>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="small text-muted">x<%= item.quantity %></span>
+                                                <span class="cart-price"><%= Number(item.price).toLocaleString('vi-VN') %> đ</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                            <div class="cart-footer">
+                                <div class="cart-total-row">
+                                    <span>Tổng cộng:</span>
+                                    <%
+                                        let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                                    %>
+                                    <span class="cart-total-val"><%= total.toLocaleString('vi-VN') %> đ</span>
+                                </div>
+                                <% if (locals.user && user.role === 'admin') { %>
+                                    <button class="btn-view-cart bg-secondary" disabled>Admin không thể mua hàng</button>
+                                <% } else { %>
+                                    <a href="/cart" class="btn-view-cart">Xem giỏ hàng</a>
+                                <% } %>
+                            </div>
+                        <% } else { %>
+                            <div class="text-center py-5">
+                                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                                <p class="text-muted small mb-0">Giỏ hàng trống</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- User -->
+                <div class="action-item">
+                    <i class="fas fa-user-circle"></i>
+                    <span><%= locals.user ? (user.full_name || user.username) : 'Tài khoản' %></span>
+                    <div class="dropdown-menu-custom user-dropdown">
+                        <% if (locals.user) { %>
+                            <div class="text-center mb-2 pb-2 border-bottom">
+                                <div class="fw-bold text-dark"><%= user.username %></div>
+                                <div class="small text-muted"><%= user.role === 'admin' ? 'Quản trị viên' : 'Thành viên' %></div>
+                            </div>
+                            <% if (user.role !== 'admin') { %>
+                                <a href="/orders" class="user-menu-link"><i class="fas fa-box-open me-2"></i> Kiểm tra đơn hàng</a>
+                            <% } %>
+                            <a href="/auth/logout" class="user-menu-link text-danger"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a>
+                        <% } else { %>
+                            <button class="btn-auth btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">Đăng nhập</button>
+                            <button class="btn-auth btn-register" data-bs-toggle="modal" data-bs-target="#registerModal">Đăng ký</button>
+                        <% } %>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- KHUNG 2: NAVIGATION BAR (Menu Danh mục) -->
-<div class="nav-bar">
-    <div class="container nav-container">
-        <!-- Danh mục sản phẩm (Dropdown) -->
-        <div class="cat-menu-btn">
-            <i class="fas fa-bars"></i> Danh mục sản phẩm
-
-            <div class="cat-dropdown">
-                <% if (locals.globalCategories && globalCategories.length > 0) { %>
-                    <% globalCategories.forEach(cat => { %>
-                        <a href="/category/<%= cat.id %>" class="cat-item"><%= cat.name %></a>
-                    <% }); %>
-                <% } else { %>
-                    <a href="#" class="cat-item">Văn học</a>
-                    <a href="#" class="cat-item">Kinh tế</a>
-                <% } %>
+    <!-- NAVIGATION BAR -->
+    <div class="nav-bar">
+        <div class="container nav-container">
+            <div class="cat-menu-btn">
+                <i class="fas fa-bars"></i> Danh mục sản phẩm
+                <div class="cat-dropdown">
+                    <% if (locals.globalCategories && globalCategories.length > 0) { %>
+                        <% globalCategories.forEach(cat => { %>
+                            <a href="/category/<%= cat.id %>" class="cat-item"><%= cat.name %></a>
+                        <% }); %>
+                    <% } else { %>
+                        <a href="#" class="cat-item">Văn học</a>
+                        <a href="#" class="cat-item">Kinh tế</a>
+                    <% } %>
+                </div>
             </div>
-        </div>
-
-        <!-- Menu ngang -->
-        <div class="nav-links">
-            <a href="/" class="nav-link-item">Trang chủ</a>
-            <a href="#" class="nav-link-item">Sách bán chạy</a>
-            <a href="#" class="nav-link-item">Sách mới</a>
-            <a href="#" class="nav-link-item">Khuyến mãi</a>
+            <div class="nav-links">
+                <a href="/" class="nav-link-item">Trang chủ</a>
+                <a href="/best-sellers" class="nav-link-item">Sách bán chạy</a>
+                <a href="/new-arrivals" class="nav-link-item">Sách mới</a>
+                <a href="/on-sale" class="nav-link-item">Khuyến mãi</a>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Đăng nhập -->
+<!-- Modals (Login/Register) -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -338,6 +445,9 @@
                     <div class="mb-4">
                         <label class="form-label">Mật khẩu</label>
                         <input type="password" class="form-control" name="password" required>
+                        <div class="text-end mt-1">
+                            <a href="/forgot-password" class="text-decoration-none small text-muted">Quên mật khẩu?</a>
+                        </div>
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn text-white fw-bold" style="background-color: #1a1a2e;">Đăng nhập</button>
@@ -351,7 +461,6 @@
     </div>
 </div>
 
-<!-- Modal Đăng ký -->
 <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -381,6 +490,8 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
+
+        // Xử lý thông báo Login/Register
         if (urlParams.has('loginError')) {
             const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
             const alertBox = document.getElementById('loginAlert');
@@ -388,6 +499,9 @@
             alertBox.classList.remove('d-none', 'alert-success');
             alertBox.classList.add('alert-danger');
             loginModal.show();
+
+            // Xóa tham số URL
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
         if (urlParams.has('registerSuccess')) {
             const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
@@ -396,6 +510,9 @@
             alertBox.classList.remove('d-none', 'alert-danger');
             alertBox.classList.add('alert-success');
             loginModal.show();
+
+            // Xóa tham số URL
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
     });
 </script>

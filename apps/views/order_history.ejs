@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Lịch sử đơn hàng - Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
+        .main-content { flex: 1; padding: 40px 0; }
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .order-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fcfcfc;
+        }
+        .order-status { font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+
+        .status-PENDING { color: #ffc107; }
+        .status-CONFIRMED { color: #0d6efd; }
+        .status-PROCESSING { color: #6c757d; }
+        .status-SHIPPED { color: #0dcaf0; }
+        .status-DELIVERING { color: #fd7e14; }
+        .status-COMPLETED { color: #198754; }
+        .status-CANCELLED { color: #dc3545; }
+
+        .order-body { padding: 20px; }
+        .order-item { display: flex; align-items: center; margin-bottom: 15px; }
+        .order-item:last-child { margin-bottom: 0; }
+        .item-img { width: 60px; height: 80px; object-fit: cover; border-radius: 4px; margin-right: 15px; border: 1px solid #eee; }
+        .item-info { flex: 1; }
+        .item-name { font-weight: 600; color: #333; font-size: 0.95rem; margin-bottom: 3px; }
+        .item-meta { font-size: 0.85rem; color: #777; }
+        .item-price { font-weight: 600; color: #C92127; }
+
+        .order-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .total-price { font-size: 1.2rem; font-weight: 700; color: #C92127; }
+
+        /* Progress Bar */
+        .progress-track {
+            display: flex;
+            margin-bottom: 30px;
+            padding: 0 10px;
+            position: relative;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            font-size: 0.75rem;
+            color: #999;
+            font-weight: 500;
+            z-index: 2;
+        }
+
+        /* Đường kẻ ngang */
+        .progress-line {
+            position: absolute;
+            top: 12px;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background-color: #eee;
+            z-index: 1;
+        }
+        .progress-line-fill {
+            height: 100%;
+            background-color: #2ecc71;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .step-icon {
+            width: 28px;
+            height: 28px;
+            background-color: #eee;
+            border-radius: 50%;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            border: 2px solid white; /* Viền trắng để tách khỏi đường kẻ */
+        }
+
+        .step.active { color: #2ecc71; font-weight: 700; }
+        .step.active .step-icon { background-color: #2ecc71; }
+
+        .empty-state { text-align: center; padding: 50px 20px; color: #777; }
+        .empty-state i { font-size: 4rem; margin-bottom: 20px; color: #ddd; }
+        .btn-shop { background-color: #C92127; color: white; padding: 8px 25px; border-radius: 20px; text-decoration: none; font-weight: 600; transition: 0.2s; }
+        .btn-shop:hover { background-color: #a11b20; color: white; }
+    </style>
+</head>
+<body>
+    <%- include('partials/menu') %>
+
+    <div class="main-content">
+        <div class="container">
+            <h4 class="mb-4 fw-bold text-uppercase"><i class="fas fa-history me-2 text-danger"></i> Lịch sử đơn hàng</h4>
+
+            <% if (orders && orders.length > 0) { %>
+                <% orders.forEach(order => {
+                    let statusText = 'Chờ xác nhận';
+                    let progressWidth = '0%';
+                    let activeStep = 1;
+
+                    switch(order.status) {
+                        case 'PENDING': statusText = 'Chờ xác nhận'; progressWidth = '0%'; activeStep = 1; break;
+                        case 'CONFIRMED': statusText = 'Đã xác nhận'; progressWidth = '33%'; activeStep = 2; break;
+                        case 'PROCESSING': statusText = 'Đang xử lý'; progressWidth = '33%'; activeStep = 2; break;
+                        case 'SHIPPED': statusText = 'Đã giao VC'; progressWidth = '66%'; activeStep = 3; break;
+                        case 'DELIVERING': statusText = 'Đang giao hàng'; progressWidth = '66%'; activeStep = 3; break;
+                        case 'COMPLETED': statusText = 'Hoàn thành'; progressWidth = '100%'; activeStep = 4; break;
+                        case 'CANCELLED': statusText = 'Đã hủy'; progressWidth = '0%'; activeStep = 0; break;
+                    }
+                %>
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <span class="fw-bold me-2">Đơn hàng #<%= order.id %></span>
+                                <span class="text-muted small"><%= new Date(order.order_date).toLocaleDateString('vi-VN') %></span>
+
+                                <% if (order.tracking_code) { %>
+                                    <span class="badge bg-info text-dark ms-2"><i class="fas fa-truck me-1"></i> <%= order.tracking_code %></span>
+                                <% } %>
+                            </div>
+                            <div class="order-status status-<%= order.status %>"><%= statusText %></div>
+                        </div>
+
+                        <div class="order-body">
+                            <% if (order.status !== 'CANCELLED') { %>
+                                <div class="progress-track">
+                                    <div class="progress-line"><div class="progress-line-fill" style="width: <%= progressWidth %>;"></div></div>
+
+                                    <div class="step <%= activeStep >= 1 ? 'active' : '' %>">
+                                        <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                                        Đặt hàng
+                                    </div>
+                                    <div class="step <%= activeStep >= 2 ? 'active' : '' %>">
+                                        <div class="step-icon"><i class="fas fa-box"></i></div>
+                                        Đóng gói
+                                    </div>
+                                    <div class="step <%= activeStep >= 3 ? 'active' : '' %>">
+                                        <div class="step-icon"><i class="fas fa-truck"></i></div>
+                                        Vận chuyển
+                                    </div>
+                                    <div class="step <%= activeStep >= 4 ? 'active' : '' %>">
+                                        <div class="step-icon"><i class="fas fa-star"></i></div>
+                                        Hoàn thành
+                                    </div>
+                                </div>
+                            <% } else { %>
+                                <div class="alert alert-danger text-center py-2 mb-3">
+                                    <i class="fas fa-times-circle me-2"></i> Đơn hàng này đã bị hủy.
+                                </div>
+                            <% } %>
+
+                            <% if (order.items && order.items.length > 0) { %>
+                                <% order.items.forEach(item => { %>
+                                    <div class="order-item">
+                                        <%
+                                            let imgSrc = item.image_url;
+                                            if (imgSrc && !imgSrc.startsWith('http')) imgSrc = '/images/' + imgSrc;
+                                        %>
+                                        <img src="<%= imgSrc || '/images/default.jpg' %>" class="item-img" onerror="this.src='https://picsum.photos/60/80'">
+                                        <div class="item-info">
+                                            <div class="item-name"><%= item.name %></div>
+                                            <div class="item-meta">x<%= item.quantity %></div>
+                                        </div>
+                                        <div class="item-price"><%= Number(item.price_at_purchase).toLocaleString('vi-VN') %> đ</div>
+                                    </div>
+                                <% }); %>
+                            <% } %>
+                        </div>
+                        <div class="order-footer">
+                            <span class="text-muted small">Phương thức: <b><%= order.payment_method || 'COD' %></b></span>
+                            <div>
+                                <span class="total-label me-2">Tổng tiền:</span>
+                                <span class="total-price"><%= Number(order.final_total).toLocaleString('vi-VN') %> đ</span>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h5>Bạn chưa có đơn hàng nào</h5>
+                    <p class="mb-4">Hãy khám phá thêm các sản phẩm thú vị tại BookTotal nhé!</p>
+                    <a href="/" class="btn-shop">Mua sắm ngay</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

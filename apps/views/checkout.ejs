@@ -67,7 +67,21 @@
         }
         .payment-method-item:hover { border-color: #C92127; background-color: #fff5f5; }
         .payment-method-item input { margin-right: 15px; transform: scale(1.2); accent-color: #C92127; }
-        .payment-icon { width: 30px; margin-right: 10px; }
+        .payment-icon { width: 35px; margin-right: 10px; object-fit: contain; }
+
+        /* QR Code Box */
+        .qr-payment-box {
+            display: none;
+            text-align: center;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px dashed #C92127;
+        }
+        .qr-img { width: 200px; height: 200px; margin-bottom: 10px; border: 1px solid #ddd; padding: 5px; background: white; }
+        .qr-note { font-size: 0.9rem; color: #555; }
+        .qr-amount { font-weight: 700; color: #C92127; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -95,34 +109,32 @@
                                 <input type="email" class="form-control" name="email" value="<%= locals.user ? user.email : '' %>" required placeholder="Nhập email...">
                             </div>
 
-                            <!-- ĐỊA CHỈ CHI TIẾT (3 CẤP) -->
+                            <!-- ĐỊA CHỈ CHI TIẾT (API NGOÀI) -->
                             <div class="col-md-4">
                                 <label class="form-label">Tỉnh/Thành phố</label>
-                                <select class="form-select" id="province" name="province" required onchange="loadDistricts()">
+                                <select class="form-select" id="province" required onchange="loadDistricts()">
                                     <option value="">Chọn Tỉnh/Thành</option>
-                                    <option value="Hồ Chí Minh">Hồ Chí Minh</option>
-                                    <option value="Hà Nội">Hà Nội</option>
-                                    <option value="Đà Nẵng">Đà Nẵng</option>
-                                    <option value="Cần Thơ">Cần Thơ</option>
-                                    <option value="Bình Dương">Bình Dương</option>
                                 </select>
+                                <input type="hidden" name="province_name" id="province_name">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Quận/Huyện</label>
-                                <select class="form-select" id="district" name="district" required onchange="loadWards()" disabled>
+                                <select class="form-select" id="district" required onchange="loadWards()" disabled>
                                     <option value="">Chọn Quận/Huyện</option>
                                 </select>
+                                <input type="hidden" name="district_name" id="district_name">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Phường/Xã</label>
-                                <select class="form-select" id="ward" name="ward" required disabled>
+                                <select class="form-select" id="ward" required onchange="updateAddressString()" disabled>
                                     <option value="">Chọn Phường/Xã</option>
                                 </select>
+                                <input type="hidden" name="ward_name" id="ward_name">
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label">Địa chỉ cụ thể (Số nhà, tên đường)</label>
-                                <input type="text" class="form-control" name="address_detail" required placeholder="VD: 123 Nguyễn Văn Linh...">
+                                <input type="text" class="form-control" id="address_detail" required placeholder="VD: 123 Nguyễn Văn Linh..." oninput="updateAddressString()">
                             </div>
 
                             <!-- Input ẩn để gom địa chỉ gửi lên server -->
@@ -139,22 +151,30 @@
                         <h4 class="section-title"><i class="fas fa-credit-card me-2 text-danger"></i> Phương thức thanh toán</h4>
 
                         <label class="payment-method-item">
-                            <input type="radio" name="payment_method" value="COD" checked>
-                            <i class="fas fa-money-bill-wave payment-icon text-success"></i>
+                            <input type="radio" name="payment_method" value="COD" checked onchange="toggleQR('COD')">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2331/2331941.png" class="payment-icon" alt="COD">
                             <span>Thanh toán khi nhận hàng (COD)</span>
                         </label>
 
                         <label class="payment-method-item">
-                            <input type="radio" name="payment_method" value="VNPAY">
-                            <i class="fas fa-qrcode payment-icon text-primary"></i>
+                            <input type="radio" name="payment_method" value="VNPAY" onchange="toggleQR('VNPAY')">
+                            <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg" class="payment-icon" alt="VNPAY">
                             <span>Ví VNPAY / QR Code</span>
                         </label>
 
                         <label class="payment-method-item">
-                            <input type="radio" name="payment_method" value="MOMO">
-                            <i class="fas fa-wallet payment-icon text-danger"></i>
+                            <input type="radio" name="payment_method" value="MOMO" onchange="toggleQR('MOMO')">
+                            <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" class="payment-icon" alt="MOMO">
                             <span>Ví MoMo</span>
                         </label>
+
+                        <!-- KHUNG QR CODE -->
+                        <div id="qrCodeBox" class="qr-payment-box">
+                            <p class="qr-note">Vui lòng quét mã QR bên dưới để thanh toán:</p>
+                            <img id="qrImage" src="" class="qr-img" alt="QR Code">
+                            <p class="mt-2">Số tiền: <span class="qr-amount" id="qrAmountDisplay">0 đ</span></p>
+                            <p class="small text-muted">Nội dung: <b id="qrContent">THANH TOAN DON HANG</b></p>
+                        </div>
                     </div>
                 </div>
 
@@ -195,7 +215,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-confirm" onclick="prepareAddress()">
+                        <button type="submit" class="btn-confirm">
                             XÁC NHẬN ĐẶT HÀNG
                         </button>
                     </div>
@@ -204,29 +224,33 @@
         </form>
     </div>
 
-    <!-- Đã xóa Footer -->
+    <%- include('partials/footer') %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Dữ liệu giả lập Quận/Huyện
-        const districtsData = {
-            "Hồ Chí Minh": ["Quận 1", "Quận 3", "Quận 5", "Quận 7", "Thủ Đức", "Bình Thạnh"],
-            "Hà Nội": ["Hoàn Kiếm", "Ba Đình", "Cầu Giấy", "Đống Đa", "Tây Hồ"],
-            "Đà Nẵng": ["Hải Châu", "Thanh Khê", "Sơn Trà"],
-            "Cần Thơ": ["Ninh Kiều", "Bình Thủy", "Cái Răng"],
-            "Bình Dương": ["Thủ Dầu Một", "Dĩ An", "Thuận An"]
-        };
+        // API Hành chính công Việt Nam (Open API)
+        const API_HOST = "https://provinces.open-api.vn/api/";
+        const finalTotal = <%= totalAmount + shippingFee - productDiscount %>;
 
-        // Dữ liệu giả lập Phường/Xã
-        const wardsData = {
-            "Quận 1": ["Phường Bến Nghé", "Phường Bến Thành", "Phường Đa Kao"],
-            "Thủ Đức": ["Phường Linh Trung", "Phường Linh Xuân", "Phường Hiệp Bình Chánh"],
-            "Hoàn Kiếm": ["Phường Hàng Bài", "Phường Tràng Tiền"],
-            "default": ["Phường 1", "Phường 2", "Xã A", "Xã B"]
-        };
+        document.addEventListener("DOMContentLoaded", function() {
+            loadProvinces();
+        });
+
+        function loadProvinces() {
+            fetch(API_HOST + "?depth=1")
+                .then(response => response.json())
+                .then(data => {
+                    let html = '<option value="">Chọn Tỉnh/Thành</option>';
+                    data.forEach(item => {
+                        html += `<option value="${item.code}">${item.name}</option>`;
+                    });
+                    document.getElementById('province').innerHTML = html;
+                })
+                .catch(error => console.error('Lỗi tải tỉnh thành:', error));
+        }
 
         function loadDistricts() {
-            const province = document.getElementById('province').value;
+            const provinceCode = document.getElementById('province').value;
             const districtSelect = document.getElementById('district');
             const wardSelect = document.getElementById('ward');
 
@@ -234,49 +258,91 @@
             wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
             wardSelect.disabled = true;
 
-            if (province && districtsData[province]) {
-                districtsData[province].forEach(d => {
-                    const option = document.createElement('option');
-                    option.value = d;
-                    option.text = d;
-                    districtSelect.appendChild(option);
-                });
-                districtSelect.disabled = false;
+            const provinceName = document.getElementById('province').options[document.getElementById('province').selectedIndex].text;
+            document.getElementById('province_name').value = provinceName;
+            updateAddressString();
+
+            if (provinceCode) {
+                fetch(API_HOST + `p/${provinceCode}?depth=2`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let html = '<option value="">Chọn Quận/Huyện</option>';
+                        data.districts.forEach(item => {
+                            html += `<option value="${item.code}">${item.name}</option>`;
+                        });
+                        districtSelect.innerHTML = html;
+                        districtSelect.disabled = false;
+                    });
             } else {
                 districtSelect.disabled = true;
             }
         }
 
         function loadWards() {
-            const district = document.getElementById('district').value;
+            const districtCode = document.getElementById('district').value;
             const wardSelect = document.getElementById('ward');
 
             wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
 
-            const wards = wardsData[district] || wardsData["default"];
+            const districtName = document.getElementById('district').options[document.getElementById('district').selectedIndex].text;
+            document.getElementById('district_name').value = districtName;
+            updateAddressString();
 
-            if (district) {
-                wards.forEach(w => {
-                    const option = document.createElement('option');
-                    option.value = w;
-                    option.text = w;
-                    wardSelect.appendChild(option);
-                });
-                wardSelect.disabled = false;
+            if (districtCode) {
+                fetch(API_HOST + `d/${districtCode}?depth=2`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let html = '<option value="">Chọn Phường/Xã</option>';
+                        data.wards.forEach(item => {
+                            html += `<option value="${item.code}">${item.name}</option>`;
+                        });
+                        wardSelect.innerHTML = html;
+                        wardSelect.disabled = false;
+                    });
             } else {
                 wardSelect.disabled = true;
             }
         }
 
-        function prepareAddress() {
-            const province = document.getElementById('province').value;
-            const district = document.getElementById('district').value;
-            const ward = document.getElementById('ward').value;
-            const detail = document.querySelector('input[name="address_detail"]').value;
+        function updateAddressString() {
+            const province = document.getElementById('province_name').value;
+            const district = document.getElementById('district_name').value;
+            const wardSelect = document.getElementById('ward');
+            const ward = wardSelect.options[wardSelect.selectedIndex]?.text || '';
+            const detail = document.getElementById('address_detail').value;
+
+            if (wardSelect.value) {
+                document.getElementById('ward_name').value = ward;
+            }
 
             if (province && district && ward && detail) {
                 const fullAddress = `${detail}, ${ward}, ${district}, ${province}`;
                 document.getElementById('fullAddress').value = fullAddress;
+            }
+        }
+
+        function toggleQR(method) {
+            const qrBox = document.getElementById('qrCodeBox');
+            const qrImage = document.getElementById('qrImage');
+            const qrAmount = document.getElementById('qrAmountDisplay');
+            const qrContent = document.getElementById('qrContent');
+
+            if (method === 'COD') {
+                qrBox.style.display = 'none';
+            } else {
+                qrBox.style.display = 'block';
+                qrAmount.innerText = finalTotal.toLocaleString('vi-VN') + ' đ';
+
+                let qrData = '';
+                if (method === 'MOMO') {
+                    qrData = `2|99|0909123456|BookStore|email@test.com|0|0|${finalTotal}`;
+                    qrContent.innerText = "Chuyển khoản MoMo: 0909123456";
+                } else {
+                    qrData = `VNPAY_QR|${finalTotal}|BookStore Payment`;
+                    qrContent.innerText = "Quét mã VNPAY để thanh toán";
+                }
+
+                qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
             }
         }
     </script>

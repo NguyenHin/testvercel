@@ -40,7 +40,80 @@ module.exports = {
         return rows[0]; 
     },
 
-    // HÀM TÌM KIẾM CHUẨN
+    getProductsByCategory: async (categoryId) => {
+        const query = `
+            SELECT
+                p.*,
+                GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') as author_name
+            FROM products p
+            JOIN product_categories pc ON p.id = pc.product_id
+            LEFT JOIN product_authors pa ON p.id = pa.product_id
+            LEFT JOIN authors a ON pa.author_id = a.id
+            WHERE pc.category_id = ?
+            GROUP BY p.id
+            ORDER BY p.id DESC
+        `;
+        const [rows] = await db.query(query, [categoryId]);
+        return rows;
+    },
+
+    getCategoryName: async (categoryId) => {
+        const [rows] = await db.query('SELECT name FROM categories WHERE id = ?', [categoryId]);
+        return rows[0] ? rows[0].name : 'Danh mục';
+    },
+
+    // HÀM MỚI: Sách bán chạy (Top 10 theo sold_count)
+    getBestSellers: async () => {
+        const query = `
+            SELECT
+                p.*,
+                GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') as author_name
+            FROM products p
+            LEFT JOIN product_authors pa ON p.id = pa.product_id
+            LEFT JOIN authors a ON pa.author_id = a.id
+            GROUP BY p.id
+            ORDER BY p.sold_count DESC
+            LIMIT 10
+        `;
+        const [rows] = await db.query(query);
+        return rows;
+    },
+
+    // HÀM MỚI: Sách mới (Top 10 theo created_at)
+    getNewArrivals: async () => {
+        const query = `
+            SELECT
+                p.*,
+                GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') as author_name
+            FROM products p
+            LEFT JOIN product_authors pa ON p.id = pa.product_id
+            LEFT JOIN authors a ON pa.author_id = a.id
+            GROUP BY p.id
+            ORDER BY p.created_at DESC
+            LIMIT 10
+        `;
+        const [rows] = await db.query(query);
+        return rows;
+    },
+
+    // HÀM MỚI: Khuyến mãi (Giả lập: Lấy ngẫu nhiên 10 sản phẩm)
+    // Trong thực tế sẽ lọc theo bảng promotions hoặc cột discount_price
+    getOnSaleProducts: async () => {
+        const query = `
+            SELECT
+                p.*,
+                GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') as author_name
+            FROM products p
+            LEFT JOIN product_authors pa ON p.id = pa.product_id
+            LEFT JOIN authors a ON pa.author_id = a.id
+            GROUP BY p.id
+            ORDER BY RAND()
+            LIMIT 10
+        `;
+        const [rows] = await db.query(query);
+        return rows;
+    },
+
     searchProducts: async (keyword) => {
         const query = `
             SELECT
@@ -153,10 +226,17 @@ module.exports = {
         return result;
     },
 
-    importStock: async (id, quantityImport) => {
-        const query = `UPDATE products SET quantity = quantity + ? WHERE id = ?`;
-        const [result] = await db.query(query, [quantityImport, id]);
-        return result;
+    importStock: async (id, quantityImport, note) => {
+        const updateQuery = `UPDATE products SET quantity = quantity + ? WHERE id = ?`;
+        await db.query(updateQuery, [quantityImport, id]);
+        const logQuery = `INSERT INTO inventory_logs (product_id, quantity, note) VALUES (?, ?, ?)`;
+        await db.query(logQuery, [id, quantityImport, note]);
+    },
+
+    getInventoryLogs: async (productId) => {
+        const query = `SELECT * FROM inventory_logs WHERE product_id = ? ORDER BY created_at DESC`;
+        const [rows] = await db.query(query, [productId]);
+        return rows;
     },
 
     getReviews: async (productId) => {

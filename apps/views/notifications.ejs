@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thông báo của bạn - Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
+        .main-content { flex: 1; padding: 40px 0; }
+        .notification-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .notification-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .notification-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .notification-item {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            transition: 0.2s;
+        }
+        .notification-item:last-child { border-bottom: none; }
+        .notification-item:hover { background-color: #f9f9f9; }
+        .notification-item.unread { background-color: #e8f4fd; } /* Màu nền cho tin chưa đọc */
+
+        .notif-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .icon-info { background-color: #e7f1ff; color: #0d6efd; }
+        .icon-success { background-color: #d1e7dd; color: #198754; }
+        .icon-warning { background-color: #fff3cd; color: #ffc107; }
+        .icon-danger { background-color: #f8d7da; color: #dc3545; }
+
+        .notif-content { flex: 1; }
+        .notif-title { font-weight: 700; color: #333; margin-bottom: 5px; font-size: 1rem; }
+        .notif-message { color: #555; font-size: 0.95rem; line-height: 1.5; }
+        .notif-time { font-size: 0.8rem; color: #999; margin-top: 8px; }
+
+        .empty-state { text-align: center; padding: 50px 20px; color: #777; }
+        .empty-state i { font-size: 4rem; margin-bottom: 20px; color: #ddd; }
+    </style>
+</head>
+<body>
+    <%- include('partials/menu') %>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="notification-card">
+                        <div class="notification-header">
+                            <h4 class="mb-0 fw-bold"><i class="far fa-bell me-2 text-danger"></i> Thông báo của bạn</h4>
+                            <span class="badge bg-secondary"><%= notifications ? notifications.length : 0 %> tin</span>
+                        </div>
+
+                        <ul class="notification-list">
+                            <% if (notifications && notifications.length > 0) { %>
+                                <% notifications.forEach(notif => {
+                                    let iconClass = 'icon-info';
+                                    let iconName = 'fa-info-circle';
+
+                                    if (notif.type === 'success') { iconClass = 'icon-success'; iconName = 'fa-check-circle'; }
+                                    else if (notif.type === 'warning') { iconClass = 'icon-warning'; iconName = 'fa-exclamation-triangle'; }
+                                    else if (notif.type === 'danger') { iconClass = 'icon-danger'; iconName = 'fa-times-circle'; }
+                                %>
+                                    <li class="notification-item <%= notif.is_read ? '' : 'unread' %>">
+                                        <div class="notif-icon <%= iconClass %>">
+                                            <i class="fas <%= iconName %>"></i>
+                                        </div>
+                                        <div class="notif-content">
+                                            <div class="notif-title"><%= notif.title %></div>
+                                            <div class="notif-message"><%= notif.message %></div>
+                                            <div class="notif-time"><%= new Date(notif.created_at).toLocaleString('vi-VN') %></div>
+                                        </div>
+                                    </li>
+                                <% }); %>
+                            <% } else { %>
+                                <div class="empty-state">
+                                    <i class="far fa-bell-slash"></i>
+                                    <h5>Bạn chưa có thông báo nào</h5>
+                                    <p>Các cập nhật về đơn hàng và khuyến mãi sẽ hiển thị tại đây.</p>
+                                </div>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

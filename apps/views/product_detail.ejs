@@ -8,55 +8,18 @@
     <link rel="stylesheet" href="/css/product-detail.css">
     <style>
         /* Style riêng cho Modal Đánh giá */
-        .rating-stars-input {
-            display: flex;
-            flex-direction: row-reverse;
-            justify-content: center;
-            gap: 10px;
-        }
+        .rating-stars-input { display: flex; flex-direction: row-reverse; justify-content: center; gap: 10px; }
         .rating-stars-input input { display: none; }
-        .rating-stars-input label {
-            font-size: 2rem;
-            color: #ddd;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .rating-stars-input input:checked ~ label,
-        .rating-stars-input label:hover,
-        .rating-stars-input label:hover ~ label {
-            color: #FFD700;
-        }
+        .rating-stars-input label { font-size: 2rem; color: #ddd; cursor: pointer; transition: color 0.2s; }
+        .rating-stars-input input:checked ~ label, .rating-stars-input label:hover, .rating-stars-input label:hover ~ label { color: #FFD700; }
         .rating-text { text-align: center; margin-top: 5px; font-weight: 600; color: #555; min-height: 24px; }
-
         /* Filter Bar */
         .review-filter { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .filter-btn {
-            border: 1px solid #eee;
-            background: #f8f9fa;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: #555;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .filter-btn.active, .filter-btn:hover {
-            background: #fff3cd;
-            border-color: #ffc107;
-            color: #856404;
-            font-weight: 600;
-        }
-
-        /* Review Item Fahasa Style */
+        .filter-btn { border: 1px solid #eee; background: #f8f9fa; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; color: #555; cursor: pointer; transition: 0.2s; }
+        .filter-btn.active, .filter-btn:hover { background: #fff3cd; border-color: #ffc107; color: #856404; font-weight: 600; }
+        /* Review Item */
         .review-item { display: flex; gap: 15px; border-bottom: 1px solid #f0f0f0; padding: 20px 0; }
-        .review-avatar {
-            width: 45px; height: 45px;
-            background: #eee;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: #777;
-            font-size: 1.2rem;
-        }
+        .review-avatar { width: 45px; height: 45px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #777; font-size: 1.2rem; }
         .review-content { flex: 1; }
         .review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
         .review-name { font-weight: 600; color: #333; font-size: 0.95rem; }
@@ -64,262 +27,129 @@
         .review-stars { color: #FFD700; font-size: 0.85rem; margin-bottom: 8px; }
         .review-text { color: #444; font-size: 0.95rem; line-height: 1.5; margin-bottom: 5px; }
         .review-date { font-size: 0.8rem; color: #999; }
-
-        /* Admin Reply Style */
-        .admin-reply-box {
-            background-color: #f8f9fa;
-            border-left: 3px solid #C92127;
-            padding: 10px 15px;
-            margin-top: 10px;
-            border-radius: 0 4px 4px 0;
-        }
-        .admin-reply-header {
-            font-weight: 700;
-            color: #C92127;
-            font-size: 0.85rem;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .admin-reply-content {
-            font-size: 0.9rem;
-            color: #555;
-        }
-
-        /* POPUP THÔNG BÁO THÀNH CÔNG (MỚI - GIỮA MÀN HÌNH) */
-        .center-success-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background-color: white;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            min-width: 300px;
-        }
-        .center-success-popup.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, -50%) scale(1);
-        }
-        .center-success-popup i {
-            font-size: 3.5rem;
-            color: #2ecc71;
-            margin-bottom: 15px;
-        }
-        .center-success-popup span {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #2ecc71;
-        }
-
-        /* THÔNG TIN VẬN CHUYỂN */
-        .shipping-info {
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px dashed #eee;
-        }
-        .shipping-row {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-        .shipping-label {
-            color: #333;
-            font-weight: 600;
-            margin-right: 5px;
-            white-space: nowrap;
-        }
-        .shipping-address {
-            font-weight: 700;
-            color: #2489F4;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        .btn-change-address {
-            color: #C92127;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
+        /* Admin Reply */
+        .admin-reply-box { background-color: #f8f9fa; border-left: 3px solid #C92127; padding: 10px 15px; margin-top: 10px; border-radius: 0 4px 4px 0; }
+        .admin-reply-header { font-weight: 700; color: #C92127; font-size: 0.85rem; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+        .admin-reply-content { font-size: 0.9rem; color: #555; }
+        /* Popup */
+        .center-success-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background-color: white; padding: 30px 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); min-width: 300px; }
+        .center-success-popup.show { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
+        .center-success-popup i { font-size: 3.5rem; color: #2ecc71; margin-bottom: 15px; }
+        .center-success-popup span { font-size: 1.1rem; font-weight: 700; color: #2ecc71; }
+        /* Shipping */
+        .shipping-info { font-size: 0.9rem; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed #eee; }
+        .shipping-row { display: flex; align-items: flex-start; margin-bottom: 10px; }
+        .shipping-label { color: #333; font-weight: 600; margin-right: 5px; white-space: nowrap; }
+        .shipping-address { font-weight: 700; color: #2489F4; margin-right: 10px; cursor: pointer; }
+        .btn-change-address { color: #C92127; text-decoration: none; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; }
         .btn-change-address:hover { text-decoration: underline; }
-
-        .shipping-estimate {
-            font-weight: 700;
-            color: #2ecc71;
-            font-size: 0.95rem;
-        }
-
-        /* Modal Chọn Địa Chỉ */
+        .shipping-estimate { font-weight: 700; color: #2ecc71; font-size: 0.95rem; }
+        /* Modal Address */
         .address-select-group { margin-bottom: 15px; }
         .address-select-group label { font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block; }
-
-        /* Rating Summary (Trên giá) */
-        .rating-summary-top {
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            color: #555;
-        }
+        /* Rating Summary */
+        .rating-summary-top { display: flex; align-items: center; font-size: 0.9rem; margin-bottom: 15px; color: #555; }
         .rating-stars-top { color: #FFD700; margin-right: 5px; }
         .divider { margin: 0 10px; color: #ddd; }
-
-        /* --- META INFO GRID --- */
-        .meta-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            column-gap: 30px;
-            row-gap: 10px;
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-        }
-        .meta-item {
-            display: flex;
-            align-items: baseline;
-        }
-        .meta-label {
-            color: #777;
-            width: 110px;
-            flex-shrink: 0;
-        }
-
-        /* HIGHLIGHT TEXT STYLE (Màu xanh) */
-        .highlight-text {
-            color: #2489F4 !important;
-            font-weight: 600;
-            text-decoration: none;
-        }
+        /* Meta Info */
+        .meta-info-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 30px; row-gap: 10px; margin-bottom: 20px; font-size: 0.95rem; }
+        .meta-item { display: flex; align-items: baseline; }
+        .meta-label { color: #777; width: 110px; flex-shrink: 0; }
+        .highlight-text { color: #2489F4 !important; font-weight: 600; text-decoration: none; }
         .highlight-text:hover { text-decoration: underline; }
-
         .meta-value { font-weight: 600; color: #333; }
-
-        /* Admin Mode Badge */
-        .admin-mode-badge {
-            background-color: #1a1a2e;
-            color: #c49b63;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            margin-bottom: 20px;
-            border: 1px dashed #c49b63;
-        }
+        /* Admin Badge */
+        .admin-mode-badge { background-color: #1a1a2e; color: #c49b63; padding: 10px; border-radius: 8px; text-align: center; font-weight: 600; margin-bottom: 20px; border: 1px dashed #c49b63; }
     </style>
 </head>
 <body>
     <%- include('partials/menu') %>
 
+    <!-- POPUP THÔNG BÁO -->
     <div id="centerSuccessPopup" class="center-success-popup">
         <i class="fas fa-check-circle"></i>
         <span>Đã thêm vào giỏ hàng thành công!</span>
     </div>
 
-    <div class="container mt-3 mb-5">
+    <div class="container mt-4 mb-5">
+        <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb bg-white shadow-sm">
+            <ol class="breadcrumb bg-white shadow-sm p-3 rounded">
                 <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
                 <li class="breadcrumb-item"><a href="#"><%= product.category_name || 'Sách' %></a></li>
                 <li class="breadcrumb-item active"><%= product.name %></li>
             </ol>
         </nav>
 
-        <div class="row">
+        <div class="row mb-4">
+            <!-- CỘT TRÁI -->
             <div class="col-lg-4 col-md-5">
-                <div class="content-box left-sidebar">
-                    <div class="product-img-box">
+                <div class="content-box left-sidebar bg-white p-3 rounded shadow-sm mb-3">
+                    <div class="product-img-box text-center mb-3">
                         <%
                             let imgSrc = product.image_url;
                             if (imgSrc && !imgSrc.startsWith('http')) imgSrc = '/images/' + imgSrc;
                         %>
-                        <img src="<%= imgSrc || '/images/default.jpg' %>" class="product-img" alt="<%= product.name %>" onerror="this.src='https://picsum.photos/400/600'">
+                        <img src="<%= imgSrc || '/images/default.jpg' %>" class="product-img img-fluid rounded" alt="<%= product.name %>" onerror="this.src='https://picsum.photos/400/600'">
                     </div>
 
                     <% if (locals.user && user.role === 'admin') { %>
                         <div class="admin-mode-badge">
                             <i class="fas fa-user-shield me-2"></i> Chế độ Admin (Chỉ xem)
                         </div>
-                        <div class="action-buttons">
-                            <button class="btn btn-secondary w-100 py-2" disabled style="cursor: not-allowed; opacity: 0.6;">
+                        <div class="action-buttons d-grid gap-2">
+                            <button class="btn btn-secondary py-2" disabled style="cursor: not-allowed; opacity: 0.6;">
                                 <i class="fas fa-ban me-2"></i> Không thể mua hàng
                             </button>
                         </div>
                     <% } else { %>
-                        <div class="action-buttons position-relative">
-                            <button class="btn-add-cart position-relative" id="btnAddToCart" data-id="<%= product.id %>">
-                                <i class="fas fa-cart-plus"></i> Thêm giỏ
+                        <div class="action-buttons d-grid gap-2">
+                            <button class="btn btn-outline-danger py-2 fw-bold" id="btnAddToCart" data-id="<%= product.id %>">
+                                <i class="fas fa-cart-plus"></i> Thêm giỏ hàng
                             </button>
-                            <button class="btn-buy-now" id="btnBuyNow" data-id="<%= product.id %>">
+                            <button class="btn btn-danger py-2 fw-bold" id="btnBuyNow" data-id="<%= product.id %>">
                                 Mua ngay
                             </button>
                         </div>
                     <% } %>
 
                     <div class="policy-box mt-3 pt-3 border-top">
-                        <ul class="policy-list">
-                            <li><i class="fas fa-truck"></i> Miễn phí giao hàng đơn từ 150k</li>
-                            <li><i class="fas fa-undo"></i> Đổi trả miễn phí trong 30 ngày</li>
-                            <li><i class="fas fa-check-shield"></i> Cam kết chính hãng 100%</li>
+                        <ul class="list-unstyled small text-muted">
+                            <li class="mb-2"><i class="fas fa-truck text-success me-2"></i> Miễn phí giao hàng đơn từ 150k</li>
+                            <li class="mb-2"><i class="fas fa-undo text-primary me-2"></i> Đổi trả miễn phí trong 30 ngày</li>
+                            <li><i class="fas fa-check-shield text-warning me-2"></i> Cam kết chính hãng 100%</li>
                         </ul>
                     </div>
                 </div>
             </div>
 
+            <!-- CỘT PHẢI -->
             <div class="col-lg-8 col-md-7">
-                <div class="content-box">
-                    <h1 class="product-title"><%= product.name %></h1>
+                <div class="content-box bg-white p-4 rounded shadow-sm mb-3">
+                    <h1 class="product-title h3 fw-bold mb-3"><%= product.name %></h1>
 
                     <div class="meta-info-grid">
-                        <div class="meta-item">
-                            <span class="meta-label">Nhà cung cấp:</span>
-                            <span class="meta-value">
-                                <a href="#" class="highlight-text"><%= product.supplier_name || 'Đang cập nhật' %></a>
-                            </span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Tác giả:</span>
-                            <span class="meta-value">
-                                <a href="#" class="highlight-text"><%= product.author_name || 'Đang cập nhật' %></a>
-                            </span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Nhà xuất bản:</span>
-                            <span class="meta-value"><%= product.publisher_name || '---' %></span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Hình thức bìa:</span>
-                            <span class="meta-value"><%= product.cover_type || '---' %></span>
-                        </div>
+                        <div class="meta-item"><span class="meta-label">Nhà cung cấp:</span><span class="meta-value"><a href="#" class="highlight-text"><%= product.supplier_name || 'Đang cập nhật' %></a></span></div>
+                        <div class="meta-item"><span class="meta-label">Tác giả:</span><span class="meta-value"><a href="#" class="highlight-text"><%= product.author_name || 'Đang cập nhật' %></a></span></div>
+                        <div class="meta-item"><span class="meta-label">Nhà xuất bản:</span><span class="meta-value"><%= product.publisher_name || '---' %></span></div>
+                        <div class="meta-item"><span class="meta-label">Hình thức bìa:</span><span class="meta-value"><%= product.cover_type || '---' %></span></div>
                     </div>
 
-                    <div class="rating-summary-top">
-                        <div class="rating-stars-top">
+                    <div class="rating-summary-top mb-3">
+                        <div class="text-warning me-2">
                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                         </div>
-                        <span class="text-warning fw-bold me-1">(<%= reviews ? reviews.length : 0 %> đánh giá)</span>
-                        <span class="divider">|</span>
+                        <span class="text-muted">(<%= reviews ? reviews.length : 0 %> đánh giá)</span>
+                        <span class="mx-2 text-muted">|</span>
                         <span class="text-muted">Đã bán <%= product.sold_count || 0 %></span>
                     </div>
 
-                    <div class="price-box">
-                        <span class="current-price"><%= Number(product.price).toLocaleString('vi-VN') %> đ</span>
+                    <div class="price-box my-3">
+                        <span class="current-price h2 text-danger fw-bold me-3"><%= Number(product.price).toLocaleString('vi-VN') %> đ</span>
                         <% if (product.quantity > 0) { %>
-                            <span class="badge bg-success" style="font-size: 12px;"><i class="fas fa-check"></i> Còn hàng</span>
+                            <span class="badge bg-success"><i class="fas fa-check"></i> Còn hàng</span>
                         <% } else { %>
-                            <span class="badge bg-secondary" style="font-size: 12px;">Hết hàng</span>
+                            <span class="badge bg-secondary">Hết hàng</span>
                         <% } %>
                     </div>
 
@@ -327,56 +157,37 @@
                         <div class="shipping-row align-items-center">
                             <span class="shipping-label">Giao hàng đến:</span>
                             <span class="shipping-address" id="currentAddress">Hồ Chí Minh</span>
-                            <span class="btn-change-address" data-bs-toggle="modal" data-bs-target="#addressModal">Thay đổi</span>
+                            <span class="btn-change-address ms-2" data-bs-toggle="modal" data-bs-target="#addressModal">Thay đổi</span>
                         </div>
                         <div class="shipping-row">
-                            <i class="fas fa-truck-fast text-success me-2 mt-1" style="font-size: 1.2rem;"></i>
-                            <div>
-                                <div class="shipping-estimate" id="deliveryDate">Đang tính toán...</div>
-                            </div>
+                            <i class="fas fa-truck-fast text-success me-2 mt-1"></i>
+                            <div class="shipping-estimate" id="deliveryDate">Đang tính toán...</div>
                         </div>
                     </div>
 
                     <div class="d-flex align-items-center gap-3 mb-3">
-                        <span class="fw-bold" style="font-size: 13px;">Số lượng:</span>
-                        <div class="input-group input-group-sm" style="width: 100px;">
+                        <span class="fw-bold">Số lượng:</span>
+                        <div class="input-group input-group-sm" style="width: 120px;">
                             <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">-</button>
                             <input type="text" class="form-control text-center fw-bold" value="1" id="qtyInput">
                             <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">+</button>
                         </div>
                     </div>
+                </div>
 
-                    <div class="spec-box">
-                        <div class="spec-title">Thông tin chi tiết</div>
-                        <table class="spec-table">
-                            <tr><td class="spec-label">Mã hàng</td><td class="spec-value"><%= product.id %></td></tr>
-                            <tr>
-                                <td class="spec-label">Tên Nhà Cung Cấp</td>
-                                <td class="spec-value"><a href="#" class="highlight-text"><%= product.supplier_name || '---' %></a></td>
-                            </tr>
-                            <tr>
-                                <td class="spec-label">Tác giả</td>
-                                <td class="spec-value"><a href="#" class="highlight-text"><%= product.author_name || '---' %></a></td>
-                            </tr>
-                            <tr><td class="spec-label">Nhà xuất bản</td><td class="spec-value"><%= product.publisher_name || '---' %></td></tr>
-                            <tr><td class="spec-label">Năm xuất bản</td><td class="spec-value"><%= product.publication_year || '---' %></td></tr>
-                            <tr><td class="spec-label">Ngôn ngữ</td><td class="spec-value"><%= product.language || 'Tiếng Việt' %></td></tr>
-                            <tr><td class="spec-label">Kích thước bao bì</td><td class="spec-value"><%= product.dimensions || '---' %></td></tr>
-                            <tr><td class="spec-label">Số trang</td><td class="spec-value"><%= product.pages || '---' %></td></tr>
-                            <tr><td class="spec-label">Hình thức</td><td class="spec-value"><%= product.cover_type || '---' %></td></tr>
-                        </table>
+                <!-- MÔ TẢ SẢN PHẨM -->
+                <div class="content-box bg-white p-4 rounded shadow-sm mb-3">
+                    <h5 class="fw-bold mb-3 border-bottom pb-2">Mô tả sản phẩm</h5>
+                    <div class="text-secondary" style="line-height: 1.6; text-align: justify;">
+                        <%= product.description || "Đang cập nhật nội dung..." %>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="content-box mt-3">
-            <h5 class="fw-bold mb-3 border-bottom pb-2" style="font-size: 1.1rem;">Mô tả sản phẩm</h5>
-            <div class="text-secondary mb-5" style="line-height: 1.6; text-align: justify; font-size: 13px;">
-                <%= product.description || "Đang cập nhật nội dung..." %>
-            </div>
-
-            <h5 class="fw-bold mb-3 border-top pt-4" style="font-size: 1.1rem;">Đánh giá khách hàng</h5>
+        <!-- ĐÁNH GIÁ KHÁCH HÀNG -->
+        <div class="content-box bg-white p-4 rounded shadow-sm">
+            <h5 class="fw-bold mb-3">Đánh giá khách hàng</h5>
 
             <div class="rating-overview">
                 <div class="rating-left">
@@ -385,7 +196,7 @@
                         let avgRating = reviews && reviews.length > 0 ? (total / reviews.length).toFixed(1) : 0;
                     %>
                     <div class="rating-score"><%= avgRating %>/5</div>
-                    <div class="text-warning mb-1" style="font-size: 14px;">
+                    <div class="text-warning mb-1">
                         <% for(let i=1; i<=5; i++) { %>
                             <% if(i <= Math.round(avgRating)) { %><i class="fas fa-star"></i><% } else { %><i class="far fa-star"></i><% } %>
                         <% } %>
@@ -417,7 +228,7 @@
 
                 <% if (locals.user) { %>
                     <% if (user.role === 'admin') { %>
-                        <button class="btn btn-secondary btn-sm px-4" disabled style="cursor: not-allowed;">Admin không thể đánh giá</button>
+                        <button class="btn btn-secondary btn-sm px-4" disabled>Admin không thể đánh giá</button>
                     <% } else { %>
                         <button class="btn btn-primary btn-sm px-4" data-bs-toggle="modal" data-bs-target="#reviewModal">
                             <i class="fas fa-pen me-2"></i> Viết đánh giá
@@ -432,15 +243,13 @@
                 <% if (reviews && reviews.length > 0) { %>
                     <% reviews.forEach(review => { %>
                         <div class="review-item">
-                            <div class="review-avatar">
-                                <%= review.full_name ? review.full_name.charAt(0).toUpperCase() : 'U' %>
-                            </div>
+                            <div class="review-avatar"><%= review.full_name ? review.full_name.charAt(0).toUpperCase() : 'U' %></div>
                             <div class="review-content">
                                 <div class="review-header">
                                     <span class="review-name"><%= review.full_name || 'Người dùng ẩn danh' %></span>
                                     <span class="verified-badge"><i class="fas fa-check-circle"></i> Đã mua hàng</span>
                                 </div>
-                                <div class="review-stars">
+                                <div class="review-stars text-warning">
                                     <% for(let i=0; i<review.rating; i++) { %>★<% } %>
                                     <% for(let i=review.rating; i<5; i++) { %>☆<% } %>
                                 </div>
@@ -449,15 +258,8 @@
 
                                 <% if (review.admin_reply) { %>
                                     <div class="admin-reply-box">
-                                        <div class="admin-reply-header">
-                                            <i class="fas fa-user-shield"></i> Phản hồi từ Quản trị viên
-                                            <span class="text-muted fw-normal ms-2" style="font-size: 0.75rem;">
-                                                <%= review.replied_at ? new Date(review.replied_at).toLocaleDateString('vi-VN') : '' %>
-                                            </span>
-                                        </div>
-                                        <div class="admin-reply-content">
-                                            <%= review.admin_reply %>
-                                        </div>
+                                        <div class="admin-reply-header"><i class="fas fa-user-shield"></i> Phản hồi từ Quản trị viên</div>
+                                        <div class="admin-reply-content"><%= review.admin_reply %></div>
                                     </div>
                                 <% } %>
                             </div>
@@ -468,35 +270,9 @@
                 <% } %>
             </div>
         </div>
-
-        <div class="content-box mt-3">
-            <h5 class="fw-bold mb-3" style="font-size: 1.1rem;">Sản phẩm liên quan</h5>
-            <div class="row row-cols-2 row-cols-md-5 g-2">
-                <% if (locals.relatedProducts) { %>
-                    <% relatedProducts.slice(0, 5).forEach(item => { %>
-                        <% if (item.id !== product.id) { %>
-                            <div class="col">
-                                <a href="/product/<%= item.id %>" class="text-decoration-none text-dark">
-                                    <div class="card related-card h-100">
-                                        <%
-                                            let rImg = item.image_url;
-                                            if (rImg && !rImg.startsWith('http')) rImg = '/images/' + rImg;
-                                        %>
-                                        <img src="<%= rImg || '/images/default.jpg' %>" class="card-img-top p-2" onerror="this.src='https://picsum.photos/200/300'">
-                                        <div class="card-body p-2">
-                                            <div class="related-title"><%= item.name %></div>
-                                            <div class="related-price"><%= Number(item.price).toLocaleString('vi-VN') %> đ</div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        <% } %>
-                    <% }); %>
-                <% } %>
-            </div>
-        </div>
     </div>
 
+    <!-- Modal Viết Đánh Giá -->
     <div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -531,6 +307,7 @@
         </div>
     </div>
 
+    <!-- Modal Chọn Địa Chỉ -->
     <div class="modal fade" id="addressModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -576,19 +353,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/product-detail.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnAddToCart = document.getElementById('btnAddToCart');
-            const btnBuyNow = document.getElementById('btnBuyNow');
-            if (btnAddToCart) btnAddToCart.addEventListener('click', function() { addToCart(this.getAttribute('data-id')); });
-            if (btnBuyNow) btnBuyNow.addEventListener('click', function() { buyNow(this.getAttribute('data-id')); });
-
-            updateDeliveryDate();
-        });
-
         function openLoginModal() {
             const currentUrl = window.location.pathname;
             const loginForm = document.querySelector('#loginModal form');
-            if (loginForm) { // Kiểm tra form tồn tại trước khi thao tác
+            if (loginForm) {
                 if (!loginForm.querySelector('input[name="returnUrl"]')) {
                     const input = document.createElement('input');
                     input.type = 'hidden';
@@ -598,136 +366,8 @@
                 } else {
                     loginForm.querySelector('input[name="returnUrl"]').value = currentUrl;
                 }
-            }
-            const modalEl = document.getElementById('loginModal');
-            if (modalEl) {
-                const loginModal = new bootstrap.Modal(modalEl);
+                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
                 loginModal.show();
-            }
-        }
-
-        function setRatingText(text) {
-            document.getElementById('ratingText').innerText = text;
-        }
-
-        function updateDeliveryDate() {
-            const today = new Date();
-            const deliveryDate = new Date(today);
-            deliveryDate.setDate(today.getDate() + 2);
-
-            const options = { weekday: 'long', day: 'numeric', month: 'numeric' };
-            const dateString = deliveryDate.toLocaleDateString('vi-VN', options);
-            const formattedDate = dateString.replace(/^\w/, (c) => c.toUpperCase());
-
-            const deliveryEl = document.getElementById('deliveryDate');
-            if (deliveryEl) deliveryEl.innerText = `Dự kiến giao ${formattedDate}`;
-        }
-
-        function updateDistricts() {
-            const province = document.getElementById('provinceSelect').value;
-            const districtSelect = document.getElementById('districtSelect');
-            districtSelect.innerHTML = '';
-
-            let districts = [];
-            if (province === 'Hồ Chí Minh') districts = ['Quận 1', 'Quận 3', 'Thủ Đức', 'Bình Thạnh'];
-            else if (province === 'Hà Nội') districts = ['Hoàn Kiếm', 'Ba Đình', 'Cầu Giấy'];
-            else districts = ['Quận trung tâm', 'Huyện ngoại thành'];
-
-            districts.forEach(d => {
-                const option = document.createElement('option');
-                option.value = d;
-                option.text = d;
-                districtSelect.appendChild(option);
-            });
-        }
-
-        function saveAddress() {
-            const province = document.getElementById('provinceSelect').value;
-            const district = document.getElementById('districtSelect').value;
-            const currentAddressEl = document.getElementById('currentAddress');
-            if (currentAddressEl) currentAddressEl.innerText = `${district}, ${province}`;
-
-            const modalEl = document.getElementById('addressModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-
-            updateDeliveryDate();
-        }
-
-        // Hàm thêm vào giỏ hàng
-        function addToCart(productId) {
-            const qtyInput = document.getElementById('qtyInput');
-            const quantity = qtyInput ? qtyInput.value : 1;
-
-            fetch(`/cart/add/${productId}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quantity: quantity })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Hiện Popup Giữa Màn Hình
-                    const popup = document.getElementById('centerSuccessPopup');
-                    if (popup) {
-                        popup.classList.add('show');
-                        setTimeout(() => popup.classList.remove('show'), 2000); // Ẩn sau 2s
-                    }
-
-                    // Cập nhật Badge
-                    let badge = document.querySelector('.cart-badge');
-                    if (!badge) {
-                        const cartLink = document.querySelector('a[href="/cart"]');
-                        if (cartLink) {
-                            badge = document.createElement('span');
-                            badge.className = 'cart-badge';
-                            badge.style.position = 'absolute';
-                            badge.style.top = '0';
-                            badge.style.right = '-5px';
-                            badge.style.backgroundColor = '#c49b63';
-                            badge.style.color = 'white';
-                            badge.style.fontSize = '0.7rem';
-                            badge.style.padding = '2px 6px';
-                            badge.style.borderRadius = '50%';
-                            badge.style.fontWeight = 'bold';
-                            badge.style.border = '2px solid white';
-                            cartLink.appendChild(badge);
-                            cartLink.style.position = 'relative';
-                        }
-                    }
-                    if (badge) badge.innerText = data.totalQty;
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        function buyNow(productId) {
-            const qtyInput = document.getElementById('qtyInput');
-            const quantity = qtyInput ? qtyInput.value : 1;
-
-            fetch(`/cart/add/${productId}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quantity: quantity })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) window.location.href = '/cart';
-                else alert(data.message);
-            });
-        }
-
-        function increaseQty() {
-            let input = document.getElementById('qtyInput');
-            if (input) input.value = parseInt(input.value) + 1;
-        }
-
-        function decreaseQty() {
-            let input = document.getElementById('qtyInput');
-            if (input && parseInt(input.value) > 1) {
-                input.value = parseInt(input.value) - 1;
             }
         }
     </script>

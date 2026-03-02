@@ -44,9 +44,9 @@
                     <thead>
                         <tr>
                             <th>Sản phẩm</th>
-                            <th class="text-center">Giá nhập (Gợi ý)</th>
+                            <th class="text-center">Giá bán</th>
                             <th class="text-center">Tồn kho</th>
-                            <th class="text-center">Đã bán</th>
+                            <th class="text-center">Tổng giá trị</th>
                             <th class="text-center">Trạng thái</th>
                             <th class="text-end">Hành động</th>
                         </tr>
@@ -82,15 +82,18 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="text-center text-muted"><%= Number(p.price * 0.7).toLocaleString('vi-VN') %> đ</td> <!-- Giả lập giá nhập = 70% giá bán -->
+                                    <td class="text-center"><%= Number(p.price).toLocaleString('vi-VN') %> đ</td>
                                     <td class="text-center fw-bold" style="font-size: 1.1rem;"><%= p.quantity %></td>
-                                    <td class="text-center"><%= p.sold_count %></td>
+                                    <td class="text-center text-muted"><%= Number(p.price * p.quantity).toLocaleString('vi-VN') %> đ</td>
                                     <td class="text-center">
                                         <span class="stock-badge <%= statusClass %>"><%= statusText %></span>
                                     </td>
                                     <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-secondary me-1" title="Lịch sử nhập" onclick="viewHistory('<%= p.id %>', '<%= p.name %>')">
+                                            <i class="fas fa-history"></i>
+                                        </button>
                                         <button class="btn btn-sm btn-primary" onclick="openImportModal('<%= p.id %>', '<%= p.name %>', <%= p.quantity %>)">
-                                            <i class="fas fa-plus-circle me-1"></i> Nhập hàng
+                                            <i class="fas fa-plus-circle"></i> Nhập
                                         </button>
                                     </td>
                                 </tr>
@@ -146,6 +149,32 @@
         </div>
     </div>
 
+    <!-- Modal Lịch Sử -->
+    <div class="modal fade" id="historyModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Lịch sử nhập hàng: <span id="historyProductName" class="text-primary"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr class="table-light">
+                                <th>Ngày nhập</th>
+                                <th>Số lượng</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function openImportModal(id, name, currentStock) {
@@ -164,6 +193,37 @@
                     row.style.display = 'none';
                 }
             });
+        }
+
+        function viewHistory(id, name) {
+            document.getElementById('historyProductName').innerText = name;
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center">Đang tải...</td></tr>';
+
+            new bootstrap.Modal(document.getElementById('historyModal')).show();
+
+            fetch(`/admin/inventory/logs/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data.length > 0) {
+                        let html = '';
+                        data.data.forEach(log => {
+                            html += `
+                                <tr>
+                                    <td>${new Date(log.created_at).toLocaleString('vi-VN')}</td>
+                                    <td class="fw-bold text-success">+${log.quantity}</td>
+                                    <td>${log.note || '---'}</td>
+                                </tr>
+                            `;
+                        });
+                        tbody.innerHTML = html;
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Chưa có lịch sử nhập hàng.</td></tr>';
+                    }
+                })
+                .catch(err => {
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Lỗi tải dữ liệu.</td></tr>';
+                });
         }
     </script>
 </body>
