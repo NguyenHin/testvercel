@@ -18,7 +18,7 @@ const updateStatusAndNotify = async (orderId, userId, newStatus, title, message,
         if (userId) {
             await Notification.createNotification(userId, title, message, type);
         }
-        // console.log(`[AUTO] Order #${orderId} updated to ${newStatus}`); // Táº¯t log Ä‘á»¡ rá»‘i
+        // console.log(`[AUTO] Order #${orderId} updated to ${newStatus}`); // Tắt log đỡ rối
     } catch (err) {
         console.error(`[AUTO] Error updating order #${orderId}:`, err.message);
     }
@@ -27,33 +27,33 @@ const updateStatusAndNotify = async (orderId, userId, newStatus, title, message,
 const startOrderAutomation = () => {
     console.log('--- Order Automation Started ---');
 
-    // Cháº¡y má»—i phÃºt (*/1 * * * *)
-    // ThÃªm scheduled: true Ä‘á»ƒ Ä‘áº£m báº£o nÃ³ cháº¡y
+    // Chạy mỗi phút (*/1 * * * *)
+    // Thêm scheduled: true để đảm bảo nó chạy
     cron.schedule('*/1 * * * *', async () => {
         try {
             // 1. PENDING -> CONFIRMED
             const [pendingOrders] = await db.query(`SELECT * FROM orders WHERE status = 'PENDING' AND order_date <= DATE_SUB(NOW(), INTERVAL 1 MINUTE)`);
             for (const order of pendingOrders) {
-                await updateStatusAndNotify(order.id, order.user_id, 'CONFIRMED', 'ÄÆ¡n hÃ ng Ä‘Ã£ Ä‘Æ°á»£c xÃ¡c nháº­n', `ÄÆ¡n hÃ ng #${order.id} cá»§a báº¡n Ä‘Ã£ Ä‘Æ°á»£c há»‡ thá»‘ng xÃ¡c nháº­n tá»± Ä‘á»™ng.`, 'info');
+                await updateStatusAndNotify(order.id, order.user_id, 'CONFIRMED', 'Đơn hàng đã được xác nhận', `Đơn hàng #${order.id} của bạn đã được hệ thống xác nhận tự động.`, 'info');
             }
 
             // 2. CONFIRMED -> SHIPPED
             const [confirmedOrders] = await db.query(`SELECT * FROM orders WHERE status = 'CONFIRMED' AND updated_at <= DATE_SUB(NOW(), INTERVAL 2 MINUTE)`);
             for (const order of confirmedOrders) {
                 const shipment = await shipmentAPI.createShipmentOrder(order);
-                await updateStatusAndNotify(order.id, order.user_id, 'SHIPPED', 'ÄÆ¡n hÃ ng Ä‘Ã£ giao cho váº­n chuyá»ƒn', `ÄÆ¡n hÃ ng #${order.id} Ä‘Ã£ Ä‘Æ°á»£c bÃ n giao cho GHN. MÃ£ váº­n Ä‘Æ¡n: ${shipment.tracking_code}`, 'info', shipment.tracking_code);
+                await updateStatusAndNotify(order.id, order.user_id, 'SHIPPED', 'Đơn hàng đã giao cho vận chuyển', `Đơn hàng #${order.id} đã được bàn giao cho GHN. Mã vận đơn: ${shipment.tracking_code}`, 'info', shipment.tracking_code);
             }
 
             // 3. SHIPPED -> DELIVERING
             const [shippedOrders] = await db.query(`SELECT * FROM orders WHERE status = 'SHIPPED' AND updated_at <= DATE_SUB(NOW(), INTERVAL 2 MINUTE)`);
             for (const order of shippedOrders) {
-                await updateStatusAndNotify(order.id, order.user_id, 'DELIVERING', 'ÄÆ¡n hÃ ng Ä‘ang Ä‘Æ°á»£c giao', `Shipper Ä‘ang giao Ä‘Æ¡n hÃ ng #${order.id} Ä‘áº¿n báº¡n.`, 'warning');
+                await updateStatusAndNotify(order.id, order.user_id, 'DELIVERING', 'Đơn hàng đang được giao', `Shipper đang giao đơn hàng #${order.id} đến bạn.`, 'warning');
             }
 
             // 4. DELIVERING -> COMPLETED
             const [deliveringOrders] = await db.query(`SELECT * FROM orders WHERE status = 'DELIVERING' AND updated_at <= DATE_SUB(NOW(), INTERVAL 3 MINUTE)`);
             for (const order of deliveringOrders) {
-                await updateStatusAndNotify(order.id, order.user_id, 'COMPLETED', 'Giao hÃ ng thÃ nh cÃ´ng', `ÄÆ¡n hÃ ng #${order.id} Ä‘Ã£ hoÃ n táº¥t. Cáº£m Æ¡n báº¡n Ä‘Ã£ mua sáº¯m!`, 'success');
+                await updateStatusAndNotify(order.id, order.user_id, 'COMPLETED', 'Giao hàng thành công', `Đơn hàng #${order.id} đã hoàn tất. Cảm ơn bạn đã mua sắm!`, 'success');
             }
 
         } catch (err) {
@@ -61,7 +61,7 @@ const startOrderAutomation = () => {
         }
     }, {
         scheduled: true,
-        timezone: "Asia/Ho_Chi_Minh" // Äáº·t mÃºi giá» chuáº©n
+        timezone: "Asia/Ho_Chi_Minh" // Đặt múi giờ chuẩn
     });
 };
 

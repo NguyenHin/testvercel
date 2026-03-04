@@ -38,20 +38,20 @@ class User {
         await db.query('DELETE FROM users WHERE id = ?', [id]);
     }
 
-    // --- CÃC HÃ€M Má»šI CHO QUÃŠN Máº¬T KHáº¨U ---
+    // --- CÁC HÀM MỚI CHO QUÊN MẬT KHẨU ---
 
-    // LÆ°u token reset vÃ o DB
+    // Lưu token reset vào DB
     static async saveResetToken(email, token, expiry) {
         await db.query('UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE email = ?', [token, expiry, email]);
     }
 
-    // TÃ¬m user báº±ng token cÃ²n háº¡n
+    // Tìm user bằng token còn hạn
     static async getUserByResetToken(token) {
         const [rows] = await db.query('SELECT * FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()', [token]);
         return rows[0];
     }
 
-    // Cáº­p nháº­t máº­t kháº©u má»›i vÃ  xÃ³a token
+    // Cập nhật mật khẩu mới và xóa token
     static async resetPassword(userId, newPassword) {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await db.query('UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?', [hashedPassword, userId]);

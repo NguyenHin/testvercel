@@ -7,7 +7,7 @@ class AdminReviewController {
             const reviews = await Product.getAllReviewsForAdmin();
             res.render('admin/review_list', { reviews: reviews });
         } catch (err) {
-            res.status(500).send("Lá»—i láº¥y danh sÃ¡ch Ä‘Ã¡nh giÃ¡");
+            res.status(500).send("Lỗi lấy danh sách đánh giá");
         }
     }
 
@@ -16,7 +16,7 @@ class AdminReviewController {
             await Product.updateReviewStatus(req.params.id, 'APPROVED');
             res.redirect('/admin/reviews');
         } catch (err) {
-            res.status(500).send("Lá»—i duyá»‡t Ä‘Ã¡nh giÃ¡");
+            res.status(500).send("Lỗi duyệt đánh giá");
         }
     }
 
@@ -26,7 +26,7 @@ class AdminReviewController {
             await Product.addAdminReply(review_id, reply_content);
             res.redirect('/admin/reviews');
         } catch (err) {
-            res.status(500).send("Lá»—i khi tráº£ lá»i Ä‘Ã¡nh giÃ¡");
+            res.status(500).send("Lỗi khi trả lời đánh giá");
         }
     }
 
@@ -35,7 +35,7 @@ class AdminReviewController {
             await Product.addAdminReply(req.params.id, null);
             res.redirect('/admin/reviews');
         } catch (err) {
-            res.status(500).send("Lá»—i khi xÃ³a tráº£ lá»i");
+            res.status(500).send("Lỗi khi xóa trả lời");
         }
     }
 
@@ -44,7 +44,7 @@ class AdminReviewController {
             await Product.deleteReview(req.params.id);
             res.redirect('/admin/reviews');
         } catch (err) {
-            res.status(500).send("Lá»—i xÃ³a Ä‘Ã¡nh giÃ¡");
+            res.status(500).send("Lỗi xóa đánh giá");
         }
     }
 }

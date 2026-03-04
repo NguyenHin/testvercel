@@ -14,7 +14,7 @@ class ApiOrderController {
             res.json({ success: true, data: order });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ success: false, message: "Lá»—i server" });
+            res.status(500).json({ success: false, message: "Lỗi server" });
         }
     }
 
@@ -24,7 +24,7 @@ class ApiOrderController {
             res.json(rows);
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: 'Lá»—i láº¥y tá»‰nh thÃ nh' });
+            res.status(500).json({ error: 'Lỗi lấy tỉnh thành' });
         }
     }
 
@@ -34,7 +34,7 @@ class ApiOrderController {
             res.json(rows);
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: 'Lá»—i láº¥y quáº­n huyá»‡n' });
+            res.status(500).json({ error: 'Lỗi lấy quận huyện' });
         }
     }
 
@@ -44,7 +44,7 @@ class ApiOrderController {
             res.json(rows);
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: 'Lá»—i láº¥y phÆ°á»ng xÃ£' });
+            res.status(500).json({ error: 'Lỗi lấy phường xã' });
         }
     }
 }

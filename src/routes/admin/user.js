@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const { requireAdmin } = require('../../middleware/auth');
 const AdminUserController = require('../../controllers/admin/AdminUserController');
@@ -6,16 +6,16 @@ const AdminUserController = require('../../controllers/admin/AdminUserController
 
 // Base path: /admin/user
 
-// GET: Danh sÃ¡ch user
+// GET: Danh sách user
 router.get('/', requireAdmin, AdminUserController.getList);
 
-// GET: Form thÃªm user
+// GET: Form thêm user
 router.get('/add', requireAdmin, AdminUserController.getAddForm);
 
-// POST: Xá»­ lÃ½ thÃªm user
+// POST: Xử lý thêm user
 router.post('/add', requireAdmin, AdminUserController.processAdd);
 
-// GET: XÃ³a user
+// GET: Xóa user
 router.get('/delete/:id', requireAdmin, AdminUserController.delete);
 
 module.exports = router;

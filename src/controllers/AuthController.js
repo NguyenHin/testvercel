@@ -22,12 +22,12 @@ class AuthController {
                 if (role === 'admin') return res.redirect('/admin');
                 return res.redirect(returnUrl || '/');
             } else {
-                const redirectUrl = returnUrl ? returnUrl + '?loginError=Sai tÃ i khoáº£n hoáº·c máº­t kháº©u!' : '/?loginError=Sai tÃ i khoáº£n hoáº·c máº­t kháº©u!';
+                const redirectUrl = returnUrl ? returnUrl + '?loginError=Sai tài khoản hoặc mật khẩu!' : '/?loginError=Sai tài khoản hoặc mật khẩu!';
                 return res.redirect(redirectUrl);
             }
         } catch (err) {
             console.error(err);
-            return res.redirect('/?loginError=Lá»—i há»‡ thá»‘ng!');
+            return res.redirect('/?loginError=Lỗi hệ thống!');
         }
     }
 
@@ -35,20 +35,20 @@ class AuthController {
         try {
             const { username, email, full_name, password } = req.body;
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) return res.redirect('/?registerError=Email khÃ´ng há»£p lá»‡!');
+            if (!emailRegex.test(email)) return res.redirect('/?registerError=Email không hợp lệ!');
             
             const existingUser = await User.getUserByUsername(username);
-            if (existingUser) return res.redirect('/?registerError=TÃªn Ä‘Äƒng nháº­p Ä‘Ã£ tá»“n táº¡i!');
+            if (existingUser) return res.redirect('/?registerError=Tên đăng nhập đã tồn tại!');
             
             await User.addUser(req.body);
             sendWelcomeEmail(email, full_name || username);
-            return res.redirect('/?registerSuccess=ÄÄƒng kÃ½ thÃ nh cÃ´ng! Vui lÃ²ng kiá»ƒm tra email.');
+            return res.redirect('/?registerSuccess=Đăng ký thành công! Vui lòng kiểm tra email.');
         } catch (err) {
             console.error(err);
             if (err.code === 'ER_DUP_ENTRY' && err.message.includes('email')) {
-                return res.redirect('/?registerError=Email Ä‘Ã£ Ä‘Æ°á»£c sá»­ dá»¥ng!');
+                return res.redirect('/?registerError=Email đã được sử dụng!');
             }
-            return res.redirect('/?registerError=Lá»—i khi Ä‘Äƒng kÃ½!');
+            return res.redirect('/?registerError=Lỗi khi đăng ký!');
         }
     }
 
@@ -66,7 +66,7 @@ class AuthController {
         try {
             const user = await User.getUserByEmail(email);
             if (!user) {
-                return res.render('auth/forgot_password', { error: 'Email khÃ´ng tá»“n táº¡i trong há»‡ thá»‘ng!' });
+                return res.render('auth/forgot_password', { error: 'Email không tồn tại trong hệ thống!' });
             }
             const token = crypto.randomBytes(32).toString('hex');
             const expiry = new Date(Date.now() + 3600000);
@@ -74,10 +74,10 @@ class AuthController {
             await User.saveResetToken(user.email, token, expiry);
             await sendResetPasswordEmail(user.email, token);
             
-            res.render('auth/forgot_password', { success: `ÄÃ£ gá»­i email hÆ°á»›ng dáº«n Ä‘áº¿n ${user.email}. Vui lÃ²ng kiá»ƒm tra há»™p thÆ°.` });
+            res.render('auth/forgot_password', { success: `Đã gửi email hướng dẫn đến ${user.email}. Vui lòng kiểm tra hộp thư.` });
         } catch (err) {
             console.error(err);
-            res.render('auth/forgot_password', { error: 'Lá»—i há»‡ thá»‘ng, vui lÃ²ng thá»­ láº¡i sau.' });
+            res.render('auth/forgot_password', { error: 'Lỗi hệ thống, vui lòng thử lại sau.' });
         }
     }
 
@@ -86,11 +86,11 @@ class AuthController {
         try {
             const user = await User.getUserByResetToken(token);
             if (!user) {
-                return res.render('auth/reset_password', { error: 'Link Ä‘áº·t láº¡i máº­t kháº©u khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n.', token: null });
+                return res.render('auth/reset_password', { error: 'Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.', token: null });
             }
             res.render('auth/reset_password', { token: token });
         } catch (err) {
-            res.render('auth/reset_password', { error: 'Lá»—i há»‡ thá»‘ng.', token: null });
+            res.render('auth/reset_password', { error: 'Lỗi hệ thống.', token: null });
         }
     }
 
@@ -99,19 +99,19 @@ class AuthController {
         const { password, confirm_password } = req.body;
         
         if (password !== confirm_password) {
-            return res.render('auth/reset_password', { error: 'Máº­t kháº©u xÃ¡c nháº­n khÃ´ng khá»›p.', token: token });
+            return res.render('auth/reset_password', { error: 'Mật khẩu xác nhận không khớp.', token: token });
         }
         
         try {
             const user = await User.getUserByResetToken(token);
             if (!user) {
-                return res.render('auth/reset_password', { error: 'Link khÃ´ng há»£p lá»‡.', token: null });
+                return res.render('auth/reset_password', { error: 'Link không hợp lệ.', token: null });
             }
             await User.resetPassword(user.id, password);
-            res.redirect('/?loginError=Äáº·t láº¡i máº­t kháº©u thÃ nh cÃ´ng! Vui lÃ²ng Ä‘Äƒng nháº­p báº±ng máº­t kháº©u má»›i.');
+            res.redirect('/?loginError=Đặt lại mật khẩu thành công! Vui lòng đăng nhập bằng mật khẩu mới.');
         } catch (err) {
             console.error(err);
-            res.render('auth/reset_password', { error: 'Lá»—i khi Ä‘áº·t láº¡i máº­t kháº©u.', token: token });
+            res.render('auth/reset_password', { error: 'Lỗi khi đặt lại mật khẩu.', token: token });
         }
     }
 }

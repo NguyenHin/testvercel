@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <title>Chi Tiết Sách - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Inter', sans-serif;
+        }
 
         .admin-header {
             background: white;
@@ -19,7 +23,7 @@
             background: white;
             border-radius: 16px;
             padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
             border: 1px solid #f0f0f0;
         }
 
@@ -28,15 +32,34 @@
             position: relative;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
             transition: transform 0.3s;
         }
-        .img-wrapper:hover { transform: translateY(-5px); }
-        .product-img { width: 100%; display: block; }
+
+        .img-wrapper:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-img {
+            width: 100%;
+            display: block;
+        }
 
         /* Thông tin */
-        .product-title { font-size: 2rem; font-weight: 800; color: #2c3e50; margin-bottom: 10px; letter-spacing: -0.5px; }
-        .product-id { font-size: 0.9rem; color: #95a5a6; font-weight: 500; margin-bottom: 20px; }
+        .product-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .product-id {
+            font-size: 0.9rem;
+            color: #95a5a6;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
 
         .price-tag {
             font-size: 2.2rem;
@@ -56,8 +79,16 @@
             font-weight: 600;
             margin-right: 10px;
         }
-        .badge-stock { background-color: #e8f5e9; color: #2ecc71; }
-        .badge-sold { background-color: #fff3e0; color: #f39c12; }
+
+        .badge-stock {
+            background-color: #e8f5e9;
+            color: #2ecc71;
+        }
+
+        .badge-sold {
+            background-color: #fff3e0;
+            color: #f39c12;
+        }
 
         /* Info Grid */
         .info-grid {
@@ -70,14 +101,46 @@
             border-radius: 12px;
             border: 1px solid #f1f1f1;
         }
-        .info-item { display: flex; flex-direction: column; }
-        .info-label { font-size: 0.85rem; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-        .info-value { font-size: 1rem; font-weight: 600; color: #34495e; }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #34495e;
+        }
 
         /* Description */
-        .desc-section { margin-top: 40px; }
-        .desc-title { font-size: 1.2rem; font-weight: 700; color: #2c3e50; margin-bottom: 15px; border-left: 4px solid #e74c3c; padding-left: 15px; }
-        .desc-content { color: #555; line-height: 1.8; font-size: 1rem; text-align: justify; }
+        .desc-section {
+            margin-top: 40px;
+        }
+
+        .desc-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-left: 4px solid #e74c3c;
+            padding-left: 15px;
+        }
+
+        .desc-content {
+            color: #555;
+            line-height: 1.8;
+            font-size: 1rem;
+            text-align: justify;
+        }
 
         /* Buttons */
         .btn-action {
@@ -88,18 +151,38 @@
             width: 100%;
             margin-bottom: 10px;
         }
-        .btn-edit { background-color: #3498db; color: white; border: none; }
-        .btn-edit:hover { background-color: #2980b9; transform: translateY(-2px); }
-        .btn-delete { background-color: #fff; color: #e74c3c; border: 2px solid #e74c3c; }
-        .btn-delete:hover { background-color: #e74c3c; color: white; }
+
+        .btn-edit {
+            background-color: #3498db;
+            color: white;
+            border: none;
+        }
+
+        .btn-edit:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background-color: #fff;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+        }
+
+        .btn-delete:hover {
+            background-color: #e74c3c;
+            color: white;
+        }
     </style>
 </head>
+
 <body>
 
     <header class="admin-header">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <a href="/admin/products" class="text-decoration-none text-secondary me-3"><i class="fas fa-arrow-left fa-lg"></i></a>
+                <a href="/admin/products" class="text-decoration-none text-secondary me-3"><i
+                        class="fas fa-arrow-left fa-lg"></i></a>
                 <h4 class="mb-0 fw-bold text-dark">Chi tiết sản phẩm</h4>
             </div>
             <span class="badge bg-secondary">Admin View</span>
@@ -112,11 +195,10 @@
                 <!-- Cột Trái: Ảnh -->
                 <div class="col-lg-4">
                     <div class="img-wrapper mb-4">
-                        <%
-                            let imgSrc = item.image_url;
-                            if (imgSrc && !imgSrc.startsWith('http')) imgSrc = '/images/' + imgSrc;
-                        %>
-                        <img src="<%= imgSrc || '/images/default.jpg' %>" class="product-img" onerror="this.src='https://picsum.photos/400/600'">
+                        <% let imgSrc=item.image_url; if (imgSrc && !imgSrc.startsWith('http')) imgSrc='/images/' +
+                            imgSrc; %>
+                            <img src="<%= imgSrc || '/images/default.jpg' %>" class="product-img"
+                                onerror="this.src='https://picsum.photos/400/600'">
                     </div>
 
                     <div class="row g-2">
@@ -126,7 +208,8 @@
                             </a>
                         </div>
                         <div class="col-12">
-                            <a href="/admin/products/delete/<%= item.id %>" class="btn btn-delete btn-action" onclick="return confirm('Hành động này không thể hoàn tác. Bạn chắc chắn muốn xóa?')">
+                            <a href="/admin/products/delete/<%= item.id %>" class="btn btn-delete btn-action"
+                                onclick="return confirm('Hành động này không thể hoàn tác. Bạn chắc chắn muốn xóa?')">
                                 <i class="fas fa-trash-alt me-2"></i> Xóa sản phẩm
                             </a>
                         </div>
@@ -137,53 +220,74 @@
                 <div class="col-lg-8">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h1 class="product-title"><%= item.name %></h1>
-                            <div class="product-id">SKU: #<%= item.id %></div>
+                            <h1 class="product-title">
+                                <%= item.name %>
+                            </h1>
+                            <div class="product-id">SKU: #<%= item.id %>
+                            </div>
                         </div>
                         <div class="text-end">
-                            <div class="price-tag"><%= Number(item.price).toLocaleString('vi-VN') %> ₫</div>
+                            <div class="price-tag">
+                                <%= Number(item.price).toLocaleString('vi-VN') %> ₫
+                            </div>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <span class="status-badge badge-stock"><i class="fas fa-box-open me-2"></i> Tồn kho: <%= item.quantity %></span>
-                        <span class="status-badge badge-sold"><i class="fas fa-chart-line me-2"></i> Đã bán: <%= item.sold_count || 0 %></span>
+                        <span class="status-badge badge-stock"><i class="fas fa-box-open me-2"></i> Tồn kho: <%=
+                                item.quantity %></span>
+                        <span class="status-badge badge-sold"><i class="fas fa-chart-line me-2"></i> Đã bán: <%=
+                                item.sold_count || 0 %></span>
                     </div>
 
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Nhà cung cấp</span>
-                            <span class="info-value text-primary"><%= item.supplier_name || '---' %></span>
+                            <span class="info-value text-primary">
+                                <%= item.supplier_name || '---' %>
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Tác giả</span>
-                            <span class="info-value text-primary"><%= item.author_name || '---' %></span>
+                            <span class="info-value text-primary">
+                                <%= item.author_name || '---' %>
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Nhà xuất bản</span>
-                            <span class="info-value"><%= item.publisher_name || '---' %></span>
+                            <span class="info-value">
+                                <%= item.publisher_name || '---' %>
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Năm xuất bản</span>
-                            <span class="info-value"><%= item.publication_year || '---' %></span>
+                            <span class="info-value">
+                                <%= item.publication_year || '---' %>
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Số trang</span>
-                            <span class="info-value"><%= item.pages || '---' %> trang</span>
+                            <span class="info-value">
+                                <%= item.pages || '---' %> trang
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Loại bìa</span>
-                            <span class="info-value"><%= item.cover_type || '---' %></span>
+                            <span class="info-value">
+                                <%= item.cover_type || '---' %>
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Danh mục</span>
-                            <span class="info-value"><%= item.category_name || 'Chưa phân loại' %></span>
+                            <span class="info-value">
+                                <%= item.category_name || 'Chưa phân loại' %>
+                            </span>
                         </div>
                     </div>
 
                     <div class="desc-section">
                         <h5 class="desc-title">Giới thiệu sách</h5>
-                        <div class="desc-content">
+                        <div class="desc-content" style="white-space: pre-wrap;">
                             <%= item.description || "Chưa có mô tả cho sản phẩm này." %>
                         </div>
                     </div>
@@ -193,4 +297,5 @@
     </div>
 
 </body>
+
 </html>

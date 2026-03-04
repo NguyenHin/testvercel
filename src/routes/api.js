@@ -12,21 +12,21 @@ const { verifyApiToken } = require('../middleware/verifyJwt');
 router.post('/auth/register', ApiAuthController.register);
 router.post('/auth/login', ApiAuthController.login);
 
-// --- API Sáº¢N PHáº¨M ---
+// --- API SẢN PHẨM ---
 router.get('/products', ApiProductController.getAllProducts);
 router.get('/products/:id', ApiProductController.getProductById);
 
-// --- API NGÆ¯á»œI DÃ™NG ---
+// --- API NGƯỜI DÙNG ---
 router.get('/users', ApiUserController.getAllUsers);
 
-// --- API MÃƒ GIáº¢M GIÃ ---
+// --- API MÃ GIẢM GIÁ ---
 router.get('/coupons', ApiCouponController.getAllCoupons);
 router.post('/coupon/check', ApiCouponController.checkCoupon);
 
-// --- API ÄÆ N HÃ€NG ---
+// --- API ĐƠN HÀNG ---
 router.get('/orders/:id', ApiOrderController.getOrderDetails);
 
-// --- API Äá»ŠA CHÃNH ---
+// --- API ĐỊA CHÍNH ---
 router.get('/location/provinces', ApiOrderController.getProvinces);
 router.get('/location/districts/:provinceCode', ApiOrderController.getDistricts);
 router.get('/location/wards/:districtCode', ApiOrderController.getWards);

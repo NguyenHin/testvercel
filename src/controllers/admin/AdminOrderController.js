@@ -7,7 +7,7 @@ class AdminOrderController {
             const orders = await Order.getAllOrders();
             res.render('admin/order_list', { orders: orders });
         } catch (err) {
-            res.status(500).send("Lá»—i láº¥y danh sÃ¡ch Ä‘Æ¡n hÃ ng");
+            res.status(500).send("Lỗi lấy danh sách đơn hàng");
         }
     }
 
@@ -35,7 +35,7 @@ class AdminOrderController {
             const order = await Order.getOrderById(orderId);
 
             if (!order) {
-                return res.status(404).send("ÄÆ¡n hÃ ng khÃ´ng tá»“n táº¡i");
+                return res.status(404).send("Đơn hàng không tồn tại");
             }
 
             if (!AdminOrderController.isValidTransition(order.status, newStatus)) {
@@ -45,36 +45,36 @@ class AdminOrderController {
             await Order.updateOrderStatus(orderId, newStatus);
 
             if (order.user_id) {
-                let title = 'Cáº­p nháº­t Ä‘Æ¡n hÃ ng';
-                let message = `ÄÆ¡n hÃ ng #${orderId} Ä‘Ã£ thay Ä‘á»•i tráº¡ng thÃ¡i.`;
+                let title = 'Cập nhật đơn hàng';
+                let message = `Đơn hàng #${orderId} đã thay đổi trạng thái.`;
                 let type = 'info';
 
                 switch (newStatus) {
                     case 'CONFIRMED':
-                        title = 'ÄÆ¡n hÃ ng Ä‘Ã£ Ä‘Æ°á»£c xÃ¡c nháº­n';
-                        message = `ÄÆ¡n hÃ ng #${orderId} cá»§a báº¡n Ä‘Ã£ Ä‘Æ°á»£c xÃ¡c nháº­n vÃ  Ä‘ang chá» xá»­ lÃ½.`;
+                        title = 'Đơn hàng đã được xác nhận';
+                        message = `Đơn hàng #${orderId} của bạn đã được xác nhận và đang chờ xử lý.`;
                         break;
                     case 'PROCESSING':
-                        title = 'Äang xá»­ lÃ½ Ä‘Æ¡n hÃ ng';
-                        message = `ÄÆ¡n hÃ ng #${orderId} Ä‘ang Ä‘Æ°á»£c Ä‘Ã³ng gÃ³i.`;
+                        title = 'Đang xử lý đơn hàng';
+                        message = `Đơn hàng #${orderId} đang được đóng gói.`;
                         break;
                     case 'SHIPPED':
-                        title = 'ÄÃ£ giao cho váº­n chuyá»ƒn';
-                        message = `ÄÆ¡n hÃ ng #${orderId} Ä‘Ã£ Ä‘Æ°á»£c bÃ n giao cho Ä‘Æ¡n vá»‹ váº­n chuyá»ƒn.`;
+                        title = 'Đã giao cho vận chuyển';
+                        message = `Đơn hàng #${orderId} đã được bàn giao cho đơn vị vận chuyển.`;
                         break;
                     case 'DELIVERING':
-                        title = 'Äang giao hÃ ng';
-                        message = `Shipper Ä‘ang giao Ä‘Æ¡n hÃ ng #${orderId} Ä‘áº¿n báº¡n.`;
+                        title = 'Đang giao hàng';
+                        message = `Shipper đang giao đơn hàng #${orderId} đến bạn.`;
                         type = 'warning';
                         break;
                     case 'COMPLETED':
-                        title = 'Giao hÃ ng thÃ nh cÃ´ng';
-                        message = `ÄÆ¡n hÃ ng #${orderId} Ä‘Ã£ hoÃ n táº¥t. Cáº£m Æ¡n báº¡n Ä‘Ã£ mua sáº¯m!`;
+                        title = 'Giao hàng thành công';
+                        message = `Đơn hàng #${orderId} đã hoàn tất. Cảm ơn bạn đã mua sắm!`;
                         type = 'success';
                         break;
                     case 'CANCELLED':
-                        title = 'ÄÆ¡n hÃ ng bá»‹ há»§y';
-                        message = `ÄÆ¡n hÃ ng #${orderId} Ä‘Ã£ bá»‹ há»§y (hoáº·c giao tháº¥t báº¡i).`;
+                        title = 'Đơn hàng bị hủy';
+                        message = `Đơn hàng #${orderId} đã bị hủy (hoặc giao thất bại).`;
                         type = 'danger';
                         break;
                 }
@@ -84,7 +84,7 @@ class AdminOrderController {
             res.redirect('/admin/orders');
         } catch (err) {
             console.error(err);
-            res.status(500).send("Lá»—i cáº­p nháº­t tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng");
+            res.status(500).send("Lỗi cập nhật trạng thái đơn hàng");
         }
     }
 
@@ -97,7 +97,7 @@ class AdminOrderController {
             res.redirect('/admin/orders');
         } catch (err) {
             console.error(err);
-            res.status(500).send("Lá»—i khi xÃ³a Ä‘Æ¡n hÃ ng");
+            res.status(500).send("Lỗi khi xóa đơn hàng");
         }
     }
 }

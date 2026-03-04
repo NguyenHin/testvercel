@@ -6,7 +6,7 @@ class AdminUserController {
             const users = await User.getAllUsers();
             res.render('admin/user/user_list', { users: users });
         } catch (err) {
-            res.status(500).send("Lá»—i láº¥y danh sÃ¡ch user");
+            res.status(500).send("Lỗi lấy danh sách user");
         }
     }
 
@@ -24,7 +24,7 @@ class AdminUserController {
 
             const existingUser = await User.getUserByUsername(username);
             if (existingUser) {
-                errors.username = "TÃªn Ä‘Äƒng nháº­p Ä‘Ã£ tá»“n táº¡i!";
+                errors.username = "Tên đăng nhập đã tồn tại!";
             }
 
             if (Object.keys(errors).length > 0) {
@@ -39,14 +39,14 @@ class AdminUserController {
             console.error(err);
             if (err.code === 'ER_DUP_ENTRY') {
                 let errors = {};
-                if (err.message.includes('email')) errors.email = "Email Ä‘Ã£ Ä‘Æ°á»£c sá»­ dá»¥ng!";
-                if (err.message.includes('username')) errors.username = "TÃªn Ä‘Äƒng nháº­p Ä‘Ã£ tá»“n táº¡i!";
+                if (err.message.includes('email')) errors.email = "Email đã được sử dụng!";
+                if (err.message.includes('username')) errors.username = "Tên đăng nhập đã tồn tại!";
 
                 req.flash('errors', errors);
                 req.flash('formData', req.body);
                 return res.redirect('/admin/user/add');
             }
-            res.status(500).send("Lá»—i khi thÃªm user: " + err.message);
+            res.status(500).send("Lỗi khi thêm user: " + err.message);
         }
     }
 
@@ -55,7 +55,7 @@ class AdminUserController {
             await User.deleteUser(req.params.id);
             res.redirect('/admin/user');
         } catch (err) {
-            res.status(500).send("Lá»—i khi xÃ³a user");
+            res.status(500).send("Lỗi khi xóa user");
         }
     }
 }

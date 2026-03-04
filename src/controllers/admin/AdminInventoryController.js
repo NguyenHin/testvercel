@@ -6,7 +6,7 @@ class AdminInventoryController {
             const products = await Product.getAllProducts();
             res.render('admin/inventory_list', { products: products });
         } catch (err) {
-            res.status(500).send("Lá»—i láº¥y dá»¯ liá»‡u kho");
+            res.status(500).send("Lỗi lấy dữ liệu kho");
         }
     }
 
@@ -17,7 +17,7 @@ class AdminInventoryController {
             res.redirect('/admin/inventory');
         } catch (err) {
             console.error(err);
-            res.status(500).send("Lá»—i nháº­p kho");
+            res.status(500).send("Lỗi nhập kho");
         }
     }
 
@@ -26,7 +26,7 @@ class AdminInventoryController {
             const logs = await Product.getInventoryLogs(req.params.id);
             res.json({ success: true, data: logs });
         } catch (err) {
-            res.status(500).json({ success: false, message: "Lá»—i láº¥y lá»‹ch sá»­" });
+            res.status(500).json({ success: false, message: "Lỗi lấy lịch sử" });
         }
     }
 }

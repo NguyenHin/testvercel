@@ -13,7 +13,7 @@ class Coupon {
             const [rows] = await db.query(query, [code]);
             return rows[0];
         } catch (error) {
-            console.error("Lá»—i láº¥y coupon:", error);
+            console.error("Lỗi lấy coupon:", error);
             return null;
         }
     }
@@ -30,7 +30,7 @@ class Coupon {
             const [rows] = await db.query(query);
             return rows;
         } catch (error) {
-            console.error("Lá»—i láº¥y danh sÃ¡ch coupon:", error);
+            console.error("Lỗi lấy danh sách coupon:", error);
             return [];
         }
     }
@@ -39,7 +39,7 @@ class Coupon {
         try {
             await db.query('UPDATE coupons SET used_count = used_count + 1 WHERE code = ?', [code]);
         } catch (error) {
-            console.error("Lá»—i cáº­p nháº­t coupon:", error);
+            console.error("Lỗi cập nhật coupon:", error);
         }
     }
 }

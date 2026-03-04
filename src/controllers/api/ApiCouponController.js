@@ -9,7 +9,7 @@ class ApiCouponController {
             res.json({ success: true, data: { product: productCoupons, shipping: shippingCoupons } });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ success: false, message: "Lá»—i láº¥y mÃ£ giáº£m giÃ¡" });
+            res.status(500).json({ success: false, message: "Lỗi lấy mã giảm giá" });
         }
     }
 
@@ -17,8 +17,8 @@ class ApiCouponController {
         const { code, totalAmount, shippingFee = 30000 } = req.body;
         try {
             const coupon = await Coupon.getCouponByCode(code);
-            if (!coupon) return res.json({ success: false, message: "MÃ£ khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n!" });
-            if (totalAmount < coupon.min_order_value) return res.json({ success: false, message: `ÄÆ¡n hÃ ng pháº£i tá»« ${Number(coupon.min_order_value).toLocaleString('vi-VN')}Ä‘ má»›i Ä‘Æ°á»£c Ã¡p dá»¥ng!` });
+            if (!coupon) return res.json({ success: false, message: "Mã không hợp lệ hoặc đã hết hạn!" });
+            if (totalAmount < coupon.min_order_value) return res.json({ success: false, message: `Đơn hàng phải từ ${Number(coupon.min_order_value).toLocaleString('vi-VN')}đ mới được áp dụng!` });
 
             let discount = 0;
             let message = "";
@@ -30,16 +30,16 @@ class ApiCouponController {
                     discount = coupon.discount_value;
                 }
                 if (discount > totalAmount) discount = totalAmount;
-                message = "Ãp dá»¥ng mÃ£ giáº£m giÃ¡ sáº£n pháº©m thÃ nh cÃ´ng!";
+                message = "Áp dụng mã giảm giá sản phẩm thành công!";
             } else if (coupon.type === 'shipping') {
                 discount = coupon.discount_value;
                 if (discount > shippingFee) discount = shippingFee;
-                message = "Ãp dá»¥ng mÃ£ Freeship thÃ nh cÃ´ng!";
+                message = "Áp dụng mã Freeship thành công!";
             }
             res.json({ success: true, message: message, discount: discount, type: coupon.type, code: coupon.code });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ success: false, message: "Lá»—i server" });
+            res.status(500).json({ success: false, message: "Lỗi server" });
         }
     }
 }

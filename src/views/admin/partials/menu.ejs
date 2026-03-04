@@ -5,6 +5,7 @@
         color: #fff;
         padding-top: 20px;
     }
+
     .admin-brand {
         font-size: 1.5rem;
         font-weight: 800;
@@ -14,6 +15,7 @@
         display: block;
         text-decoration: none;
     }
+
     .admin-nav .nav-link {
         color: #a8a8b3;
         padding: 12px 20px;
@@ -21,15 +23,23 @@
         border-left: 3px solid transparent;
         transition: 0.2s;
     }
-    .admin-nav .nav-link:hover, .admin-nav .nav-link.active {
+
+    .admin-nav .nav-link:hover,
+    .admin-nav .nav-link.active {
         color: #fff;
-        background-color: rgba(255,255,255,0.05);
+        background-color: rgba(255, 255, 255, 0.05);
         border-left-color: #c49b63;
     }
-    .admin-nav i { width: 25px; text-align: center; margin-right: 10px; }
+
+    .admin-nav i {
+        width: 25px;
+        text-align: center;
+        margin-right: 10px;
+    }
+
     .admin-user {
         padding: 20px;
-        border-top: 1px solid rgba(255,255,255,0.1);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
         margin-top: auto;
     }
 </style>
@@ -43,6 +53,9 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/admin/products"><i class="fas fa-book"></i> Sản phẩm</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/categories"><i class="fas fa-list"></i> Danh mục</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/admin/orders"><i class="fas fa-shopping-cart"></i> Đơn hàng</a>
@@ -64,7 +77,9 @@
     <div class="admin-user mt-5">
         <div class="d-flex align-items-center">
             <div class="flex-grow-1">
-                <div class="fw-bold"><%= locals.user ? user.username : 'Admin' %></div>
+                <div class="fw-bold">
+                    <%= locals.user ? user.username : 'Admin' %>
+                </div>
                 <div class="small text-muted">Quản trị viên</div>
             </div>
             <a href="/auth/logout" class="text-danger" title="Đăng xuất"><i class="fas fa-sign-out-alt"></i></a>

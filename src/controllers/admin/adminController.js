@@ -6,16 +6,16 @@ const db = require('../../db');
 module.exports = {
     dashboard: async (req, res) => {
         try {
-            // 1. Thá»‘ng kÃª tá»•ng quan
+            // 1. Thống kê tổng quan
             const [totalRevenue] = await db.query("SELECT SUM(final_total) as total FROM orders WHERE status = 'COMPLETED'");
             const [totalOrders] = await db.query("SELECT COUNT(*) as count FROM orders");
             const [totalUsers] = await db.query("SELECT COUNT(*) as count FROM users WHERE role != 'admin'");
             const [lowStock] = await db.query("SELECT COUNT(*) as count FROM products WHERE quantity < 10");
 
-            // 2. Biá»ƒu Ä‘á»“ doanh thu 7 ngÃ y gáº§n nháº¥t
+            // 2. Biểu đồ doanh thu 7 ngày gần nhất
             const revenueStats = await Order.getRevenueStats();
 
-            // 3. ÄÆ¡n hÃ ng má»›i nháº¥t
+            // 3. Đơn hàng mới nhất
             const [recentOrders] = await db.query(`
                 SELECT o.*, u.full_name
                 FROM orders o
@@ -35,11 +35,11 @@ module.exports = {
             });
         } catch (err) {
             console.error(err);
-            res.status(500).send("Lá»—i Dashboard");
+            res.status(500).send("Lỗi Dashboard");
         }
     },
 
-    // ... CÃ¡c hÃ m khÃ¡c cho Product, Order sáº½ chuyá»ƒn dáº§n ...
+    // ... Các hàm khác cho Product, Order sẽ chuyển dần ...
 };
 
 

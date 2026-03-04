@@ -42,8 +42,50 @@ class Product {
             ORDER BY p.id DESC
         `;
 
+        if (filters.limit) {
+            query += ` LIMIT ? OFFSET ?`;
+            queryParams.push(Number(filters.limit), Number(filters.offset) || 0);
+        }
+
         const [rows] = await db.query(query, queryParams);
         return rows;
+    }
+
+    static async countProducts(filters = {}) {
+        let query = `
+            SELECT count(DISTINCT p.id) as total
+            FROM products p
+        `;
+        let queryParams = [];
+        let whereClauses = [];
+
+        if (filters.keyword && filters.keyword.trim() !== '') {
+            query += ` LEFT JOIN product_authors pa ON p.id = pa.product_id
+                       LEFT JOIN authors a ON pa.author_id = a.id `;
+            whereClauses.push(`(p.name LIKE ? OR a.name LIKE ?)`);
+            queryParams.push(`%${filters.keyword}%`, `%${filters.keyword}%`);
+        }
+
+        if (filters.category_id && parseInt(filters.category_id) > 0) {
+            query += ` JOIN product_categories pc ON p.id = pc.product_id `;
+            whereClauses.push(`pc.category_id = ?`);
+            queryParams.push(filters.category_id);
+        }
+
+        if (filters.status && filters.status !== 'all') {
+            if (filters.status === 'visible') {
+                whereClauses.push(`p.is_hidden = 0`);
+            } else if (filters.status === 'hidden') {
+                whereClauses.push(`p.is_hidden = 1`);
+            }
+        }
+
+        if (whereClauses.length > 0) {
+            query += ` WHERE ` + whereClauses.join(' AND ');
+        }
+
+        const [rows] = await db.query(query, queryParams);
+        return rows[0].total;
     }
 
     static async getProductById(id) {

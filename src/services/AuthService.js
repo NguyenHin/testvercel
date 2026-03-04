@@ -14,7 +14,7 @@ class AuthService {
     static async authenticateUser(username, password) {
         const user = await User.login(username, password);
         if (!user) {
-            throw new Error("Sai tÃ i khoáº£n hoáº·c máº­t kháº©u!");
+            throw new Error("Sai tài khoản hoặc mật khẩu!");
         }
 
         const role = user.role ? user.role.trim().toLowerCase() : 'user';
@@ -35,12 +35,12 @@ class AuthService {
 
         const existingUser = await User.getUserByUsername(username);
         if (existingUser) {
-            throw new Error("TÃªn Ä‘Äƒng nháº­p Ä‘Ã£ tá»“n táº¡i!");
+            throw new Error("Tên đăng nhập đã tồn tại!");
         }
 
         const existingEmail = await User.getUserByEmail(email);
         if (existingEmail) {
-            throw new Error("Email Ä‘Ã£ Ä‘Æ°á»£c sá»­ dá»¥ng!");
+            throw new Error("Email đã được sử dụng!");
         }
 
         await User.addUser(userData);
@@ -48,13 +48,13 @@ class AuthService {
         // Send email asynchronously without blocking the registration
         sendWelcomeEmail(email, full_name || username).catch(err => console.error("Error sending welcome email:", err));
 
-        return { message: "ÄÄƒng kÃ½ thÃ nh cÃ´ng." };
+        return { message: "Đăng ký thành công." };
     }
 
     static async initiatePasswordReset(email) {
         const user = await User.getUserByEmail(email);
         if (!user) {
-            throw new Error('Email khÃ´ng tá»“n táº¡i trong há»‡ thá»‘ng!');
+            throw new Error('Email không tồn tại trong hệ thống!');
         }
 
         const token = crypto.randomBytes(32).toString('hex');
@@ -70,7 +70,7 @@ class AuthService {
     static async verifyResetToken(token) {
         const user = await User.getUserByResetToken(token);
         if (!user) {
-            throw new Error('Link Ä‘áº·t láº¡i máº­t kháº©u khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n.');
+            throw new Error('Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.');
         }
         return user;
     }
