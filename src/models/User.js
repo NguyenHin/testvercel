@@ -12,6 +12,24 @@ class User {
         return rows[0];
     }
 
+    static async getUserById(id) {
+        const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+        return rows[0];
+    }
+
+    static async updateUser(id, userData) {
+        let query = 'UPDATE users SET email = ?, full_name = ?, role = ? WHERE id = ?';
+        let params = [userData.email, userData.full_name, userData.role, id];
+
+        if (userData.password && userData.password.trim() !== '') {
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            query = 'UPDATE users SET email = ?, full_name = ?, role = ?, password = ? WHERE id = ?';
+            params = [userData.email, userData.full_name, userData.role, hashedPassword, id];
+        }
+
+        await db.query(query, params);
+    }
+
     static async getUserByEmail(email) {
         const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
         return rows[0];

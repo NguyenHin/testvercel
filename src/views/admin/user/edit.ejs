@@ -1,146 +1,168 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Quản Trị - Sửa Người Dùng</title>
+    <title>Chỉnh Sửa Người Dùng - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-        body { background-color: #f8f9fa; }
-        .admin-header {
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #eee;
+            padding: 20px 30px;
+            border-radius: 12px 12px 0 0 !important;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .form-control,
+        .form-select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .form-control:focus {
+            border-color: #1a1a2e;
+            box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
+        }
+
+        .btn-save {
             background-color: #1a1a2e;
             color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid #c49b63;
-        }
-        .sidebar {
-            min-height: 100vh;
-            background-color: #fff;
-            padding-top: 20px;
-            border-right: 1px solid #ddd;
-        }
-        .sidebar a {
-            display: block;
-            padding: 12px 15px;
-            color: #333;
-            text-decoration: none;
-            margin-bottom: 5px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .sidebar a:hover { background-color: #f0f0f0; color: #0d6efd; }
-        .sidebar a.active {
-            background-color: #e9ecef;
-            color: #0d6efd;
-            border-left: 4px solid #0d6efd;
-        }
-        .main-content { padding: 20px; }
-        .page-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #c49b63;
-            display: inline-block;
-            padding-bottom: 5px;
-        }
-        .card-form {
-            max-width: 700px;
+            font-weight: 600;
+            padding: 10px 30px;
+            border-radius: 8px;
             border: none;
-            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .btn-save:hover {
+            background-color: #0f0f1a;
+            transform: translateY(-2px);
+        }
+
+        .invalid-feedback {
+            display: block;
+            font-size: 0.85rem;
+            margin-top: 5px;
         }
     </style>
 </head>
+
 <body>
-
-    <div class="admin-header">
-        <h2><a href="/admin" class="text-white text-decoration-none">Khu vực quản trị</a></h2>
-        <a href="/auth/logout" class="btn btn-sm btn-danger">Đăng xuất</a>
-    </div>
-
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-2 sidebar">
-                <a href="/admin"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
-                <a href="/admin/products"><i class="fas fa-box me-2"></i> Quản lý Sản phẩm</a>
-                <a href="/admin/users" class="active"><i class="fas fa-users me-2"></i> Quản lý Người dùng</a>
-                <hr>
-                <a href="/"><i class="fas fa-home me-2"></i> Về trang chủ</a>
-            </div>
+            <!-- Sidebar -->
+            <%- include('../partials/menu') %>
 
-            <div class="col-md-10 main-content">
-                <h3 class="page-title"><i class="fas fa-user-edit"></i> Sửa thông tin người dùng</h3>
+                <!-- Main Content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
 
-                <div class="card shadow-sm card-form overflow-hidden">
-                    <div class="card-header bg-primary text-white">
-                        <i class="fas fa-edit me-2"></i> Cập nhật thông tin #<%= user.id %>
-                    </div>
-                    <div class="card-body p-4">
-                        <form action="/admin/users/edit/<%= user.id %>" method="POST">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Tên đăng nhập</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        <input type="text" name="username" class="form-control" value="<%= user.username %>" required>
+                    <div class="container py-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="fw-bold text-dark"><i class="fas fa-user-edit text-primary me-2"></i> Chỉnh Sửa
+                                Người Dùng: <%= userRow.username %>
+                            </h3>
+                            <div class="d-flex align-items-center">
+                                <a href="/admin/user" class="btn btn-outline-secondary"><i
+                                        class="fas fa-arrow-left me-2"></i> Quay lại</a>
+                                <%- include('../partials/account_dropdown') %>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Cập nhật thông tin</h5>
+                                    </div>
+                                    <div class="card-body p-4">
+
+                                        <% let errs=(locals.errors && locals.errors.length> 0) ? locals.errors[0] : {};
+                                            let data = (locals.formData) ? locals.formData : userRow;
+                                            %>
+
+                                            <form action="/admin/user/edit/<%= userRow.id %>" method="POST">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Họ và tên</label>
+                                                    <input type="text" name="full_name" class="form-control"
+                                                        value="<%= data.full_name || '' %>" required>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Tên đăng nhập <span
+                                                                class="text-muted">(Không thể
+                                                                đổi)</span></label>
+                                                        <input type="text" name="username" class="form-control"
+                                                            value="<%= userRow.username %>" readonly disabled>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Email <span
+                                                                class="text-danger">*</span></label>
+                                                        <input type="email" name="email"
+                                                            class="form-control <%= errs.email ? 'is-invalid' : '' %>"
+                                                            value="<%= data.email || '' %>" required>
+                                                        <% if (errs.email) { %>
+                                                            <div class="invalid-feedback">
+                                                                <%= errs.email %>
+                                                            </div>
+                                                            <% } %>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Mật khẩu mới <span
+                                                                class="text-muted fw-normal">(Để
+                                                                trống nếu không đổi)</span></label>
+                                                        <input type="password" name="password" class="form-control"
+                                                            placeholder="Nhập để đổi mật khẩu">
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Vai trò</label>
+                                                        <select name="role" class="form-select">
+                                                            <option value="user" <%=data.role==='user' ? 'selected' : ''
+                                                                %>>Thành viên
+                                                                (User)</option>
+                                                            <option value="admin" <%=data.role==='admin' ? 'selected'
+                                                                : '' %>>Quản trị
+                                                                viên (Admin)</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-4 text-end">
+                                                    <button type="submit" class="btn btn-save">
+                                                        <i class="fas fa-save me-2"></i> LƯU THAY ĐỔI
+                                                    </button>
+                                                </div>
+                                            </form>
                                     </div>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">Mật khẩu</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                        <input type="text" name="password" class="form-control" value="<%= user.password %>" required>
-                                    </div>
-                                </div>
                             </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Địa chỉ Email</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                    <input type="email" name="email" class="form-control" value="<%= user.email %>" required>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Họ và tên</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                                    <input type="text" name="full_name" class="form-control" value="<%= user.full_name %>" required>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Vai trò hệ thống</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
-                                    <select name="role" class="form-select">
-                                        <option value="user" <%= user.role === 'user' ? 'selected' : '' %>>Khách hàng (USER)</option>
-                                        <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Quản trị viên (ADMIN)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <hr>
-
-                            <div class="d-flex gap-2 justify-content-end">
-                                <a href="/admin/users" class="btn btn-outline-secondary px-4">
-                                    <i class="fas fa-times"></i> Hủy bỏ
-                                </a>
-                                <button type="submit" class="btn btn-primary px-4">
-                                    <i class="fas fa-save"></i> Cập nhật
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </main>
         </div>
     </div>
 </body>
+
 </html>

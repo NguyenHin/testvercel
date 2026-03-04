@@ -470,9 +470,8 @@
                     <!-- MÔ TẢ SẢN PHẨM -->
                     <div class="content-box bg-white p-4 rounded shadow-sm mb-3">
                         <h5 class="fw-bold mb-3 border-bottom pb-2">Mô tả sản phẩm</h5>
-                        <div class="text-secondary"
-                            style="line-height: 1.6; text-align: justify; white-space: pre-wrap;">
-                            <%= product.description || "Đang cập nhật nội dung..." %>
+                        <div class="text-secondary" style="line-height: 1.6; text-align: justify; overflow: hidden;">
+                            <%- product.description || "Đang cập nhật nội dung..." %>
                         </div>
                     </div>
                 </div>

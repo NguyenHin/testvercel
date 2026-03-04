@@ -50,6 +50,52 @@ class AdminUserController {
         }
     }
 
+    static async getEditForm(req, res) {
+        try {
+            const user = await User.getUserById(req.params.id);
+            if (!user) {
+                return res.status(404).send("Người dùng không tồn tại");
+            }
+            res.render('admin/user/edit', {
+                userRow: user,
+                errors: req.flash('errors'),
+                formData: req.flash('formData')[0] || user
+            });
+        } catch (err) {
+            res.status(500).send("Lỗi lấy thông tin user: " + err.message);
+        }
+    }
+
+    static async processEdit(req, res) {
+        try {
+            const id = req.params.id;
+            const { email, full_name, password, role } = req.body;
+            let errors = {};
+
+            // We can optionally check if email changed to an existing one, but for simplicity skip here or rely on duplicate error
+
+            if (Object.keys(errors).length > 0) {
+                req.flash('errors', errors);
+                req.flash('formData', req.body);
+                return res.redirect(`/admin/user/edit/${id}`);
+            }
+
+            await User.updateUser(id, req.body);
+            res.redirect('/admin/user');
+        } catch (err) {
+            console.error(err);
+            if (err.code === 'ER_DUP_ENTRY') {
+                let errors = {};
+                if (err.message.includes('email')) errors.email = "Email đã được sử dụng!";
+
+                req.flash('errors', errors);
+                req.flash('formData', req.body);
+                return res.redirect(`/admin/user/edit/${req.params.id}`);
+            }
+            res.status(500).send("Lỗi khi cập nhật user: " + err.message);
+        }
+    }
+
     static async delete(req, res) {
         try {
             await User.deleteUser(req.params.id);

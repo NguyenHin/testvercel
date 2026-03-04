@@ -3,9 +3,39 @@
 class AdminInventoryController {
     static async getList(req, res) {
         try {
-            const products = await Product.getAllProducts();
-            res.render('admin/inventory_list', { products: products });
+            const page = parseInt(req.query.page) || 1;
+            const limit = 10;
+            const offset = (page - 1) * limit;
+
+            const filters = {
+                keyword: req.query.keyword || '',
+                category_id: req.query.category_id || '',
+                stock_status: req.query.stock_status || 'all',
+                limit: limit,
+                offset: offset
+            };
+
+            const products = await Product.getAllProducts(filters);
+            const totalProductsFiltered = await Product.countProducts(filters);
+            const totalPages = Math.ceil(totalProductsFiltered / limit);
+
+            const categories = await Product.getCategories();
+
+            // Top indicators
+            const totalProducts = await Product.getTotalStockQuantity();
+            const lowStockProducts = await Product.countProducts({ stock_status: 'low' });
+
+            res.render('admin/inventory_list', {
+                products,
+                categories,
+                query: filters,
+                currentPage: page,
+                totalPages,
+                totalProducts,
+                lowStockProducts
+            });
         } catch (err) {
+            console.error(err);
             res.status(500).send("Lỗi lấy dữ liệu kho");
         }
     }

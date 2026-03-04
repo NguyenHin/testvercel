@@ -33,6 +33,16 @@ class Product {
             }
         }
 
+        if (filters.stock_status && filters.stock_status !== 'all') {
+            if (filters.stock_status === 'ok') {
+                whereClauses.push(`p.quantity >= 10`);
+            } else if (filters.stock_status === 'low') {
+                whereClauses.push(`p.quantity > 0 AND p.quantity < 10`);
+            } else if (filters.stock_status === 'out') {
+                whereClauses.push(`p.quantity = 0`);
+            }
+        }
+
         if (whereClauses.length > 0) {
             query += ` WHERE ` + whereClauses.join(' AND ');
         }
@@ -80,12 +90,28 @@ class Product {
             }
         }
 
+        if (filters.stock_status && filters.stock_status !== 'all') {
+            if (filters.stock_status === 'ok') {
+                whereClauses.push(`p.quantity >= 10`);
+            } else if (filters.stock_status === 'low') {
+                whereClauses.push(`p.quantity > 0 AND p.quantity < 10`);
+            } else if (filters.stock_status === 'out') {
+                whereClauses.push(`p.quantity = 0`);
+            }
+        }
+
         if (whereClauses.length > 0) {
             query += ` WHERE ` + whereClauses.join(' AND ');
         }
 
         const [rows] = await db.query(query, queryParams);
         return rows[0].total;
+    }
+
+    static async getTotalStockQuantity() {
+        const query = `SELECT SUM(quantity) as totalStock FROM products`;
+        const [rows] = await db.query(query);
+        return rows[0].totalStock || 0;
     }
 
     static async getProductById(id) {
