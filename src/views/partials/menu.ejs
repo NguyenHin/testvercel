@@ -386,6 +386,12 @@
                                 <div class="fw-bold text-dark"><%= user.username %></div>
                                 <div class="small text-muted"><%= user.role === 'admin' ? 'Quản trị viên' : 'Thành viên' %></div>
                             </div>
+                            <a href="/profile" class="user-menu-link">
+                                <i class="fas fa-user me-2"></i> Thông tin tài khoản
+                            </a>
+                            <a href="/profile#change-password" class="user-menu-link">
+                                <i class="fas fa-key me-2"></i> Đổi mật khẩu
+                            </a>
                             <% if (user.role !== 'admin') { %>
                                 <a href="/orders" class="user-menu-link"><i class="fas fa-box-open me-2"></i> Kiểm tra đơn hàng</a>
                             <% } %>

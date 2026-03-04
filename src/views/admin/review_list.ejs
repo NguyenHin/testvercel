@@ -60,107 +60,118 @@
 </head>
 
 <body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <%- include('partials/menu') %>
 
-    <header class="admin-header">
-        <div class="container d-flex justify-content-between align-items-center">
-            <h4 class="mb-0 fw-bold"><i class="fas fa-star me-2"></i> QUẢN LÝ ĐÁNH GIÁ</h4>
-            <div class="d-flex align-items-center">
-                <a href="/admin" class="btn btn-sm btn-outline-light"><i class="fas fa-home me-1"></i> Dashboard</a>
-                <%- include('partials/account_dropdown') %>
-            </div>
-        </div>
-    </header>
+                <!-- Main Content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                    <div
+                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-star me-2"></i> QUẢN LÝ ĐÁNH GIÁ</h1>
+                        <div class="d-flex align-items-center">
+                            <a href="/admin" class="btn btn-sm btn-outline-secondary me-2"><i
+                                    class="fas fa-home me-1"></i> Dashboard</a>
+                            <%- include('partials/account_dropdown') %>
+                        </div>
+                    </div>
 
-    <div class="container pb-5">
-        <div class="card">
-            <div class="card-body">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Sản phẩm</th>
-                            <th>Người dùng</th>
-                            <th>Đánh giá</th>
-                            <th>Nội dung</th>
-                            <th>Ngày tạo</th>
-                            <th>Trạng thái</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% if (reviews && reviews.length> 0) { %>
-                            <% reviews.forEach(r=> { %>
-                                <tr>
-                                    <td>#<%= r.id %>
-                                    </td>
-                                    <td style="max-width: 200px;" class="text-truncate" title="<%= r.product_name %>">
-                                        <%= r.product_name %>
-                                    </td>
-                                    <td>
-                                        <%= r.username %>
-                                    </td>
-                                    <td class="text-warning fw-bold">
-                                        <%= r.rating %> ★
-                                    </td>
-                                    <td style="max-width: 350px;">
-                                        <div class="text-truncate" title="<%= r.comment %>">
-                                            <%= r.comment %>
-                                        </div>
-                                        <% if (r.admin_reply) { %>
-                                            <div class="admin-reply">
-                                                <strong>Admin:</strong>
-                                                <%= r.admin_reply %>
-                                            </div>
-                                            <% } %>
-                                    </td>
-                                    <td>
-                                        <%= new Date(r.created_at).toLocaleDateString('vi-VN') %>
-                                    </td>
-                                    <td>
-                                        <% if (r.status==='APPROVED' ) { %>
-                                            <span class="status-badge status-approved">Đã duyệt</span>
-                                            <% } else { %>
-                                                <span class="status-badge status-pending">Chờ duyệt</span>
-                                                <% } %>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <% if (r.status !=='APPROVED' ) { %>
-                                                <a href="/admin/reviews/approve/<%= r.id %>"
-                                                    class="btn btn-sm btn-success" title="Duyệt">
-                                                    <i class="fas fa-check"></i>
-                                                </a>
-                                                <% } %>
-
-                                                    <button class="btn btn-sm btn-primary" title="Trả lời"
-                                                        onclick="openReplyModal('<%= r.id %>', '<%= r.username %>', `<%= r.admin_reply || '' %>`)">
-                                                        <i class="fas fa-reply"></i>
-                                                    </button>
-
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Sản phẩm</th>
+                                        <th>Người dùng</th>
+                                        <th>Đánh giá</th>
+                                        <th>Nội dung</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Trạng thái</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (reviews && reviews.length> 0) { %>
+                                        <% reviews.forEach(r=> { %>
+                                            <tr>
+                                                <td>#<%= r.id %>
+                                                </td>
+                                                <td style="max-width: 200px;" class="text-truncate"
+                                                    title="<%= r.product_name %>">
+                                                    <%= r.product_name %>
+                                                </td>
+                                                <td>
+                                                    <%= r.username %>
+                                                </td>
+                                                <td class="text-warning fw-bold">
+                                                    <%= r.rating %> ★
+                                                </td>
+                                                <td style="max-width: 350px;">
+                                                    <div class="text-truncate" title="<%= r.comment %>">
+                                                        <%= r.comment %>
+                                                    </div>
                                                     <% if (r.admin_reply) { %>
-                                                        <button class="btn btn-sm btn-secondary" title="Xóa trả lời"
-                                                            onclick="showConfirmModal('/admin/reviews/reply/delete/<%= r.id %>', 'Xóa câu trả lời này?')">
-                                                            <i class="fas fa-eraser"></i>
-                                                        </button>
+                                                        <div class="admin-reply">
+                                                            <strong>Admin:</strong>
+                                                            <%= r.admin_reply %>
+                                                        </div>
                                                         <% } %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(r.created_at).toLocaleDateString('vi-VN') %>
+                                                </td>
+                                                <td>
+                                                    <% if (r.status==='APPROVED' ) { %>
+                                                        <span class="status-badge status-approved">Đã duyệt</span>
+                                                        <% } else { %>
+                                                            <span class="status-badge status-pending">Chờ duyệt</span>
+                                                            <% } %>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <% if (r.status !=='APPROVED' ) { %>
+                                                            <a href="/admin/reviews/approve/<%= r.id %>"
+                                                                class="btn btn-sm btn-success" title="Duyệt">
+                                                                <i class="fas fa-check"></i>
+                                                            </a>
+                                                            <% } %>
 
-                                                            <button class="btn btn-sm btn-danger" title="Xóa"
-                                                                onclick="showConfirmModal('/admin/reviews/delete/<%= r.id %>', 'Xóa đánh giá này?')">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <% }); %>
-                                    <% } else { %>
-                                        <tr>
-                                            <td colspan="8" class="text-center py-4 text-muted">Chưa có đánh giá nào.
-                                            </td>
-                                        </tr>
-                                        <% } %>
-                    </tbody>
-                </table>
-            </div>
+                                                                <button class="btn btn-sm btn-primary" title="Trả lời"
+                                                                    onclick="openReplyModal('<%= r.id %>', '<%= r.username %>', `<%= r.admin_reply || '' %>`)">
+                                                                    <i class="fas fa-reply"></i>
+                                                                </button>
+
+                                                                <% if (r.admin_reply) { %>
+                                                                    <button class="btn btn-sm btn-secondary"
+                                                                        title="Xóa trả lời"
+                                                                        onclick="showConfirmModal('/admin/reviews/reply/delete/<%= r.id %>', 'Xóa câu trả lời này?')">
+                                                                        <i class="fas fa-eraser"></i>
+                                                                    </button>
+                                                                    <% } %>
+
+                                                                        <button class="btn btn-sm btn-danger"
+                                                                            title="Xóa"
+                                                                            onclick="showConfirmModal('/admin/reviews/delete/<%= r.id %>', 'Xóa đánh giá này?')">
+                                                                            <i class="fas fa-trash"></i>
+                                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td colspan="8" class="text-center py-4 text-muted">Chưa có đánh
+                                                            giá nào.
+                                                        </td>
+                                                    </tr>
+                                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </main>
         </div>
     </div>
 

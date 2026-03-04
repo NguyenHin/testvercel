@@ -17,6 +17,7 @@
             padding: 20px 0;
             margin-bottom: 30px;
             border-bottom: 1px solid #eee;
+            display: none;
         }
 
         .product-card {
@@ -178,18 +179,16 @@
 
 <body>
 
-    <header class="admin-header">
-        <div class="container d-flex justify-content-between align-items-center">
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold text-dark"><i class="fas fa-info-circle text-info me-2"></i> Chi tiết sản phẩm</h3>
             <div class="d-flex align-items-center">
-                <a href="/admin/products" class="text-decoration-none text-secondary me-3"><i
-                        class="fas fa-arrow-left fa-lg"></i></a>
-                <h4 class="mb-0 fw-bold text-dark">Chi tiết sản phẩm</h4>
+                <span class="badge bg-secondary me-3">Admin View</span>
+                <a href="/admin/products" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i> Quay
+                    lại</a>
             </div>
-            <span class="badge bg-secondary">Admin View</span>
         </div>
-    </header>
 
-    <div class="container pb-5">
         <div class="product-card">
             <div class="row g-5">
                 <!-- Cột Trái: Ảnh -->

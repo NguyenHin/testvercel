@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Thông tin tài khoản - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <%- include('partials/menu') %>
+
+                <!-- Main Content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                    <div
+                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <h1 class="h2 mb-0"><i class="fas fa-user-circle me-2"></i> Thông tin tài khoản</h1>
+                            <span class="badge bg-secondary text-uppercase ms-3 pt-2 pb-2">
+                                <i class="fas fa-user-shield me-1"></i>
+                                <%= userInfo.role==='admin' ? 'Admin' : 'User' %>
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <%- include('partials/account_dropdown') %>
+                        </div>
+                    </div>
+
+                    <% if (error) { %>
+                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <span>
+                                <%= error %>
+                            </span>
+                        </div>
+                        <% } %>
+                            <% if (success) { %>
+                                <div class="alert alert-success d-flex align-items-center" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <span>
+                                        <%= success %>
+                                    </span>
+                                </div>
+                                <% } %>
+
+                                    <div class="row g-4">
+                                        <!-- Thông tin cá nhân -->
+                                        <div class="col-lg-8 col-xl-6 mx-auto">
+                                            <div class="card shadow-sm">
+                                                <div class="card-header bg-white">
+                                                    <h5 class="mb-0">
+                                                        <i class="fas fa-id-card me-1 text-primary"></i>
+                                                        Thông tin cá nhân
+                                                    </h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <form action="/admin/profile" method="POST" autocomplete="off">
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">Tên đăng nhập</label>
+                                                            <input type="text" class="form-control"
+                                                                value="<%= userInfo.username %>" disabled>
+                                                            <div class="form-text">Tên đăng nhập không thể thay đổi.
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">Vai trò</label>
+                                                            <input type="text" class="form-control"
+                                                                value="<%= userInfo.role === 'admin' ? 'Admin' : 'User' %>"
+                                                                disabled>
+                                                            <div class="form-text">Vai trò không thể thay đổi.
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">Họ và tên</label>
+                                                            <input type="text" class="form-control" name="full_name"
+                                                                value="<%= userInfo.full_name || '' %>" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-semibold">Email</label>
+                                                            <input type="email" class="form-control" name="email"
+                                                                value="<%= userInfo.email || '' %>" required>
+                                                        </div>
+                                                        <button type="submit"
+                                                            class="btn btn-warning text-dark fw-semibold w-100">
+                                                            <i class="fas fa-save me-1"></i> Lưu thay đổi
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

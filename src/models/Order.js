@@ -27,6 +27,59 @@ class Order {
         return rows;
     }
 
+    static async getFilteredOrders(filters) {
+        let query = `
+            SELECT DISTINCT o.*, u.full_name, u.phone 
+            FROM orders o
+            LEFT JOIN users u ON o.user_id = u.id
+            LEFT JOIN order_details od ON o.id = od.order_id
+            WHERE 1=1
+        `;
+        const queryParams = [];
+
+        // 1. Keyword search (Mã SP, Tên KH, SĐT, Địa chỉ)
+        if (filters.keyword) {
+            query += ` AND (
+                od.product_id LIKE ? OR 
+                u.full_name LIKE ? OR 
+                u.phone LIKE ? OR 
+                o.shipping_address LIKE ?
+            )`;
+            const likeKeyword = `%${filters.keyword}%`;
+            queryParams.push(likeKeyword, likeKeyword, likeKeyword, likeKeyword);
+        }
+
+        // 2. Status filtering 
+        if (filters.status && filters.status !== 'all') {
+            switch (filters.status) {
+                case 'UNPAID':
+                    query += ` AND o.payment_method = 'COD' AND o.status NOT IN ('COMPLETED', 'CANCELLED')`;
+                    break;
+                case 'PAID':
+                    query += ` AND o.payment_method IN ('VNPAY', 'MOMO')`;
+                    break;
+                case 'INVALID':
+                    query += ` AND o.status = 'CANCELLED'`; // Map "không hợp lệ" to CANCELLED or a specific state if exists
+                    break;
+                default:
+                    query += ` AND o.status = ?`;
+                    queryParams.push(filters.status);
+                    break;
+            }
+        }
+
+        // 3. Payment Method
+        if (filters.payment_method && filters.payment_method !== 'all') {
+            query += ` AND o.payment_method = ?`;
+            queryParams.push(filters.payment_method);
+        }
+
+        query += ` ORDER BY o.order_date DESC`;
+
+        const [rows] = await db.query(query, queryParams);
+        return rows;
+    }
+
     static async getOrderById(id) {
         const query = `
             SELECT o.*, u.full_name, u.phone, u.email
