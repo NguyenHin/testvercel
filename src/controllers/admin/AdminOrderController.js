@@ -9,7 +9,7 @@ class AdminOrderController {
             const filters = {
                 keyword: req.query.keyword || '',
                 status: req.query.status || 'all',
-                payment_method: req.query.payment_method || 'all'
+                payment_status: req.query.payment_status || 'all'
             };
 
             const orders = await Order.getFilteredOrders(filters);
@@ -51,9 +51,6 @@ class AdminOrderController {
                 return res.status(404).send("Đơn hàng không tồn tại");
             }
 
-            // Cho phép cập nhật trạng thái tự do hơn theo yêu cầu người dùng
-            // Bỏ kiểm tra strict transition nếu cần thiết, hoặc nới lỏng
-
             await Order.updateOrderStatus(orderId, newStatus);
 
             // Gửi thông báo cho người dùng
@@ -91,7 +88,6 @@ class AdminOrderController {
                         type = 'danger';
                         break;
                 }
-                // Chỉ tạo thông báo nếu có user_id hợp lệ
                 if (order.user_id) {
                      await Notification.createNotification(order.user_id, title, message, type);
                 }
@@ -121,12 +117,9 @@ class AdminOrderController {
 
     static async delete(req, res) {
         try {
-            // Xóa chi tiết đơn hàng trước
             await db.query('DELETE FROM order_details WHERE order_id = ?', [req.params.id]);
-            // Xóa đơn hàng
             await db.query('DELETE FROM orders WHERE id = ?', [req.params.id]);
 
-            // Nếu request là AJAX (từ bulk action hoặc fetch)
             if (req.xhr || req.headers.accept.indexOf('json') > -1) {
                  return res.json({ success: true, message: 'Đã xóa đơn hàng thành công' });
             }
@@ -134,14 +127,10 @@ class AdminOrderController {
             res.redirect('/admin/orders');
         } catch (error) {
             console.error(error);
-            if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-                 return res.json({ success: false, message: 'Lỗi khi xóa đơn hàng' });
-            }
             res.status(500).send('Lỗi khi xóa đơn hàng');
         }
     }
 
-    // Xử lý thao tác hàng loạt (Bulk Actions)
     static async bulkAction(req, res) {
         try {
             const { action, orderIds } = req.body;
@@ -170,7 +159,7 @@ class AdminOrderController {
             const filters = {
                 keyword: req.query.keyword || '',
                 status: req.query.status || 'all',
-                payment_method: req.query.payment_method || 'all'
+                payment_status: req.query.payment_status || 'all'
             };
 
             const orders = await Order.getFilteredOrders(filters);
@@ -185,13 +174,12 @@ class AdminOrderController {
                 { header: 'Địa Chỉ', key: 'address', width: 40 },
                 { header: 'Tổng Tiền', key: 'total', width: 15 },
                 { header: 'Trạng Thái', key: 'status', width: 20 },
-                { header: 'Thanh Toán', key: 'payment_method', width: 15 },
+                { header: 'Thanh Toán', key: 'payment_status', width: 15 },
                 { header: 'Ngày Đặt', key: 'order_date', width: 20 }
             ];
 
             orders.forEach(order => {
                 let statusText = order.status;
-                // Map status codes to Vietnamese text
                 const statusMap = {
                     'PENDING': 'Chờ xác nhận',
                     'CONFIRMED': 'Đã xác nhận',
@@ -210,7 +198,7 @@ class AdminOrderController {
                     address: order.shipping_address || '',
                     total: Number(order.final_total).toLocaleString('vi-VN') + ' đ',
                     status: statusText,
-                    payment_method: order.payment_method || 'COD',
+                    payment_status: order.payment_status === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán',
                     order_date: new Date(order.order_date).toLocaleString('vi-VN')
                 });
             });

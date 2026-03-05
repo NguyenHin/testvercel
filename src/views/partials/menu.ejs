@@ -389,9 +389,6 @@
                             <a href="/profile" class="user-menu-link">
                                 <i class="fas fa-user me-2"></i> Thông tin tài khoản
                             </a>
-                            <a href="/profile#change-password" class="user-menu-link">
-                                <i class="fas fa-key me-2"></i> Đổi mật khẩu
-                            </a>
                             <% if (user.role !== 'admin') { %>
                                 <a href="/orders" class="user-menu-link"><i class="fas fa-box-open me-2"></i> Kiểm tra đơn hàng</a>
                             <% } %>
@@ -497,7 +494,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
 
-        // Xử lý thông báo Login/Register
+        // Xử lý thông báo Login
         if (urlParams.has('loginError')) {
             const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
             const alertBox = document.getElementById('loginAlert');
@@ -505,10 +502,20 @@
             alertBox.classList.remove('d-none', 'alert-success');
             alertBox.classList.add('alert-danger');
             loginModal.show();
-
-            // Xóa tham số URL
             window.history.replaceState({}, document.title, window.location.pathname);
         }
+
+        // Xử lý thông báo Register
+        if (urlParams.has('registerError')) {
+            const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+            const alertBox = document.getElementById('registerAlert');
+            alertBox.textContent = urlParams.get('registerError');
+            alertBox.classList.remove('d-none', 'alert-success');
+            alertBox.classList.add('alert-danger');
+            registerModal.show();
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
         if (urlParams.has('registerSuccess')) {
             const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
             const alertBox = document.getElementById('loginAlert');
@@ -516,8 +523,6 @@
             alertBox.classList.remove('d-none', 'alert-danger');
             alertBox.classList.add('alert-success');
             loginModal.show();
-
-            // Xóa tham số URL
             window.history.replaceState({}, document.title, window.location.pathname);
         }
     });

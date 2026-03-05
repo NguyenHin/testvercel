@@ -63,7 +63,7 @@ class OrderController {
                 discount_amount: productDiscount,
                 final_total: finalTotal,
                 shipping_address: `${full_name}, ${phone}, ${address} (${note})`,
-                status: 'PENDING',
+                status: 'PENDING', // Mặc định luôn là PENDING
                 payment_method: payment_method
             });
 
@@ -113,8 +113,9 @@ class OrderController {
 
         try {
             if (status === 'SUCCESS') {
-                await Order.updateOrderStatus(orderId, 'CONFIRMED');
-                if (userId) await Notification.createNotification(userId, 'Thanh toán thành công', `Đơn hàng #${orderId} đã được thanh toán thành công.`, 'success');
+                // Khi thanh toán thành công qua VNPAY/MOMO, trạng thái vẫn là PENDING (Chờ xác nhận)
+                // Thông báo gửi đến user là "Đơn hàng đã được xác nhận" (ghi nhận việc đặt hàng)
+                if (userId) await Notification.createNotification(userId, 'Đơn hàng đã được xác nhận', `Đơn hàng #${orderId} của bạn đã được hệ thống ghi nhận thành công.`, 'success');
                 res.redirect(`/order/success/${orderId}`);
             } else {
                 await Order.updateOrderStatus(orderId, 'CANCELLED');

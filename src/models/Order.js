@@ -2,12 +2,12 @@
 
 class Order {
     static async createOrder(data) {
-        const { user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status } = data;
+        const { user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status, payment_method } = data;
         const query = `
-            INSERT INTO orders (user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO orders (user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status, payment_method)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        const [result] = await db.query(query, [user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status]);
+        const [result] = await db.query(query, [user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status, payment_method]);
         return result.insertId;
     }
 
@@ -37,10 +37,10 @@ class Order {
         `;
         const queryParams = [];
 
-        // 1. Keyword search (Mã SP, Tên KH, SĐT, Địa chỉ)
+        // 1. Keyword search (Mã ĐH, Tên KH, SĐT, Địa chỉ)
         if (filters.keyword) {
             query += ` AND (
-                od.product_id LIKE ? OR 
+                o.id LIKE ? OR
                 u.full_name LIKE ? OR 
                 u.phone LIKE ? OR 
                 o.shipping_address LIKE ?
@@ -51,27 +51,14 @@ class Order {
 
         // 2. Status filtering 
         if (filters.status && filters.status !== 'all') {
-            switch (filters.status) {
-                case 'UNPAID':
-                    query += ` AND o.payment_method = 'COD' AND o.status NOT IN ('COMPLETED', 'CANCELLED')`;
-                    break;
-                case 'PAID':
-                    query += ` AND o.payment_method IN ('VNPAY', 'MOMO')`;
-                    break;
-                case 'INVALID':
-                    query += ` AND o.status = 'CANCELLED'`; // Map "không hợp lệ" to CANCELLED or a specific state if exists
-                    break;
-                default:
-                    query += ` AND o.status = ?`;
-                    queryParams.push(filters.status);
-                    break;
-            }
+            query += ` AND o.status = ?`;
+            queryParams.push(filters.status);
         }
 
-        // 3. Payment Method
-        if (filters.payment_method && filters.payment_method !== 'all') {
-            query += ` AND o.payment_method = ?`;
-            queryParams.push(filters.payment_method);
+        // 3. Payment Status Filtering (Đã thanh toán / Chưa thanh toán)
+        if (filters.payment_status && filters.payment_status !== 'all') {
+            query += ` AND o.payment_status = ?`;
+            queryParams.push(filters.payment_status);
         }
 
         query += ` ORDER BY o.order_date DESC`;

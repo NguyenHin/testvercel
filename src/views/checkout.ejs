@@ -174,13 +174,13 @@
                                     <label class="form-label">Số điện thoại</label>
                                     <input type="tel" class="form-control" name="phone"
                                         value="<%= locals.user ? user.phone : '' %>" required
-                                        placeholder="Nhập số điện thoại...">
+                                        placeholder="">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label">Email</label>
                                     <input type="email" class="form-control" name="email"
                                         value="<%= locals.user ? user.email : '' %>" required
-                                        placeholder="Nhập email...">
+                                        placeholder="">
                                 </div>
 
                                 <!-- ĐỊA CHỈ CHI TIẾT (API NỘI BỘ) -->
@@ -210,7 +210,7 @@
                                 <div class="col-12">
                                     <label class="form-label">Địa chỉ cụ thể (Số nhà, tên đường)</label>
                                     <input type="text" class="form-control" id="address_detail" required
-                                        placeholder="VD: 123 Nguyễn Văn Linh..." oninput="updateAddressString()">
+                                        placeholder="" oninput="updateAddressString()">
                                 </div>
 
                                 <!-- Input ẩn để gom địa chỉ gửi lên server -->
@@ -219,7 +219,7 @@
                                 <div class="col-12">
                                     <label class="form-label">Ghi chú đơn hàng (Tùy chọn)</label>
                                     <textarea class="form-control" name="note" rows="2"
-                                        placeholder="VD: Giao hàng giờ hành chính..."></textarea>
+                                        placeholder=""></textarea>
                                 </div>
                             </div>
                         </div>
@@ -410,7 +410,7 @@
 
                 function toggleQR(method) {
                     // Đã loại bỏ việc show mã QR trực tiếp tại trang Checkout
-                    // Đơn hàng sẽ được chuyển sang /payment_gateway giống cấu trúc Fahasa 
+                    // Đơn hàng sẽ được chuyển sang /payment_gateway giống cấu trúc Fahasa
                 }
             </script>
 </body>

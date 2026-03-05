@@ -126,6 +126,18 @@
         .table-responsive {
             overflow: visible !important;
         }
+
+        .bulk-actions {
+            display: none;
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+            position: sticky;
+            bottom: 20px;
+            z-index: 100;
+            border: 1px solid #dee2e6;
+        }
     </style>
 </head>
 
@@ -177,15 +189,13 @@
                                         </select>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label fw-bold">Phương thức thanh toán</label>
-                                        <select class="form-select" name="payment_method">
+                                        <label class="form-label fw-bold">Trạng thái thanh toán</label>
+                                        <select class="form-select" name="payment_status">
                                             <option value="all">Tất cả</option>
-                                            <option value="COD" <%=(typeof query !=='undefined' &&
-                                                query.payment_method==='COD' ) ? 'selected' : '' %>>COD</option>
-                                            <option value="VNPAY" <%=(typeof query !=='undefined' &&
-                                                query.payment_method==='VNPAY' ) ? 'selected' : '' %>>VNPAY</option>
-                                            <option value="MOMO" <%=(typeof query !=='undefined' &&
-                                                query.payment_method==='MOMO' ) ? 'selected' : '' %>>MOMO</option>
+                                            <option value="PAID" <%=(typeof query !=='undefined' &&
+                                                query.payment_status==='PAID' ) ? 'selected' : '' %>>Đã thanh toán</option>
+                                            <option value="UNPAID" <%=(typeof query !=='undefined' &&
+                                                query.payment_status==='UNPAID' ) ? 'selected' : '' %>>Chưa thanh toán</option>
                                         </select>
                                     </div>
                                     <div class="col-md-2 d-flex align-items-end gap-2">
@@ -212,12 +222,15 @@
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th class="ps-4">Mã ĐH</th>
+                                            <th class="ps-4" style="width: 40px;">
+                                                <input type="checkbox" class="form-check-input" id="selectAll">
+                                            </th>
+                                            <th style="width: 100px;">Mã ĐH</th>
                                             <th>Khách hàng</th>
                                             <th>Tổng tiền</th>
                                             <th style="width: 160px;">Trạng thái</th>
                                             <th style="width: 160px;">Thanh toán</th>
-                                            <th class="text-center" style="width: 80px;">Chi tiết</th>
+                                            <th class="text-center" style="width: 100px;">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -227,17 +240,32 @@
                                                 , 'DELIVERING' : 'Đang giao hàng' , 'COMPLETED' : 'Đã giao'
                                                 , 'CANCELLED' : 'Đã hủy' }; %>
                                                 <% orders.forEach(order=> { %>
-                                                    <% const statusText=statusMap[order.status] || order.status; %>
+                                                    <%
+                                                        const statusText=statusMap[order.status] || order.status;
+
+                                                        let customerName = order.full_name;
+                                                        let customerPhone = order.phone;
+
+                                                        if (order.shipping_address) {
+                                                            const parts = order.shipping_address.split(',').map(p => p.trim());
+                                                            if (parts.length >= 2) {
+                                                                if (!customerName || customerName === 'Khách vãng lai') customerName = parts[0];
+                                                                if (!customerPhone) customerPhone = parts[1];
+                                                            }
+                                                        }
+                                                    %>
                                                         <tr>
-                                                            <td class="ps-4 fw-bold">#<%= order.id %>
+                                                            <td class="ps-4">
+                                                                <input type="checkbox" class="form-check-input order-checkbox" value="<%= order.id %>">
                                                             </td>
+                                                            <td class="fw-bold">#<%= order.id %></td>
                                                             <td>
                                                                 <div class="fw-bold">
-                                                                    <%= order.full_name || 'Khách vãng lai' %>
+                                                                    <%= customerName || 'Khách vãng lai' %>
                                                                 </div>
                                                                 <div class="small text-muted"><i
                                                                         class="fas fa-phone-alt me-1"></i>
-                                                                    <%= order.phone || 'Chưa có SĐT' %>
+                                                                    <%= customerPhone || 'Chưa có SĐT' %>
                                                                 </div>
                                                             </td>
                                                             <td class="fw-bold text-danger">
@@ -281,7 +309,7 @@
                                                                     <button
                                                                         class="btn dropdown-toggle payment-badge <%= order.payment_status === 'PAID' ? 'PAID' : 'UNPAID' %>"
                                                                         type="button" data-bs-toggle="dropdown">
-                                                                        <%= order.payment_status==='PAID'
+                                                                        <%= order.payment_method %> - <%= order.payment_status==='PAID'
                                                                             ? 'Đã thanh toán' : 'Chưa thanh toán' %>
                                                                     </button>
                                                                     <ul class="dropdown-menu shadow">
@@ -295,11 +323,7 @@
                                                                 </div>
                                                             </td>
                                                             <td class="text-center">
-                                                                <button
-                                                                    class="btn btn-sm btn-outline-info rounded-circle"
-                                                                    style="width: 32px; height: 32px;"
-                                                                    onclick="showOrderDetail('<%= order.id %>')"
-                                                                    title="Xem chi tiết">
+                                                                <button class="btn btn-sm btn-outline-info" onclick="showOrderDetail('<%= order.id %>')" title="Xem chi tiết">
                                                                     <i class="fas fa-eye"></i>
                                                                 </button>
                                                             </td>
@@ -307,7 +331,7 @@
                                                         <% }); %>
                                                             <% } else { %>
                                                                 <tr>
-                                                                    <td colspan="6" class="text-center py-5 text-muted">
+                                                                    <td colspan="7" class="text-center py-5 text-muted">
                                                                         <i
                                                                             class="fas fa-box-open fa-3x mb-3 text-secondary"></i><br>
                                                                         Không tìm thấy đơn hàng nào phù hợp.
@@ -317,6 +341,19 @@
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Thanh thao tác hàng loạt -->
+                    <div class="bulk-actions d-flex align-items-center justify-content-between" id="bulkActionsBar">
+                        <div>
+                            <span class="fw-bold me-3 text-primary"><i class="fas fa-check-double me-1"></i> Đã chọn <span id="selectedCount">0</span> đơn hàng</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-danger btn-sm" onclick="deleteSelectedOrders()">
+                                <i class="fas fa-trash-alt me-1"></i> Xóa các đơn đã chọn
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="deselectAll()">Hủy</button>
                         </div>
                     </div>
                 </main>
@@ -347,8 +384,71 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let currentOrderIdForModal = null;
+
+        // Xử lý Checkbox
+        const selectAll = document.getElementById('selectAll');
+        const bulkActionsBar = document.getElementById('bulkActionsBar');
+        const selectedCountSpan = document.getElementById('selectedCount');
+
+        function updateBulkBar() {
+            const checkedCount = document.querySelectorAll('.order-checkbox:checked').length;
+            selectedCountSpan.innerText = checkedCount;
+            bulkActionsBar.style.display = checkedCount > 0 ? 'flex' : 'none';
+        }
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.order-checkbox');
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                updateBulkBar();
+            });
+        }
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('order-checkbox')) {
+                updateBulkBar();
+            }
+        });
+
+        function deselectAll() {
+            selectAll.checked = false;
+            document.querySelectorAll('.order-checkbox').forEach(cb => cb.checked = false);
+            updateBulkBar();
+        }
+
+        // Xóa nhiều đơn hàng
+        function deleteSelectedOrders() {
+            const selectedIds = Array.from(document.querySelectorAll('.order-checkbox:checked')).map(cb => cb.value);
+
+            Swal.fire({
+                title: 'Xóa hàng loạt?',
+                text: `Bạn có chắc chắn muốn xóa ${selectedIds.length} đơn hàng đã chọn?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'Xóa tất cả',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/admin/orders/bulk-action', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'delete', orderIds: selectedIds })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Thành công', data.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Lỗi', data.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
 
         function showOrderDetail(orderId) {
             currentOrderIdForModal = orderId;
@@ -424,6 +524,10 @@
 
                         let html = `
                         <div id="printableArea">
+                            <div class="text-center mb-4">
+                                <h2 class="fw-bold text-uppercase">HÓA ĐƠN BÁN HÀNG</h2>
+                                <p class="text-muted">Mã đơn hàng: #${order.id}</p>
+                            </div>
                             <div class="row mb-4">
                                 <div class="col-6">
                                     <h5 class="fw-bold">Thông tin khách hàng</h5>

@@ -55,26 +55,11 @@
             font-weight: 700;
         }
 
-        .bg-success-light {
-            background-color: #28a745;
-        }
-
-        .bg-info-light {
-            background-color: #17a2b8;
-        }
-
-        .bg-warning-light {
-            background-color: #ffc107;
-            color: #333 !important;
-        }
-
-        .bg-primary-light {
-            background-color: #007bff;
-        }
-
-        .bg-danger-light {
-            background-color: #dc3545;
-        }
+        .bg-success-light { background-color: #28a745; }
+        .bg-info-light { background-color: #17a2b8; }
+        .bg-warning-light { background-color: #ffc107; color: #333 !important; }
+        .bg-primary-light { background-color: #007bff; }
+        .bg-danger-light { background-color: #dc3545; }
 
         .order-status-box {
             padding: 1rem;
@@ -82,7 +67,6 @@
             color: #fff;
             text-align: center;
         }
-
         .status-badge {
             display: inline-block;
             padding: .35em .65em;
@@ -95,27 +79,13 @@
             vertical-align: baseline;
             border-radius: .25rem;
         }
-
-        .status-COMPLETED {
-            background-color: #28a745;
-        }
-
-        .status-PENDING {
-            background-color: #ffc107;
-            color: #212529;
-        }
-
-        .status-CONFIRMED {
-            background-color: #17a2b8;
-        }
-
-        .status-SHIPPING {
-            background-color: #007bff;
-        }
-
-        .status-CANCELLED {
-            background-color: #dc3545;
-        }
+        .status-COMPLETED { background-color: #28a745; }
+        .status-PENDING { background-color: #fff3cd; color: #664d03; }
+        .status-CONFIRMED { background-color: #cfe2ff; color: #084298; }
+        .status-PROCESSING { background-color: #e2e3e5; color: #41464b; }
+        .status-SHIPPED { background-color: #d1e7dd; color: #0f5132; }
+        .status-DELIVERING { background-color: #cff4fc; color: #055160; }
+        .status-CANCELLED { background-color: #f8d7da; color: #842029; }
 
         .payment-badge {
             padding: 5px 12px;
@@ -123,16 +93,8 @@
             font-size: 0.8rem;
             font-weight: 600;
         }
-
-        .payment-badge.PAID {
-            background-color: #d1e7dd;
-            color: #0f5132;
-        }
-
-        .payment-badge.UNPAID {
-            background-color: #f8d7da;
-            color: #842029;
-        }
+        .payment-badge.PAID { background-color: #d1e7dd; color: #0f5132; }
+        .payment-badge.UNPAID { background-color: #f8d7da; color: #842029; }
     </style>
 </head>
 
@@ -142,200 +104,173 @@
             <!-- Sidebar -->
             <%- include('partials/menu') %>
 
-                <!-- Main Content -->
-                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-                    <div
-                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2"><i class="fas fa-chart-pie me-2"></i> THỐNG KÊ & BÁO CÁO</h1>
-                        <%- include('partials/account_dropdown') %>
-                    </div>
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2"><i class="fas fa-chart-pie me-2"></i> THỐNG KÊ & BÁO CÁO</h1>
+                    <%- include('partials/account_dropdown') %>
+                </div>
 
-                    <!-- Tổng quan Doanh thu và Đơn hàng -->
-                    <div class="row">
-                        <div class="col-lg-6 mb-4">
-                            <div class="stat-card bg-success-light p-4 h-100">
-                                <div class="icon"><i class="fas fa-dollar-sign"></i></div>
-                                <p class="mb-2 fs-5">Tổng Doanh Thu (Đã Hoàn Thành)</p>
-                                <h3>
-                                    <%= totalRevenue.toLocaleString('vi-VN') %> đ
-                                </h3>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 mb-4">
-                            <div class="stat-card bg-info-light p-4 h-100">
-                                <div class="icon"><i class="fas fa-shopping-cart"></i></div>
-                                <p class="mb-2 fs-5">Tổng Số Đơn Hàng</p>
-                                <h3>
-                                    <%= totalOrders %>
-                                </h3>
-                            </div>
+                <!-- Tổng quan Doanh thu và Đơn hàng -->
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="stat-card bg-success-light p-4 h-100">
+                            <div class="icon"><i class="fas fa-dollar-sign"></i></div>
+                            <p class="mb-2 fs-5">Tổng Doanh Thu (Đã Hoàn Thành)</p>
+                            <h3><%= totalRevenue.toLocaleString('vi-VN') %> đ</h3>
                         </div>
                     </div>
-
-                    <!-- Tình hình đơn hàng -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title fw-bold mb-0">Tình Hình Đơn Hàng</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="order-status-box bg-warning-light"><strong>Chờ xác nhận</strong><br>
-                                        <%= orderStats.PENDING %>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="order-status-box bg-primary-light"><strong>Đã xác nhận</strong><br>
-                                        <%= orderStats.CONFIRMED %>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="order-status-box bg-info-light"><strong>Đang giao</strong><br>
-                                        <%= orderStats.SHIPPING %>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="order-status-box bg-success-light"><strong>Hoàn thành</strong><br>
-                                        <%= orderStats.COMPLETED %>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="order-status-box bg-danger-light"><strong>Đã hủy</strong><br>
-                                        <%= orderStats.CANCELLED %>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="stat-card bg-info-light p-4 h-100">
+                            <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+                            <p class="mb-2 fs-5">Tổng Số Đơn Hàng</p>
+                            <h3><%= totalOrders %></h3>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Biểu đồ doanh thu -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title fw-bold mb-0">Doanh Thu 7 Ngày Gần Nhất (Đơn Hoàn Thành)</h5>
-                        </div>
-                        <div class="card-body">
-                            <% if (data && data.length> 0) { %>
-                                <canvas id="revenueChart"></canvas>
-                                <% } else { %>
-                                    <p class="text-center text-muted py-5">Chưa có dữ liệu doanh thu để vẽ biểu đồ.</p>
-                                    <% } %>
+                <!-- Tình hình đơn hàng -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title fw-bold mb-0">Tình Hình Đơn Hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col"><div class="order-status-box" style="background-color: #fff3cd; color: #664d03;"><strong>Chờ xác nhận</strong><br><%= orderStats.PENDING %></div></div>
+                            <div class="col"><div class="order-status-box" style="background-color: #cfe2ff; color: #084298;"><strong>Đã xác nhận</strong><br><%= orderStats.CONFIRMED %></div></div>
+                            <div class="col"><div class="order-status-box" style="background-color: #cff4fc; color: #055160;"><strong>Đang giao</strong><br><%= orderStats.SHIPPING %></div></div>
+                            <div class="col"><div class="order-status-box" style="background-color: #d1e7dd; color: #0f5132;"><strong>Hoàn thành</strong><br><%= orderStats.COMPLETED %></div></div>
+                            <div class="col"><div class="order-status-box" style="background-color: #f8d7da; color: #842029;"><strong>Đã hủy</strong><br><%= orderStats.CANCELLED %></div></div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Chi tiết đơn hàng gần đây -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title fw-bold mb-0">Chi Tiết Đơn Hàng Gần Đây</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead>
+                <!-- Biểu đồ doanh thu -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title fw-bold mb-0">Doanh Thu 7 Ngày Gần Nhất (Đơn Hoàn Thành)</h5>
+                    </div>
+                    <div class="card-body">
+                        <% if (data && data.length > 0) { %>
+                            <canvas id="revenueChart"></canvas>
+                        <% } else { %>
+                            <p class="text-center text-muted py-5">Chưa có dữ liệu doanh thu để vẽ biểu đồ.</p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Chi tiết đơn hàng gần đây -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title fw-bold mb-0">Chi Tiết Đơn Hàng Gần Đây</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Mã ĐH</th>
+                                        <th>Khách Hàng</th>
+                                        <th>Ngày Đặt</th>
+                                        <th>Tổng Tiền</th>
+                                        <th>Trạng Thái</th>
+                                        <th>Hành Động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (recentOrders && recentOrders.length > 0) { %>
+                                        <%
+                                        const statusMap = {
+                                            'PENDING': 'Chờ xác nhận',
+                                            'CONFIRMED': 'Đã xác nhận',
+                                            'PROCESSING': 'Đang xử lý',
+                                            'SHIPPED': 'Đã giao VC',
+                                            'DELIVERING': 'Đang giao hàng',
+                                            'COMPLETED': 'Đã giao',
+                                            'CANCELLED': 'Đã hủy'
+                                        };
+                                        %>
+                                        <% recentOrders.forEach(order => { %>
+                                            <%
+                                                const statusText = statusMap[order.status] || order.status;
+                                                let customerName = order.full_name;
+                                                let customerPhone = order.phone;
+                                                if (order.shipping_address) {
+                                                    const parts = order.shipping_address.split(',').map(p => p.trim());
+                                                    if (parts.length >= 2) {
+                                                        if (!customerName || customerName === 'Khách vãng lai') customerName = parts[0];
+                                                        if (!customerPhone) customerPhone = parts[1];
+                                                    }
+                                                }
+                                            %>
+                                            <tr>
+                                                <td>#<%= order.id %></td>
+                                                <td>
+                                                    <div class="fw-bold"><%= customerName || 'Khách vãng lai' %></div>
+                                                    <div class="small text-muted"><%= customerPhone || 'Chưa có SĐT' %></div>
+                                                </td>
+                                                <td><%= new Date(order.order_date).toLocaleDateString('vi-VN') %></td>
+                                                <td><%= order.final_total.toLocaleString('vi-VN') %> đ</td>
+                                                <td><span class="status-badge status-<%= order.status %>"><%= statusText %></span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-info" onclick="showOrderDetail('<%= order.id %>')" title="Xem chi tiết">
+                                                        <i class="fas fa-eye"></i> Xem chi tiết
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } else { %>
                                         <tr>
-                                            <th>Mã ĐH</th>
-                                            <th>Khách Hàng</th>
-                                            <th>Ngày Đặt</th>
-                                            <th>Tổng Tiền</th>
-                                            <th>Trạng Thái</th>
-                                            <th>Hành Động</th>
+                                            <td colspan="6" class="text-center text-muted py-4">Chưa có đơn hàng nào.</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% if (recentOrders && recentOrders.length> 0) { %>
-                                            <% const statusMap={ 'PENDING' : 'Chờ xác nhận' , 'CONFIRMED'
-                                                : 'Đã xác nhận' , 'PROCESSING' : 'Đang xử lý' , 'SHIPPED' : 'Đã giao VC'
-                                                , 'DELIVERING' : 'Đang giao hàng' , 'COMPLETED' : 'Đã giao'
-                                                , 'CANCELLED' : 'Đã hủy' }; %>
-                                                <% recentOrders.forEach(order=> { %>
-                                                    <% const statusText=statusMap[order.status] || order.status; %>
-                                                        <tr>
-                                                            <td>#<%= order.id %>
-                                                            </td>
-                                                            <td>
-                                                                <%= order.full_name || 'Khách vãng lai' %>
-                                                            </td>
-                                                            <td>
-                                                                <%= new
-                                                                    Date(order.order_date).toLocaleDateString('vi-VN')
-                                                                    %>
-                                                            </td>
-                                                            <td>
-                                                                <%= order.final_total.toLocaleString('vi-VN') %> đ
-                                                            </td>
-                                                            <td><span class="status-badge status-<%= order.status %>">
-                                                                    <%= statusText %>
-                                                                </span></td>
-                                                            <td>
-                                                                <button class="btn btn-sm btn-outline-info"
-                                                                    onclick="showOrderDetail('<%= order.id %>')"
-                                                                    title="Xem chi tiết">
-                                                                    <i class="fas fa-eye"></i> Xem chi tiết
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        <% }) %>
-                                                            <% } else { %>
-                                                                <tr>
-                                                                    <td colspan="6" class="text-center text-muted py-4">
-                                                                        Chưa có đơn hàng nào.</td>
-                                                                </tr>
-                                                                <% } %>
-                                    </tbody>
-                                </table>
-                            </div>
+                                    <% } %>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+                </div>
 
-                </main>
+            </main>
         </div>
     </div>
 
-    <!-- Modal Chi Tiết Đơn Hàng (Copy từ order_list.ejs) -->
+    <!-- Modal Chi Tiết Đơn Hàng -->
     <div class="modal fade" id="orderDetailModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Chi tiết đơn hàng <span id="modalOrderId"
-                            class="text-primary"></span></h5>
+                    <h5 class="modal-title fw-bold">Chi tiết đơn hàng <span id="modalOrderId" class="text-primary"></span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="modalOrderContent">
-                    <div class="text-center py-5">
-                        <div class="spinner-border"></div>
-                    </div>
+                    <div class="text-center py-5"><div class="spinner-border"></div></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary" onclick="printOrderFromModal()"><i
-                            class="fas fa-print me-2"></i> In đơn hàng</button>
+                    <button type="button" class="btn btn-primary" onclick="printOrderFromModal()"><i class="fas fa-print me-2"></i> In đơn hàng</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Inject data correctly avoiding unescaped EJS formatter corruption -->
-    <div id="statsChartDataContainer" data-labels="<%= JSON.stringify(labels || []) %>"
-        data-values="<%= JSON.stringify(data || []) %>" style="display: none;"></div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const statsChartDataContainer = document.getElementById('statsChartDataContainer');
-        const labels = JSON.parse(statsChartDataContainer.dataset.labels);
-        // Chuyển string '535000' sang number
-        const data = JSON.parse(statsChartDataContainer.dataset.values).map(Number);
+        const labels = <%- JSON.stringify(labels) %>;
+        const data = <%- JSON.stringify(data) %>;
 
         if (data && data.length > 0) {
             const ctx = document.getElementById('revenueChart').getContext('2d');
             new Chart(ctx, {
-                type: 'bar', // Cập nhật sang bar chart cho dễ nhìn hoặc giữ line
+                type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'Doanh thu (VNĐ)',
                         data: data,
-                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
                         borderColor: '#28a745',
-                        borderWidth: 1
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        fill: true,
+                        tension: 0.4
                     }]
                 },
                 options: {
@@ -357,7 +292,6 @@
             });
         }
 
-        // Logic Modal Chi Tiết (Giống order_list.ejs)
         let currentOrderIdForModal = null;
 
         function showOrderDetail(orderId) {
@@ -403,7 +337,7 @@
                         const paymentText = order.payment_status === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán';
                         const paymentClass = order.payment_status === 'PAID' ? 'PAID' : 'UNPAID';
 
-                        // Parsing shipping address
+                        // Parsing shipping address (ĐỒNG BỘ VỚI ORDER_LIST)
                         let parsedName = order.full_name || 'Khách vãng lai';
                         let parsedPhone = order.phone || 'Chưa có SĐT';
                         let cityDistrict = '';
@@ -432,8 +366,12 @@
                             }
                         }
 
-                        const html = `
+                        let html = `
                         <div id="printableArea">
+                            <div class="text-center mb-4">
+                                <h2 class="fw-bold text-uppercase">HÓA ĐƠN BÁN HÀNG</h2>
+                                <p class="text-muted">Mã đơn hàng: #${order.id}</p>
+                            </div>
                             <div class="row mb-4">
                                 <div class="col-6">
                                     <h5 class="fw-bold">Thông tin khách hàng</h5>
@@ -483,11 +421,10 @@
 
         function printOrderFromModal() {
             const printContent = document.getElementById('printableArea').innerHTML;
-
             const printWindow = window.open('', '', 'height=600,width=800');
             printWindow.document.write('<html><head><title>In Hóa Đơn</title>');
             printWindow.document.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">');
-            printWindow.document.write('<style>body{padding: 20px; font-family: "Segoe UI", sans-serif;} .dropdown { display: none; } /* Hide dropdowns in print */</style>');
+            printWindow.document.write('<style>body{padding: 20px; font-family: "Segoe UI", sans-serif;} .dropdown { display: none; } </style>');
             printWindow.document.write('</head><body>');
             printWindow.document.write(printContent);
             printWindow.document.write('</body></html>');

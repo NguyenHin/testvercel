@@ -81,6 +81,27 @@
         .quick-access-btn:hover i {
             transform: scale(1.2);
         }
+
+        /* Custom Scrollable Order List */
+        .recent-orders-container {
+            max-height: 160px; /* Chiều cao tối đa cho khoảng 2 đơn hàng */
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4e73df #f8f9fc;
+        }
+
+        .recent-orders-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .recent-orders-container::-webkit-scrollbar-track {
+            background: #f8f9fc;
+        }
+
+        .recent-orders-container::-webkit-scrollbar-thumb {
+            background-color: #4e73df;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
@@ -200,40 +221,42 @@
                                     <a href="/admin/orders" class="btn btn-sm btn-primary shadow-sm">Xem tất cả</a>
                                 </div>
                                 <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-borderless table-hover mb-0">
-                                            <tbody>
-                                                <% if (recentOrders && recentOrders.length> 0) { %>
-                                                    <% recentOrders.forEach(order=> { %>
-                                                        <tr class="border-bottom">
-                                                            <td>
-                                                                <div class="fw-bold text-dark">#<%= order.id %>
-                                                                </div>
-                                                                <small class="text-muted">
-                                                                    <%= new
-                                                                        Date(order.order_date).toLocaleDateString('vi-VN')
-                                                                        %>
-                                                                </small>
-                                                            </td>
-                                                            <td class="text-end">
-                                                                <div class="fw-bold text-success">+<%=
-                                                                        order.final_total.toLocaleString('vi-VN') %> đ
-                                                                </div>
-                                                                <span
-                                                                    class="badge bg-<%= order.status === 'COMPLETED' ? 'success' : (order.status === 'PENDING' ? 'warning' : 'secondary') %>">
-                                                                    <%= order.status %>
-                                                                </span>
-                                                            </td>
-                                                        </tr>
-                                                        <% }) %>
-                                                            <% } else { %>
-                                                                <tr>
-                                                                    <td colspan="2" class="text-center text-muted">Chưa
-                                                                        có đơn hàng nào.</td>
-                                                                </tr>
-                                                                <% } %>
-                                            </tbody>
-                                        </table>
+                                    <div class="recent-orders-container">
+                                        <div class="table-responsive">
+                                            <table class="table table-borderless table-hover mb-0">
+                                                <tbody>
+                                                    <% if (recentOrders && recentOrders.length> 0) { %>
+                                                        <% recentOrders.forEach(order=> { %>
+                                                            <tr class="border-bottom">
+                                                                <td>
+                                                                    <div class="fw-bold text-dark">#<%= order.id %>
+                                                                    </div>
+                                                                    <small class="text-muted">
+                                                                        <%= new
+                                                                            Date(order.order_date).toLocaleDateString('vi-VN')
+                                                                            %>
+                                                                    </small>
+                                                                </td>
+                                                                <td class="text-end">
+                                                                    <div class="fw-bold text-success">+<%=
+                                                                            order.final_total.toLocaleString('vi-VN') %> đ
+                                                                    </div>
+                                                                    <span
+                                                                        class="badge bg-<%= order.status === 'COMPLETED' ? 'success' : (order.status === 'PENDING' ? 'warning' : 'secondary') %>">
+                                                                        <%= order.status %>
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                            <% }) %>
+                                                                <% } else { %>
+                                                                    <tr>
+                                                                        <td colspan="2" class="text-center text-muted">Chưa
+                                                                            có đơn hàng nào.</td>
+                                                                    </tr>
+                                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

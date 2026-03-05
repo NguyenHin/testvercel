@@ -225,6 +225,24 @@ class Product {
         return rows;
     }
 
+    static async getRelatedProducts(productId, categoryId) {
+        const query = `
+            SELECT
+                p.*,
+                GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') as author_name
+            FROM products p
+            JOIN product_categories pc ON p.id = pc.product_id
+            LEFT JOIN product_authors pa ON p.id = pa.product_id
+            LEFT JOIN authors a ON pa.author_id = a.id
+            WHERE pc.category_id = ? AND p.id != ? AND p.is_hidden = 0
+            GROUP BY p.id
+            ORDER BY RAND()
+            LIMIT 5
+        `;
+        const [rows] = await db.query(query, [categoryId, productId]);
+        return rows;
+    }
+
     static async getOrCreateAuthor(authorName) {
         if (!authorName) return null;
         const [rows] = await db.query('SELECT id FROM authors WHERE name = ?', [authorName.trim()]);

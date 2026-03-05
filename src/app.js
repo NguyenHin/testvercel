@@ -9,7 +9,7 @@ const db = require("./db");
 const Product = require("./models/Product");
 const Notification = require("./models/Notification");
 const { checkUser } = require("./middleware/auth");
-const startOrderAutomation = require('./utils/order_automation');
+// const startOrderAutomation = require('./utils/order_automation'); // ĐÃ TẮT TỰ ĐỘNG
 
 const app = express();
 
@@ -109,9 +109,9 @@ app.use((err, req, res, next) => {
 });
 
 // SỬA LẠI CỔNG CHẠY SERVER
-const PORT = 3003; // Đổi từ 3002 sang 3003
+const PORT = 3000;
 
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
-    startOrderAutomation();
+    // startOrderAutomation(); // ĐÃ TẮT TỰ ĐỘNG
 });

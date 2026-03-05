@@ -35,20 +35,55 @@ class AuthController {
     static async register(req, res) {
         try {
             const { username, email, full_name, password } = req.body;
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) return res.redirect('/?registerError=Email không hợp lệ!');
+            let errors = [];
 
-            const existingUser = await User.getUserByUsername(username);
-            if (existingUser) return res.redirect('/?registerError=Tên đăng nhập đã tồn tại!');
+            // 1. Kiểm tra username không được chứa khoảng trắng
+            if (/\s/.test(username)) {
+                errors.push('Tên đăng nhập không được chứa khoảng trắng!');
+            }
+
+            // 2. Kiểm tra độ dài username (tối đa 50 ký tự)
+            if (username && username.length > 50) {
+                errors.push('Username tối đa 50 ký tự.');
+            }
+
+            // 3. Kiểm tra định dạng và độ dài email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errors.push('Email không hợp lệ!');
+            } else if (email.length > 100) {
+                errors.push('Email không được vượt quá 100 ký tự!');
+            }
+
+            // 4. Kiểm tra độ dài full_name (giới hạn 100 ký tự)
+            if (full_name && full_name.length > 100) {
+                errors.push('Họ tên không được vượt quá 100 ký tự!');
+            }
+
+            // 5. Kiểm tra trùng lặp username và email đồng thời
+            const [existingUser, existingEmail] = await Promise.all([
+                User.getUserByUsername(username),
+                User.getUserByEmail(email)
+            ]);
+
+            if (existingUser) {
+                errors.push('Tên đăng nhập đã tồn tại.');
+            }
+            if (existingEmail) {
+                errors.push('Email đã được sử dụng.');
+            }
+
+            // Nếu có bất kỳ lỗi nào, trả về tất cả thông báo lỗi
+            if (errors.length > 0) {
+                const errorMsg = encodeURIComponent(errors.join(' '));
+                return res.redirect(`/?registerError=${errorMsg}`);
+            }
 
             await User.addUser(req.body);
             sendWelcomeEmail(email, full_name || username);
             return res.redirect('/?registerSuccess=Đăng ký thành công! Vui lòng kiểm tra email.');
         } catch (err) {
             console.error(err);
-            if (err.code === 'ER_DUP_ENTRY' && err.message.includes('email')) {
-                return res.redirect('/?registerError=Email đã được sử dụng!');
-            }
             return res.redirect('/?registerError=Lỗi khi đăng ký!');
         }
     }
@@ -210,5 +245,3 @@ class AuthController {
 }
 
 module.exports = AuthController;
-
-
