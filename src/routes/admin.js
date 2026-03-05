@@ -1,7 +1,8 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const { requireAdmin } = require('../middleware/auth');
 const adminController = require('../controllers/admin/adminController');
+const AuthController = require('../controllers/AuthController');
 
 // Import các router con
 const productRoutes = require('./admin/product');
@@ -14,6 +15,17 @@ const categoryRoutes = require('./admin/category');
 // Trang Dashboard chính
 router.get('/admin', requireAdmin, adminController.dashboard);
 
+// Tài khoản admin
+router.get('/admin/profile', requireAdmin, AuthController.getAdminProfile);
+router.post('/admin/profile', requireAdmin, AuthController.updateProfile);
+router.get('/admin/change-password', requireAdmin, (req, res) => {
+    res.render('admin/change_password', {
+        error: req.query.error,
+        success: req.query.success
+    });
+});
+router.post('/admin/change-password', requireAdmin, AuthController.processChangePassword);
+
 // Sử dụng các router con
 router.use('/admin/products', productRoutes);
 router.use('/admin/orders', orderRoutes);
@@ -22,9 +34,7 @@ router.use('/admin/inventory', inventoryRoutes);
 router.use('/admin/reviews', reviewRoutes);
 router.use('/admin/categories', categoryRoutes);
 
-// Route cho trang thống kê (nếu có)
-// router.get('/admin/stats', requireAdmin, (req, res) => {
-//     res.render('admin/stats');
-// });
+// Route cho trang thống kê
+router.get('/admin/stats', requireAdmin, adminController.getStats);
 
 module.exports = router;

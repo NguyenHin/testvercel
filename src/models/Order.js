@@ -2,12 +2,12 @@
 
 class Order {
     static async createOrder(data) {
-        const { user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status } = data;
+        const { user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status, payment_method } = data;
         const query = `
-            INSERT INTO orders (user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO orders (user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status, payment_method)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        const [result] = await db.query(query, [user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status]);
+        const [result] = await db.query(query, [user_id, total_money, shipping_fee, discount_amount, final_total, shipping_address, status, payment_method]);
         return result.insertId;
     }
 
@@ -24,6 +24,46 @@ class Order {
             ORDER BY o.order_date DESC
         `;
         const [rows] = await db.query(query);
+        return rows;
+    }
+
+    static async getFilteredOrders(filters) {
+        let query = `
+            SELECT DISTINCT o.*, u.full_name, u.phone 
+            FROM orders o
+            LEFT JOIN users u ON o.user_id = u.id
+            LEFT JOIN order_details od ON o.id = od.order_id
+            WHERE 1=1
+        `;
+        const queryParams = [];
+
+        // 1. Keyword search (Mã ĐH, Tên KH, SĐT, Địa chỉ)
+        if (filters.keyword) {
+            query += ` AND (
+                o.id LIKE ? OR
+                u.full_name LIKE ? OR 
+                u.phone LIKE ? OR 
+                o.shipping_address LIKE ?
+            )`;
+            const likeKeyword = `%${filters.keyword}%`;
+            queryParams.push(likeKeyword, likeKeyword, likeKeyword, likeKeyword);
+        }
+
+        // 2. Status filtering 
+        if (filters.status && filters.status !== 'all') {
+            query += ` AND o.status = ?`;
+            queryParams.push(filters.status);
+        }
+
+        // 3. Payment Status Filtering (Đã thanh toán / Chưa thanh toán)
+        if (filters.payment_status && filters.payment_status !== 'all') {
+            query += ` AND o.payment_status = ?`;
+            queryParams.push(filters.payment_status);
+        }
+
+        query += ` ORDER BY o.order_date DESC`;
+
+        const [rows] = await db.query(query, queryParams);
         return rows;
     }
 

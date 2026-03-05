@@ -322,6 +322,38 @@
             margin-bottom: 20px;
             border: 1px dashed #c49b63;
         }
+
+        /* Related Products */
+        .related-card {
+            border: none;
+            transition: 0.3s;
+            height: 100%;
+        }
+        .related-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .related-img {
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .related-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin: 10px 0 5px;
+            height: 40px;
+        }
+        .related-price {
+            color: #C92127;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 
@@ -470,16 +502,15 @@
                     <!-- MÔ TẢ SẢN PHẨM -->
                     <div class="content-box bg-white p-4 rounded shadow-sm mb-3">
                         <h5 class="fw-bold mb-3 border-bottom pb-2">Mô tả sản phẩm</h5>
-                        <div class="text-secondary"
-                            style="line-height: 1.6; text-align: justify; white-space: pre-wrap;">
-                            <%= product.description || "Đang cập nhật nội dung..." %>
+                        <div class="text-secondary" style="line-height: 1.6; text-align: justify; overflow: hidden;">
+                            <%- product.description || "Đang cập nhật nội dung..." %>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- ĐÁNH GIÁ KHÁCH HÀNG -->
-            <div class="content-box bg-white p-4 rounded shadow-sm">
+            <div class="content-box bg-white p-4 rounded shadow-sm mb-4">
                 <h5 class="fw-bold mb-3">Đánh giá khách hàng</h5>
 
                 <div class="rating-overview">
@@ -571,8 +602,7 @@
 
                                     <% if (review.admin_reply) { %>
                                         <div class="admin-reply-box">
-                                            <div class="admin-reply-header"><i class="fas fa-user-shield"></i> Phản hồi
-                                                từ Quản trị viên</div>
+                                            <div class="admin-reply-header"><i class="fas fa-user-shield"></i> BookTotal</div>
                                             <div class="admin-reply-content">
                                                 <%= review.admin_reply %>
                                             </div>
@@ -586,6 +616,32 @@
                                     <% } %>
                 </div>
             </div>
+
+            <!-- SẢN PHẨM LIÊN QUAN (ĐÃ CHUYỂN XUỐNG DƯỚI ĐÁNH GIÁ) -->
+            <% if (relatedProducts && relatedProducts.length > 0) { %>
+            <div class="content-box bg-white p-4 rounded shadow-sm mb-4">
+                <h5 class="fw-bold mb-4 border-bottom pb-2">Sản phẩm liên quan khác</h5>
+                <div class="row row-cols-2 row-cols-md-5 g-3">
+                    <% relatedProducts.forEach(item => { %>
+                        <div class="col">
+                            <a href="/product/<%= item.id %>" class="text-decoration-none">
+                                <div class="card related-card">
+                                    <%
+                                        let rImg = item.image_url;
+                                        if (rImg && !rImg.startsWith('http')) rImg = '/images/' + rImg;
+                                    %>
+                                    <img src="<%= rImg || '/images/default.jpg' %>" class="related-img card-img-top" alt="<%= item.name %>" onerror="this.src='https://picsum.photos/200/300'">
+                                    <div class="card-body p-2">
+                                        <h6 class="related-title"><%= item.name %></h6>
+                                        <div class="related-price"><%= Number(item.price).toLocaleString('vi-VN') %> đ</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+            <% } %>
         </div>
 
         <!-- Modal Viết Đánh Giá -->

@@ -9,6 +9,7 @@ const AdminInventoryController = require('../../controllers/admin/AdminInventory
 
 router.get('/', requireAdmin, AdminInventoryController.getList);
 router.post('/import', requireAdmin, AdminInventoryController.processImport);
+router.post('/export', requireAdmin, AdminInventoryController.processExport);
 
 // Route xem lịch sử nhập hàng (API trả về JSON cho Modal)
 router.get('/logs/:id', requireAdmin, AdminInventoryController.getLogs);

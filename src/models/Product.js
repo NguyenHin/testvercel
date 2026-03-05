@@ -33,6 +33,16 @@ class Product {
             }
         }
 
+        if (filters.stock_status && filters.stock_status !== 'all') {
+            if (filters.stock_status === 'ok') {
+                whereClauses.push(`p.quantity >= 10`);
+            } else if (filters.stock_status === 'low') {
+                whereClauses.push(`p.quantity > 0 AND p.quantity < 10`);
+            } else if (filters.stock_status === 'out') {
+                whereClauses.push(`p.quantity = 0`);
+            }
+        }
+
         if (whereClauses.length > 0) {
             query += ` WHERE ` + whereClauses.join(' AND ');
         }
@@ -80,12 +90,28 @@ class Product {
             }
         }
 
+        if (filters.stock_status && filters.stock_status !== 'all') {
+            if (filters.stock_status === 'ok') {
+                whereClauses.push(`p.quantity >= 10`);
+            } else if (filters.stock_status === 'low') {
+                whereClauses.push(`p.quantity > 0 AND p.quantity < 10`);
+            } else if (filters.stock_status === 'out') {
+                whereClauses.push(`p.quantity = 0`);
+            }
+        }
+
         if (whereClauses.length > 0) {
             query += ` WHERE ` + whereClauses.join(' AND ');
         }
 
         const [rows] = await db.query(query, queryParams);
         return rows[0].total;
+    }
+
+    static async getTotalStockQuantity() {
+        const query = `SELECT SUM(quantity) as totalStock FROM products`;
+        const [rows] = await db.query(query);
+        return rows[0].totalStock || 0;
     }
 
     static async getProductById(id) {
@@ -199,6 +225,24 @@ class Product {
         return rows;
     }
 
+    static async getRelatedProducts(productId, categoryId) {
+        const query = `
+            SELECT
+                p.*,
+                GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') as author_name
+            FROM products p
+            JOIN product_categories pc ON p.id = pc.product_id
+            LEFT JOIN product_authors pa ON p.id = pa.product_id
+            LEFT JOIN authors a ON pa.author_id = a.id
+            WHERE pc.category_id = ? AND p.id != ? AND p.is_hidden = 0
+            GROUP BY p.id
+            ORDER BY RAND()
+            LIMIT 5
+        `;
+        const [rows] = await db.query(query, [categoryId, productId]);
+        return rows;
+    }
+
     static async getOrCreateAuthor(authorName) {
         if (!authorName) return null;
         const [rows] = await db.query('SELECT id FROM authors WHERE name = ?', [authorName.trim()]);
@@ -301,6 +345,16 @@ class Product {
         await db.query(updateQuery, [quantityImport, id]);
         const logQuery = `INSERT INTO inventory_logs (product_id, quantity, note) VALUES (?, ?, ?)`;
         await db.query(logQuery, [id, quantityImport, note]);
+    }
+
+    static async exportStock(id, quantityExport, note) {
+        const updateQuery = `UPDATE products SET quantity = quantity - ? WHERE id = ? AND quantity >= ?`;
+        const [result] = await db.query(updateQuery, [quantityExport, id, quantityExport]);
+        if (result.affectedRows === 0) {
+            throw new Error('Số lượng tồn kho không đủ để xuất');
+        }
+        const logQuery = `INSERT INTO inventory_logs (product_id, quantity, note) VALUES (?, ?, ?)`;
+        await db.query(logQuery, [id, -quantityExport, note]);
     }
 
     static async getInventoryLogs(productId) {

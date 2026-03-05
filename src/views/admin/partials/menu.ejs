@@ -38,9 +38,7 @@
     }
 
     .admin-user {
-        padding: 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        margin-top: auto;
+        display: none;
     }
 </style>
 
@@ -74,15 +72,5 @@
         </li>
     </ul>
 
-    <div class="admin-user mt-5">
-        <div class="d-flex align-items-center">
-            <div class="flex-grow-1">
-                <div class="fw-bold">
-                    <%= locals.user ? user.username : 'Admin' %>
-                </div>
-                <div class="small text-muted">Quản trị viên</div>
-            </div>
-            <a href="/auth/logout" class="text-danger" title="Đăng xuất"><i class="fas fa-sign-out-alt"></i></a>
-        </div>
-    </div>
+    <!-- User block moved to header -->
 </div>

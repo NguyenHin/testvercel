@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 
 const PageController = require('../controllers/PageController');
@@ -6,6 +6,7 @@ const AuthController = require('../controllers/AuthController');
 const ProductController = require('../controllers/ProductController');
 const CartController = require('../controllers/CartController');
 const OrderController = require('../controllers/OrderController');
+const { requireLogin } = require('../middleware/auth');
 
 const adminRoutes = require('./admin');
 
@@ -20,6 +21,11 @@ router.get('/search', ProductController.search);
 router.post('/login', AuthController.login);
 router.post('/register', AuthController.register);
 router.get('/auth/logout', AuthController.logout);
+
+// --- HỒ SƠ CÁ NHÂN & ĐỔI MẬT KHẨU ---
+router.get('/profile', requireLogin, AuthController.getProfile);
+router.post('/profile', requireLogin, AuthController.updateProfile);
+router.post('/profile/change-password', requireLogin, AuthController.processChangePassword);
 
 // --- QUÊN MẬT KHẨU ---
 router.get('/forgot-password', AuthController.showForgotPassword);

@@ -91,16 +91,21 @@
                         <%= Number(amount).toLocaleString('vi-VN') %> đ
                     </div>
 
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=PAYMENT_<%= method %>_<%= orderId %>_<%= amount %>"
-                        class="qr-code" alt="QR Code">
+                    <!-- Sử dụng ảnh qrck.jpg cho VNPAY, API QR cho MOMO -->
+                    <% if (method === 'VNPAY') { %>
+                        <img src="/images/qrck.jpg" class="qr-code" alt="VNPAY QR">
+                    <% } else { %>
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=PAYMENT_MOMO_<%= orderId %>_<%= amount %>"
+                            class="qr-code" alt="MOMO QR">
+                    <% } %>
 
                     <p class="small text-muted">Vui lòng mở ứng dụng <%= method %> và quét mã QR để thanh toán.</p>
                     <div class="timer">Giao dịch hết hạn sau: <span id="countdown">10:00</span></div>
 
-                    <form action="/payment/confirm" method="POST">
+                    <form id="confirmForm" action="/payment/confirm" method="POST">
                         <input type="hidden" name="orderId" value="<%= orderId %>">
                         <input type="hidden" name="status" value="SUCCESS">
-                        <button type="submit" class="btn-confirm">XÁC NHẬN ĐÃ THANH TOÁN</button>
+                        <button type="button" class="btn-confirm" onclick="confirmPayment()">XÁC NHẬN ĐÃ THANH TOÁN</button>
                     </form>
 
                     <form action="/payment/confirm" method="POST">
@@ -110,6 +115,7 @@
                     </form>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let time = 600; // 10 phút
         const countdownEl = document.getElementById('countdown');
@@ -121,6 +127,20 @@
             countdownEl.innerHTML = `${minutes}:${seconds}`;
             if (time > 0) time--;
         }, 1000);
+
+        function confirmPayment() {
+            Swal.fire({
+                title: 'Đã ghi nhận thông tin',
+                text: "Hệ thống đã lưu lại thông tin chuyển khoản. Chúng tôi sẽ gửi thông tin đơn hàng cũng như xác nhận đã chuyển khoản qua email của bạn ngay khi nhận được tiền.",
+                icon: 'success',
+                confirmButtonColor: '#28a745',
+                confirmButtonText: 'Đồng ý'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('confirmForm').submit();
+                }
+            });
+        }
     </script>
 </body>
 

@@ -1,74 +1,423 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <title>Dashboard - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .admin-header {
+            background-color: #1a1a2e;
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card {
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card .icon {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            font-size: 3.5rem;
+            opacity: 0.2;
+        }
+
+        .bg-gradient-primary {
+            background: linear-gradient(45deg, #4e73df, #224abe);
+        }
+
+        .bg-gradient-success {
+            background: linear-gradient(45deg, #1cc88a, #13855c);
+        }
+
+        .bg-gradient-info {
+            background: linear-gradient(45deg, #36b9cc, #258391);
+        }
+
+        .bg-gradient-warning {
+            background: linear-gradient(45deg, #f6c23e, #dda20a);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .quick-access-btn {
+            padding: 1.5rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .quick-access-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .quick-access-btn:hover i {
+            transform: scale(1.2);
+        }
+
+        /* Custom Scrollable Order List */
+        .recent-orders-container {
+            max-height: 160px; /* Chiều cao tối đa cho khoảng 2 đơn hàng */
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #4e73df #f8f9fc;
+        }
+
+        .recent-orders-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .recent-orders-container::-webkit-scrollbar-track {
+            background: #f8f9fc;
+        }
+
+        .recent-orders-container::-webkit-scrollbar-thumb {
+            background-color: #4e73df;
+            border-radius: 10px;
+        }
+    </style>
 </head>
+
 <body>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
             <%- include('partials/menu') %>
 
-            <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Dashboard</h1>
-                </div>
+                <!-- Main Content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                    <div
+                        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2"><i class="fas fa-tachometer-alt me-2"></i> TỔNG QUAN</h1>
+                        <div class="d-flex align-items-center">
+                            <%- include('partials/account_dropdown') %>
+                        </div>
+                    </div>
 
-                <div class="row g-4 mb-4">
-                    <div class="col-md-3">
-                        <div class="card text-white bg-primary h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Sản phẩm</h5>
-                                <p class="card-text fs-4 fw-bold">Quản lý sách</p>
-                                <a href="/admin/products" class="text-white text-decoration-none stretched-link">Xem chi tiết <i class="fas fa-arrow-right ms-1"></i></a>
+                    <!-- Thống kê nhanh -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card bg-gradient-primary h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs fw-bold text-uppercase mb-1">Doanh thu (Tổng)</div>
+                                            <div class="h5 mb-0 fw-bold">
+                                                <%= stats.revenue.toLocaleString('vi-VN') %> đ
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-dollar-sign fa-2x text-gray-300 icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-white bg-success h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Đơn hàng</h5>
-                                <p class="card-text fs-4 fw-bold">Xử lý đơn</p>
-                                <a href="/admin/orders" class="text-white text-decoration-none stretched-link">Xem chi tiết <i class="fas fa-arrow-right ms-1"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-white bg-warning h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Kho hàng</h5>
-                                <p class="card-text fs-4 fw-bold">Nhập/Xuất</p>
-                                <a href="/admin/inventory" class="text-white text-decoration-none stretched-link">Xem chi tiết <i class="fas fa-arrow-right ms-1"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-white bg-danger h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Thống kê</h5>
-                                <p class="card-text fs-4 fw-bold">Báo cáo</p>
-                                <a href="/admin/stats" class="text-white text-decoration-none stretched-link">Xem chi tiết <i class="fas fa-arrow-right ms-1"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        Hoạt động gần đây
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card bg-gradient-success h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs fw-bold text-uppercase mb-1">Đơn hàng</div>
+                                            <div class="h5 mb-0 fw-bold">
+                                                <%= stats.orders %>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-clipboard-list fa-2x text-gray-300 icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card bg-gradient-info h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs fw-bold text-uppercase mb-1">Khách hàng</div>
+                                            <div class="h5 mb-0 fw-bold">
+                                                <%= stats.users %>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-users fa-2x text-gray-300 icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card stat-card bg-gradient-warning h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs fw-bold text-uppercase mb-1">Sắp hết hàng</div>
+                                            <div class="h5 mb-0 fw-bold">
+                                                <%= stats.lowStock %>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300 icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p class="text-muted text-center">Chưa có dữ liệu hoạt động.</p>
+
+                    <div class="row">
+                        <!-- Biểu đồ doanh thu -->
+                        <div class="col-xl-8 col-lg-7">
+                            <div class="card shadow mb-4">
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white">
+                                    <h6 class="m-0 fw-bold text-primary">Tổng quan doanh thu (7 ngày qua)</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-area">
+                                        <canvas id="myAreaChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Đơn hàng mới nhất -->
+                        <div class="col-xl-4 col-lg-5">
+                            <div class="card shadow mb-4">
+                                <div
+                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white">
+                                    <h6 class="m-0 fw-bold text-primary">Đơn hàng mới nhất</h6>
+                                    <a href="/admin/orders" class="btn btn-sm btn-primary shadow-sm">Xem tất cả</a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="recent-orders-container">
+                                        <div class="table-responsive">
+                                            <table class="table table-borderless table-hover mb-0">
+                                                <tbody>
+                                                    <% if (recentOrders && recentOrders.length> 0) { %>
+                                                        <% recentOrders.forEach(order=> { %>
+                                                            <tr class="border-bottom">
+                                                                <td>
+                                                                    <div class="fw-bold text-dark">#<%= order.id %>
+                                                                    </div>
+                                                                    <small class="text-muted">
+                                                                        <%= new
+                                                                            Date(order.order_date).toLocaleDateString('vi-VN')
+                                                                            %>
+                                                                    </small>
+                                                                </td>
+                                                                <td class="text-end">
+                                                                    <div class="fw-bold text-success">+<%=
+                                                                            order.final_total.toLocaleString('vi-VN') %> đ
+                                                                    </div>
+                                                                    <span
+                                                                        class="badge bg-<%= order.status === 'COMPLETED' ? 'success' : (order.status === 'PENDING' ? 'warning' : 'secondary') %>">
+                                                                        <%= order.status %>
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                            <% }) %>
+                                                                <% } else { %>
+                                                                    <tr>
+                                                                        <td colspan="2" class="text-center text-muted">Chưa
+                                                                            có đơn hàng nào.</td>
+                                                                    </tr>
+                                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </main>
+
+                    <!-- Truy cập nhanh -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 bg-white">
+                                    <h6 class="m-0 fw-bold text-primary">Truy cập nhanh</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-6 mb-3">
+                                            <a href="/admin/products"
+                                                class="btn btn-outline-primary w-100 h-100 d-flex flex-column justify-content-center align-items-center quick-access-btn">
+                                                <i class="fas fa-boxes fa-2x mb-2"></i>
+                                                <span>Xem tất cả sản phẩm</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 mb-3">
+                                            <a href="/admin/inventory"
+                                                class="btn btn-outline-warning w-100 h-100 d-flex flex-column justify-content-center align-items-center quick-access-btn">
+                                                <i class="fas fa-warehouse fa-2x mb-2"></i>
+                                                <span>Quản lý kho hàng</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 mb-3">
+                                            <a href="/admin/categories"
+                                                class="btn btn-outline-info w-100 h-100 d-flex flex-column justify-content-center align-items-center quick-access-btn">
+                                                <i class="fas fa-sitemap fa-2x mb-2"></i>
+                                                <span>Quản lý danh mục</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 mb-3">
+                                            <a href="/admin/user"
+                                                class="btn btn-outline-success w-100 h-100 d-flex flex-column justify-content-center align-items-center quick-access-btn">
+                                                <i class="fas fa-users-cog fa-2x mb-2"></i>
+                                                <span>Quản lý người dùng</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </main>
         </div>
     </div>
 
+    <!-- Inject data correctly avoiding unescaped EJS formatter corruption -->
+    <div id="indexChartDataContainer" data-revenue="<%= JSON.stringify(revenueChart || []) %>" style="display: none;">
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dữ liệu biểu đồ từ Server
+        const indexChartDataContainer = document.getElementById('indexChartDataContainer');
+        const revenueData = JSON.parse(indexChartDataContainer.dataset.revenue);
+
+        const labels = revenueData.map(item => {
+            const d = new Date(item.date);
+            return d.toLocaleDateString('vi-VN');
+        });
+        const data = revenueData.map(item => Number(item.revenue) || 0);
+
+        // Vẽ biểu đồ
+        const ctx = document.getElementById("myAreaChart");
+        const myLineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Doanh thu",
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(78, 115, 223, 0.05)",
+                    borderColor: "rgba(78, 115, 223, 1)",
+                    pointRadius: 3,
+                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHoverRadius: 3,
+                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                    pointHitRadius: 10,
+                    pointBorderWidth: 2,
+                    data: data,
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 25,
+                        top: 25,
+                        bottom: 0
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 7
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            maxTicksLimit: 5,
+                            padding: 10,
+                            callback: function (value, index, values) {
+                                return value.toLocaleString('vi-VN') + ' đ';
+                            }
+                        },
+                        grid: {
+                            color: "rgb(234, 236, 244)",
+                            zeroLineColor: "rgb(234, 236, 244)",
+                            drawBorder: false,
+                            borderDash: [2],
+                            zeroLineBorderDash: [2]
+                        }
+                    },
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyColor: "#858796",
+                        titleMarginBottom: 10,
+                        titleColor: '#6e707e',
+                        titleFont: { size: 14 },
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        xPadding: 15,
+                        yPadding: 15,
+                        displayColors: false,
+                        intersect: false,
+                        mode: 'index',
+                        caretPadding: 10,
+                        callbacks: {
+                            label: function (context) {
+                                var label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.parsed.y.toLocaleString('vi-VN') + ' đ';
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
+
 </html>

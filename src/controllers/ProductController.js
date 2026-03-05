@@ -22,7 +22,8 @@ class ProductController {
             const product = await Product.getProductById(productId);
             if (!product) return res.status(404).send("Sản phẩm không tồn tại");
 
-            const relatedProducts = await Product.getAllProducts(); // Should be getting related in reality
+            // Lấy danh sách sản phẩm liên quan (cùng danh mục)
+            const relatedProducts = await Product.getRelatedProducts(productId, product.category_id);
             const reviews = await Product.getReviews(productId);
 
             let canReview = false;
