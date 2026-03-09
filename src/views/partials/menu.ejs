@@ -249,6 +249,8 @@
     .btn-login:hover { background-color: #2c2c4e; }
     .btn-register { border: 1px solid var(--primary-color); color: var(--primary-color); background: white; }
     .btn-register:hover { background-color: #f0f0f0; }
+
+    .toggle-password { cursor: pointer; }
 </style>
 
 <!-- HEADER WRAPPER (Gom nhóm để sticky) -->
@@ -423,7 +425,6 @@
                 <a href="/" class="nav-link-item">Trang chủ</a>
                 <a href="/best-sellers" class="nav-link-item">Sách bán chạy</a>
                 <a href="/new-arrivals" class="nav-link-item">Sách mới</a>
-                <a href="/on-sale" class="nav-link-item">Khuyến mãi</a>
             </div>
         </div>
     </div>
@@ -443,11 +444,14 @@
                     <input type="hidden" name="returnUrl" value="">
                     <div class="mb-3">
                         <label class="form-label">Tên đăng nhập</label>
-                        <input type="text" class="form-control" name="username" required>
+                        <input type="text" class="form-control" name="username" id="loginUsername" required>
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Mật khẩu</label>
-                        <input type="password" class="form-control" name="password" required>
+                        <div class="input-group">
+                            <input type="password" class="form-control" name="password" required>
+                            <span class="input-group-text toggle-password"><i class="fas fa-eye"></i></span>
+                        </div>
                         <div class="text-end mt-1">
                             <a href="/forgot-password" class="text-decoration-none small text-muted">Quên mật khẩu?</a>
                         </div>
@@ -457,7 +461,7 @@
                     </div>
                 </form>
                 <div class="text-center mt-3">
-                    <p class="small">Chưa có tài khoản? <a href="#" class="text-decoration-none" style="color: #c49b63;" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Đăng ký ngay</a></p>
+                    <p class="small">Chưa có tài khoản? <a href="javascript:void(0)" class="text-decoration-none" style="color: #c49b63;" id="switchToRegister">Đăng ký ngay</a></p>
                 </div>
             </div>
         </div>
@@ -477,12 +481,18 @@
                     <div class="mb-3"><label class="form-label">Họ và tên</label><input type="text" class="form-control" name="full_name" required></div>
                     <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" name="email" required></div>
                     <div class="mb-3"><label class="form-label">Tên đăng nhập</label><input type="text" class="form-control" name="username" required></div>
-                    <div class="mb-4"><label class="form-label">Mật khẩu</label><input type="password" class="form-control" name="password" required></div>
+                    <div class="mb-4">
+                        <label class="form-label">Mật khẩu</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" name="password" required>
+                            <span class="input-group-text toggle-password"><i class="fas fa-eye"></i></span>
+                        </div>
+                    </div>
                     <input type="hidden" name="role" value="user">
                     <div class="d-grid"><button type="submit" class="btn text-white fw-bold" style="background-color: #1a1a2e;">Đăng ký</button></div>
                 </form>
                 <div class="text-center mt-3">
-                    <p class="small">Đã có tài khoản? <a href="#" class="text-decoration-none" style="color: #c49b63;" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Đăng nhập ngay</a></p>
+                    <p class="small">Đã có tài khoản? <a href="javascript:void(0)" class="text-decoration-none" style="color: #c49b63;" id="switchToLogin">Đăng nhập ngay</a></p>
                 </div>
             </div>
         </div>
@@ -494,36 +504,109 @@
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
 
-        // Xử lý thông báo Login
+        function clearParamsAndReload() {
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.location.href = cleanUrl;
+        }
+
+        const loginModalEl = document.getElementById('loginModal');
+        const registerModalEl = document.getElementById('registerModal');
+        const loginModal = new bootstrap.Modal(loginModalEl);
+        const registerModal = new bootstrap.Modal(registerModalEl);
+
+        function removeBackdrop() {
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        }
+
+        function cleanupModal(modalEl) {
+            if (document.activeElement) document.activeElement.blur();
+            modalEl.removeAttribute('aria-hidden');
+        }
+
+        document.getElementById('switchToRegister').addEventListener('click', function(e) {
+            e.preventDefault();
+            cleanupModal(loginModalEl);
+            loginModal.hide();
+            loginModalEl.addEventListener('hidden.bs.modal', function handler() {
+                registerModal.show();
+                loginModalEl.removeEventListener('hidden.bs.modal', handler);
+            });
+        });
+
+        document.getElementById('switchToLogin').addEventListener('click', function(e) {
+            e.preventDefault();
+            cleanupModal(registerModalEl);
+            registerModal.hide();
+            registerModalEl.addEventListener('hidden.bs.modal', function handler() {
+                loginModal.show();
+                registerModalEl.removeEventListener('hidden.bs.modal', handler);
+            });
+        });
+
+        [loginModalEl, registerModalEl].forEach(el => {
+            el.addEventListener('hide.bs.modal', function () {
+                cleanupModal(el);
+            });
+
+            el.addEventListener('hidden.bs.modal', function () {
+                setTimeout(removeBackdrop, 100);
+                if (window.location.search.includes('Error') || window.location.search.includes('Success')) {
+                    clearParamsAndReload();
+                }
+            });
+
+            el.addEventListener('shown.bs.modal', function () {
+                el.removeAttribute('aria-hidden');
+            });
+        });
+
+        // Xử lý thông báo Login và điền lại username
         if (urlParams.has('loginError')) {
-            const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
             const alertBox = document.getElementById('loginAlert');
             alertBox.textContent = urlParams.get('loginError');
             alertBox.classList.remove('d-none', 'alert-success');
             alertBox.classList.add('alert-danger');
+
+            // Điền lại username nếu có
+            if (urlParams.has('username')) {
+                document.getElementById('loginUsername').value = urlParams.get('username');
+            }
+
             loginModal.show();
-            window.history.replaceState({}, document.title, window.location.pathname);
         }
 
-        // Xử lý thông báo Register
         if (urlParams.has('registerError')) {
-            const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
             const alertBox = document.getElementById('registerAlert');
             alertBox.textContent = urlParams.get('registerError');
             alertBox.classList.remove('d-none', 'alert-success');
             alertBox.classList.add('alert-danger');
             registerModal.show();
-            window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         if (urlParams.has('registerSuccess')) {
-            const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
             const alertBox = document.getElementById('loginAlert');
             alertBox.textContent = urlParams.get('registerSuccess');
             alertBox.classList.remove('d-none', 'alert-danger');
             alertBox.classList.add('alert-success');
             loginModal.show();
-            window.history.replaceState({}, document.title, window.location.pathname);
         }
+
+        document.querySelectorAll('.toggle-password').forEach(span => {
+            span.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                const icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            });
+        });
     });
 </script>

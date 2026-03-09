@@ -80,18 +80,83 @@
             margin: 0 auto;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
+
+        /* --- TIPTAP EDITOR STYLES --- */
+        .editor-container {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .editor-toolbar {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 8px;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .editor-toolbar button {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #333;
+            transition: 0.2s;
+        }
+
+        .editor-toolbar button:hover {
+            background: #e9ecef;
+        }
+
+        .editor-toolbar button.is-active {
+            background: #C92127;
+            color: white;
+            border-color: #C92127;
+        }
+
+        .ProseMirror {
+            padding: 15px;
+            min-height: 250px;
+            outline: none;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .ProseMirror p { margin-bottom: 10px; }
+        .ProseMirror ul, .ProseMirror ol { padding-left: 20px; }
+        .ProseMirror blockquote {
+            border-left: 3px solid #ddd;
+            padding-left: 10px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .ProseMirror p.is-editor-empty:first-child::before {
+            color: #adb5bd;
+            content: attr(data-placeholder);
+            float: left;
+            height: 0;
+            pointer-events: none;
+        }
     </style>
 </head>
 
 <body>
     <div class="container py-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold text-dark"><i class="fas fa-edit text-primary me-2"></i> Cập Nhật Sách</h3>
-            <a href="/admin/products" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i> Quay
-                lại</a>
+            <h3 class="fw-bold text-dark"><i class="fas fa-edit text-warning me-2"></i> Cập Nhật Sách</h3>
+            <a href="/admin/products" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i> Quay lại</a>
         </div>
 
-        <form action="/admin/products/edit/<%= product.id %>" method="POST" enctype="multipart/form-data">
+        <form action="/admin/products/edit/<%= product.id %>" method="POST" enctype="multipart/form-data" id="productForm">
+            <!-- THÊM DÒNG NÀY ĐỂ GIỮ LẠI ẢNH CŨ -->
+            <input type="hidden" name="old_image" value="<%= product.image_url %>">
+
             <div class="row">
                 <div class="col-lg-8">
                     <div class="card mb-4">
@@ -101,15 +166,13 @@
                         <div class="card-body p-4">
                             <div class="mb-3">
                                 <label class="form-label">Tên sách <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control" value="<%= product.name %>"
-                                    required>
+                                <input type="text" name="name" class="form-control" value="<%= product.name %>" required>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Tác giả <span class="text-danger">*</span></label>
-                                    <input type="text" name="author_name" class="form-control"
-                                        value="<%= product.author_name %>" required>
+                                    <input type="text" name="author_name" class="form-control" value="<%= product.author_name %>" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Danh mục <span class="text-danger">*</span></label>
@@ -117,21 +180,33 @@
                                         <option value="">-- Chọn Danh mục --</option>
                                         <% if (locals.categories) { %>
                                             <% categories.forEach(c=> { %>
-                                                <option value="<%= c.id %>" <%=product.category_id===c.id ? 'selected'
-                                                    : '' %>>
-                                                    <%= c.name %>
-                                                </option>
-                                                <% }); %>
-                                                    <% } %>
+                                                <option value="<%= c.id %>" <%= product.category_id == c.id ? 'selected' : '' %>><%= c.name %></option>
+                                            <% }); %>
+                                        <% } %>
                                     </select>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Mô tả sản phẩm</label>
-                                <textarea name="description" class="form-control" rows="10"
-                                    placeholder="Nhập mô tả sản phẩm (giữ nguyên khoảng cách và xuống dòng)"
-                                    style="white-space: pre-wrap;"><%= product.description %></textarea>
+                                <div class="editor-container">
+                                    <div class="editor-toolbar">
+                                        <button type="button" id="boldBtn" title="In đậm"><i class="fas fa-bold"></i></button>
+                                        <button type="button" id="italicBtn" title="In nghiêng"><i class="fas fa-italic"></i></button>
+                                        <button type="button" id="strikeBtn" title="Gạch ngang"><i class="fas fa-strikethrough"></i></button>
+                                        <div style="width: 1px; background: #ddd; margin: 0 5px;"></div>
+                                        <button type="button" id="h1Btn" title="Tiêu đề 1">H1</button>
+                                        <button type="button" id="h2Btn" title="Tiêu đề 2">H2</button>
+                                        <button type="button" id="bulletListBtn" title="Danh sách chấm"><i class="fas fa-list-ul"></i></button>
+                                        <button type="button" id="orderedListBtn" title="Danh sách số"><i class="fas fa-list-ol"></i></button>
+                                        <div style="width: 1px; background: #ddd; margin: 0 5px;"></div>
+                                        <button type="button" id="blockquoteBtn" title="Trích dẫn"><i class="fas fa-quote-right"></i></button>
+                                        <button type="button" id="undoBtn" title="Hoàn tác"><i class="fas fa-undo"></i></button>
+                                        <button type="button" id="redoBtn" title="Làm lại"><i class="fas fa-redo"></i></button>
+                                    </div>
+                                    <div id="editor"></div>
+                                </div>
+                                <input type="hidden" name="description" id="descriptionInput" value="<%= product.description %>">
                             </div>
                         </div>
                     </div>
@@ -144,43 +219,38 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Nhà cung cấp</label>
-                                    <input type="text" name="supplier_name" class="form-control"
-                                        value="<%= product.supplier_name %>">
+                                    <input type="text" name="supplier_name" class="form-control" value="<%= product.supplier_name %>">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Nhà xuất bản</label>
-                                    <input type="text" name="publisher_name" class="form-control"
-                                        value="<%= product.publisher_name %>">
+                                    <input type="text" name="publisher_name" class="form-control" value="<%= product.publisher_name %>">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Năm xuất bản</label>
-                                    <input type="number" name="publication_year" class="form-control"
-                                        value="<%= product.publication_year %>" min="1900" max="2099">
+                                    <input type="number" name="publication_year" class="form-control" value="<%= product.publication_year %>" min="1900" max="<%= new Date().getFullYear() %>">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Số trang</label>
-                                    <input type="number" name="pages" class="form-control" value="<%= product.pages %>"
-                                        min="1">
+                                    <input type="number" name="pages" class="form-control" value="<%= product.pages %>" min="1">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Loại bìa</label>
                                     <select name="cover_type" class="form-select">
-                                        <option value="Bìa mềm" <%=product.cover_type==='Bìa mềm' ? 'selected' : '' %>
-                                            >Bìa mềm</option>
-                                        <option value="Bìa cứng" <%=product.cover_type==='Bìa cứng' ? 'selected' : '' %>
-                                            >Bìa cứng</option>
+                                        <option value="Bìa mềm" <%= product.cover_type === 'Bìa mềm' ? 'selected' : '' %>>Bìa mềm</option>
+                                        <option value="Bìa cứng" <%= product.cover_type === 'Bìa cứng' ? 'selected' : '' %>>Bìa cứng</option>
                                     </select>
                                 </div>
-                                <!-- THÊM 2 TRƯỜNG MỚI -->
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Ngôn ngữ</label>
-                                    <input type="text" name="language" class="form-control"
-                                        value="<%= product.language %>">
+                                    <select name="language" class="form-select">
+                                        <option value="Tiếng Việt" <%= product.language === 'Tiếng Việt' ? 'selected' : '' %>>Tiếng Việt</option>
+                                        <option value="Tiếng Anh" <%= product.language === 'Tiếng Anh' ? 'selected' : '' %>>Tiếng Anh</option>
+                                        <option value="Khác" <%= product.language === 'Khác' ? 'selected' : '' %>>Khác</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Kích thước bao bì</label>
-                                    <input type="text" name="dimensions" class="form-control"
-                                        value="<%= product.dimensions %>">
+                                    <input type="text" name="dimensions" class="form-control" value="<%= product.dimensions %>">
                                 </div>
                             </div>
                         </div>
@@ -196,23 +266,19 @@
                             <div class="mb-3">
                                 <label class="form-label">Giá bán (VNĐ) <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <input type="number" name="price" class="form-control fw-bold text-danger"
-                                        value="<%= product.price %>" required min="0">
+                                    <input type="number" name="price" class="form-control fw-bold text-danger" value="<%= product.price %>" required min="0">
                                     <span class="input-group-text">₫</span>
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Số lượng tồn <span class="text-danger">*</span></label>
-                                <input type="number" name="quantity" class="form-control"
-                                    value="<%= product.quantity %>" required min="0">
+                                <label class="form-label">Số lượng tồn kho <span class="text-danger">*</span></label>
+                                <input type="number" name="quantity" class="form-control" value="<%= product.quantity %>" required min="0">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Trạng thái hiển thị</label>
                                 <select name="is_hidden" class="form-select">
-                                    <option value="0" <%=product.is_hidden==0 ? 'selected' : '' %>>Hiển thị (Khách hàng
-                                        có thể thấy)</option>
-                                    <option value="1" <%=product.is_hidden==1 ? 'selected' : '' %>>Đang ẩn (Tạm khóa/Hết
-                                        hàng)</option>
+                                    <option value="0" <%= product.is_hidden == 0 ? 'selected' : '' %>>Hiển thị</option>
+                                    <option value="1" <%= product.is_hidden == 1 ? 'selected' : '' %>>Đang ẩn</option>
                                 </select>
                             </div>
                         </div>
@@ -224,26 +290,23 @@
                         </div>
                         <div class="card-body p-4 text-center">
                             <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                                <% let imgSrc=product.image_url; if (imgSrc && !imgSrc.startsWith('http'))
-                                    imgSrc='/images/' + imgSrc; %>
-                                    <img id="previewImg" src="<%= imgSrc || '#' %>" alt="Preview"
-                                        style="<%= imgSrc ? 'display:block' : 'display:none' %>">
-
-                                    <div id="uploadPlaceholder"
-                                        style="<%= imgSrc ? 'display:none' : 'display:block' %>">
-                                        <i class="fas fa-cloud-upload-alt fa-3x text-secondary mb-2"></i>
-                                        <p class="text-muted small mb-0">Click để thay đổi ảnh</p>
-                                    </div>
+                                <%
+                                    let imgSrc = product.image_url;
+                                    if (imgSrc && !imgSrc.startsWith('http')) imgSrc = '/images/' + imgSrc;
+                                %>
+                                <img id="previewImg" src="<%= imgSrc || '#' %>" alt="Preview" style="<%= imgSrc ? 'display:block' : 'display:none' %>">
+                                <div id="uploadPlaceholder" style="<%= imgSrc ? 'display:none' : 'display:block' %>">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-secondary mb-2"></i>
+                                    <p class="text-muted small mb-0">Click để thay đổi ảnh</p>
+                                </div>
                             </div>
-                            <input type="file" name="image" id="fileInput" class="d-none" accept="image/*"
-                                onchange="previewFile()">
-                            <input type="hidden" name="old_image" value="<%= product.image_url %>">
+                            <input type="file" name="image" id="fileInput" class="d-none" accept="image/*" onchange="previewFile()">
                         </div>
                     </div>
 
                     <div class="mt-4">
                         <button type="submit" class="btn btn-save w-100 py-3">
-                            <i class="fas fa-save me-2"></i> CẬP NHẬT
+                            <i class="fas fa-save me-2"></i> CẬP NHẬT SẢN PHẨM
                         </button>
                     </div>
                 </div>
@@ -266,31 +329,54 @@
 
             if (file) reader.readAsDataURL(file);
         }
+    </script>
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const preview = document.getElementById('previewImg');
-            const placeholder = document.getElementById('uploadPlaceholder');
+    <script type="module">
+        import { Editor } from 'https://esm.sh/@tiptap/core';
+        import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
+        import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder';
 
-            if (preview.src && !preview.src.endsWith('#')) {
-                preview.style.display = 'block';
-                placeholder.style.display = 'none';
-            } else {
-                preview.style.display = 'none';
-                placeholder.style.display = 'block';
+        const initialContent = document.getElementById('descriptionInput').value;
+
+        const editor = new Editor({
+            element: document.querySelector('#editor'),
+            extensions: [
+                StarterKit,
+                Placeholder.configure({
+                    placeholder: 'Nhập mô tả sản phẩm...',
+                }),
+            ],
+            content: initialContent,
+            onUpdate: ({ editor }) => {
+                document.getElementById('descriptionInput').value = editor.getHTML();
+                updateToolbar(editor);
+            },
+            onSelectionUpdate: ({ editor }) => {
+                updateToolbar(editor);
             }
         });
-    </script>
-    <!-- TinyMCE CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js" referrerpolicy="origin"></script>
-    <script>
-        tinymce.init({
-            selector: 'textarea[name="description"]',
-            height: 400,
-            plugins: 'advlist autolink lists link image charmap preview anchor pagebreak',
-            toolbar_mode: 'floating',
-            toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
-        });
+
+        function updateToolbar(editor) {
+            document.getElementById('boldBtn').classList.toggle('is-active', editor.isActive('bold'));
+            document.getElementById('italicBtn').classList.toggle('is-active', editor.isActive('italic'));
+            document.getElementById('strikeBtn').classList.toggle('is-active', editor.isActive('strike'));
+            document.getElementById('h1Btn').classList.toggle('is-active', editor.isActive('heading', { level: 1 }));
+            document.getElementById('h2Btn').classList.toggle('is-active', editor.isActive('heading', { level: 2 }));
+            document.getElementById('bulletListBtn').classList.toggle('is-active', editor.isActive('bulletList'));
+            document.getElementById('orderedListBtn').classList.toggle('is-active', editor.isActive('orderedList'));
+            document.getElementById('blockquoteBtn').classList.toggle('is-active', editor.isActive('blockquote'));
+        }
+
+        document.getElementById('boldBtn').addEventListener('click', () => editor.chain().focus().toggleBold().run());
+        document.getElementById('italicBtn').addEventListener('click', () => editor.chain().focus().toggleItalic().run());
+        document.getElementById('strikeBtn').addEventListener('click', () => editor.chain().focus().toggleStrike().run());
+        document.getElementById('h1Btn').addEventListener('click', () => editor.chain().focus().toggleHeading({ level: 1 }).run());
+        document.getElementById('h2Btn').addEventListener('click', () => editor.chain().focus().toggleHeading({ level: 2 }).run());
+        document.getElementById('bulletListBtn').addEventListener('click', () => editor.chain().focus().toggleBulletList().run());
+        document.getElementById('orderedListBtn').addEventListener('click', () => editor.chain().focus().toggleOrderedList().run());
+        document.getElementById('blockquoteBtn').addEventListener('click', () => editor.chain().focus().toggleBlockquote().run());
+        document.getElementById('undoBtn').addEventListener('click', () => editor.chain().focus().undo().run());
+        document.getElementById('redoBtn').addEventListener('click', () => editor.chain().focus().redo().run());
     </script>
 </body>
 

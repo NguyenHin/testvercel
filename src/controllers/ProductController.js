@@ -6,10 +6,18 @@ class ProductController {
             const keyword = req.query.q;
             if (!keyword || keyword.trim() === "") {
                 const products = await Product.getAllProducts();
-                return res.render('home', { products: products, searchError: "Vui lòng nhập từ khóa để tìm kiếm!" });
+                return res.render('product', {
+                    products: products,
+                    title: "Tất cả sản phẩm",
+                    keyword: ""
+                });
             }
             const products = await Product.searchProducts(keyword);
-            res.render('home', { products: products, keyword: keyword });
+            res.render('product', {
+                products: products,
+                title: `Kết quả tìm kiếm: "${keyword}"`,
+                keyword: keyword
+            });
         } catch (err) {
             console.error(err);
             res.status(500).send("Lỗi tìm kiếm");
@@ -59,7 +67,10 @@ class ProductController {
             const categoryId = req.params.id;
             const products = await Product.getProductsByCategory(categoryId);
             const categoryName = await Product.getCategoryName(categoryId);
-            res.render('home', { products: products, categoryName: categoryName });
+            res.render('product', {
+                products: products,
+                title: categoryName
+            });
         } catch (err) {
             console.error(err);
             res.status(500).send("Lỗi lọc danh mục");
@@ -69,7 +80,10 @@ class ProductController {
     static async getBestSellers(req, res) {
         try {
             const products = await Product.getBestSellers();
-            res.render('home', { products: products, categoryName: 'Sách Bán Chạy' });
+            res.render('product', {
+                products: products,
+                title: 'Sách Bán Chạy Nhất'
+            });
         } catch (err) {
             console.error(err);
             res.status(500).send("Lỗi lấy sách bán chạy");
@@ -79,7 +93,10 @@ class ProductController {
     static async getNewArrivals(req, res) {
         try {
             const products = await Product.getNewArrivals();
-            res.render('home', { products: products, categoryName: 'Sách Mới Phát Hành' });
+            res.render('product', {
+                products: products,
+                title: 'Sách Mới Phát Hành'
+            });
         } catch (err) {
             console.error(err);
             res.status(500).send("Lỗi lấy sách mới");
@@ -89,7 +106,10 @@ class ProductController {
     static async getOnSale(req, res) {
         try {
             const products = await Product.getOnSaleProducts();
-            res.render('home', { products: products, categoryName: 'Sách Đang Khuyến Mãi' });
+            res.render('product', {
+                products: products,
+                title: 'Sách Đang Khuyến Mãi'
+            });
         } catch (err) {
             console.error(err);
             res.status(500).send("Lỗi lấy sách khuyến mãi");

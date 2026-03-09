@@ -4,6 +4,11 @@ const { requireAdmin } = require('../middleware/auth');
 const adminController = require('../controllers/admin/adminController');
 const AuthController = require('../controllers/AuthController');
 
+// Kiểm tra xem controller có được load đúng không
+if (!adminController || !adminController.dashboard) {
+    console.error('LỖI: adminController hoặc hàm dashboard không tồn tại!');
+}
+
 // Import các router con
 const productRoutes = require('./admin/product');
 const orderRoutes = require('./admin/order');

@@ -44,7 +44,7 @@ class User {
 
     static async login(username, password) {
         const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
-        const user = rows[0];
+        const user = rows.find(u => u.username.toLowerCase() === (username || '').toLowerCase());
         if (user) {
             const match = await bcrypt.compare(password, user.password);
             if (match) return user;

@@ -12,15 +12,6 @@
             font-family: 'Segoe UI', sans-serif;
         }
 
-        .admin-header {
-            background-color: #1a1a2e;
-            color: white;
-            padding: 15px 0;
-            margin-bottom: 30px;
-            display: none;
-            /* Removed */
-        }
-
         .card {
             border: none;
             border-radius: 12px;
@@ -143,7 +134,7 @@
                                                         <%= p.author_name || '---' %>
                                                     </td>
                                                     <td class="fw-bold text-danger">
-                                                        <%= Number(p.price).toLocaleString('vi-VN') %>
+                                                        <%= Number(p.price).toLocaleString('vi-VN') %> đ
                                                     </td>
                                                     <td>
                                                         <% if (p.quantity < 10) { %>
@@ -167,14 +158,15 @@
                                                                 <% } %>
                                                     </td>
                                                     <td>
-                                                        <a href="/admin/products/detail/<%= p.id %>"
+                                                        <!-- SỬA: Dẫn đến trang chi tiết sản phẩm bên ngoài -->
+                                                        <a href="/product/<%= p.id %>"
                                                             class="btn btn-sm btn-info text-white me-1"
-                                                            title="Xem chi tiết"><i class="fas fa-eye"></i></a>
+                                                            title="Xem trên website" target="_blank"><i class="fas fa-eye"></i></a>
+
                                                         <a href="/admin/products/edit/<%= p.id %>"
                                                             class="btn btn-sm btn-primary me-1" title="Sửa"><i
                                                                 class="fas fa-edit"></i></a>
 
-                                                        <!-- Nút Xóa dùng Modal -->
                                                         <button class="btn btn-sm btn-danger" title="Xóa"
                                                             onclick="showConfirmModal('/admin/products/delete/<%= p.id %>', 'Bạn có chắc chắn muốn xóa sản phẩm này?')">
                                                             <i class="fas fa-trash"></i>
@@ -184,7 +176,7 @@
                                                 <% }); %>
                                                     <% } else { %>
                                                         <tr>
-                                                            <td colspan="8" class="text-center py-4 text-muted">Chưa có
+                                                            <td colspan="9" class="text-center py-4 text-muted">Chưa có
                                                                 sản phẩm nào.
                                                             </td>
                                                         </tr>

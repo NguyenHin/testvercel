@@ -1,9 +1,10 @@
 class AuthValidator {
     static validateRegistration(data) {
         const errors = [];
-
         if (!data.username || data.username.trim().length < 4) {
             errors.push('Tên đăng nhập phải dài ít nhất 4 ký tự');
+        } else if (!/^[a-zA-Z0-9_]+$/.test(data.username)) {
+            errors.push('Username chỉ cho phép chữ cái, số hoặc dấu _');
         }
 
         if (!data.email) {

@@ -12,20 +12,53 @@ class AuthController {
         });
     }
 
+    // Hàm kiểm tra độ mạnh của mật khẩu
+    static validatePassword(password) {
+        const minLength = 6;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        if (password.length < minLength) return "Mật khẩu phải có ít nhất 6 ký tự.";
+        if (!hasUpperCase) return "Mật khẩu phải chứa ít nhất một chữ cái viết hoa.";
+        if (!hasLowerCase) return "Mật khẩu phải chứa ít nhất một chữ cái viết thường.";
+        if (!hasSpecialChar) return "Mật khẩu phải chứa ít nhất một ký tự đặc biệt.";
+
+        return null;
+    }
+
     static async login(req, res) {
         const { username, password, returnUrl } = req.body;
         try {
-            const user = await User.login(username, password);
-            if (user) {
-                const role = user.role ? user.role.trim().toLowerCase() : 'user';
-                const token = AuthController.createToken(user.id, user.username, role, user.full_name, user.email);
-                res.cookie('jwt', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-                if (role === 'admin') return res.redirect('/admin');
-                return res.redirect(returnUrl || '/');
-            } else {
-                const redirectUrl = returnUrl ? returnUrl + '?loginError=Sai tài khoản hoặc mật khẩu!' : '/?loginError=Sai tài khoản hoặc mật khẩu!';
+            // 1. Tìm user theo username trước
+            const user = await User.getUserByUsername(username);
+
+            if (!user) {
+                // Trường hợp sai tài khoản
+                const redirectUrl = returnUrl
+                    ? `${returnUrl}?loginError=Tài khoản không tồn tại!&username=${encodeURIComponent(username)}`
+                    : `/?loginError=Tài khoản không tồn tại!&username=${encodeURIComponent(username)}`;
                 return res.redirect(redirectUrl);
             }
+
+            // 2. Kiểm tra mật khẩu
+            const match = await bcrypt.compare(password, user.password);
+            if (!match) {
+                // Trường hợp sai mật khẩu
+                const redirectUrl = returnUrl
+                    ? `${returnUrl}?loginError=Mật khẩu không đúng!&username=${encodeURIComponent(username)}`
+                    : `/?loginError=Mật khẩu không đúng!&username=${encodeURIComponent(username)}`;
+                return res.redirect(redirectUrl);
+            }
+
+            // 3. Đăng nhập thành công
+            const role = user.role ? user.role.trim().toLowerCase() : 'user';
+            const token = AuthController.createToken(user.id, user.username, role, user.full_name, user.email);
+            res.cookie('jwt', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+
+            if (role === 'admin') return res.redirect('/admin');
+            return res.redirect(returnUrl || '/');
+
         } catch (err) {
             console.error(err);
             return res.redirect('/?loginError=Lỗi hệ thống!');
@@ -37,43 +70,26 @@ class AuthController {
             const { username, email, full_name, password } = req.body;
             let errors = [];
 
-            // 1. Kiểm tra username không được chứa khoảng trắng
-            if (/\s/.test(username)) {
-                errors.push('Tên đăng nhập không được chứa khoảng trắng!');
-            }
+            if (/\s/.test(username)) errors.push('Tên đăng nhập không được chứa khoảng trắng!');
+            if (username && username.length > 50) errors.push('Username tối đa 50 ký tự.');
 
-            // 2. Kiểm tra độ dài username (tối đa 50 ký tự)
-            if (username && username.length > 50) {
-                errors.push('Username tối đa 50 ký tự.');
-            }
-
-            // 3. Kiểm tra định dạng và độ dài email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                errors.push('Email không hợp lệ!');
-            } else if (email.length > 100) {
-                errors.push('Email không được vượt quá 100 ký tự!');
-            }
+            if (!emailRegex.test(email)) errors.push('Email không hợp lệ!');
+            else if (email.length > 100) errors.push('Email không được vượt quá 100 ký tự!');
 
-            // 4. Kiểm tra độ dài full_name (giới hạn 100 ký tự)
-            if (full_name && full_name.length > 100) {
-                errors.push('Họ tên không được vượt quá 100 ký tự!');
-            }
+            if (full_name && full_name.length > 100) errors.push('Họ tên không được vượt quá 100 ký tự!');
 
-            // 5. Kiểm tra trùng lặp username và email đồng thời
+            const passwordError = AuthController.validatePassword(password);
+            if (passwordError) errors.push(passwordError);
+
             const [existingUser, existingEmail] = await Promise.all([
                 User.getUserByUsername(username),
                 User.getUserByEmail(email)
             ]);
 
-            if (existingUser) {
-                errors.push('Tên đăng nhập đã tồn tại.');
-            }
-            if (existingEmail) {
-                errors.push('Email đã được sử dụng.');
-            }
+            if (existingUser) errors.push('Tên đăng nhập đã tồn tại.');
+            if (existingEmail) errors.push('Email đã được sử dụng.');
 
-            // Nếu có bất kỳ lỗi nào, trả về tất cả thông báo lỗi
             if (errors.length > 0) {
                 const errorMsg = encodeURIComponent(errors.join(' '));
                 return res.redirect(`/?registerError=${errorMsg}`);
@@ -138,6 +154,11 @@ class AuthController {
             return res.render('auth/reset_password', { error: 'Mật khẩu xác nhận không khớp.', token: token });
         }
 
+        const passwordError = AuthController.validatePassword(password);
+        if (passwordError) {
+            return res.render('auth/reset_password', { error: passwordError, token: token });
+        }
+
         try {
             const user = await User.getUserByResetToken(token);
             if (!user) {
@@ -182,37 +203,26 @@ class AuthController {
         const { full_name, email } = req.body;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+        const backURL = req.header('Referer') || '/profile';
+
         if (!emailRegex.test(email)) {
-            const base = res.locals.user.role && res.locals.user.role.trim().toLowerCase() === 'admin'
-                ? '/admin/profile'
-                : '/profile';
-            return res.redirect(`${base}?error=Email không hợp lệ!`);
+            return res.redirect(`${backURL}${backURL.includes('?') ? '&' : '?'}error=${encodeURIComponent('Email không hợp lệ!')}`);
         }
 
         try {
             const user = await User.getUserById(res.locals.user.id);
-            if (!user) {
-                return res.redirect('/?loginError=Tài khoản không tồn tại!');
-            }
+            if (!user) return res.redirect('/?loginError=Tài khoản không tồn tại!');
 
-            await User.updateUser(user.id, {
-                email,
-                full_name,
-                role: user.role
-            });
+            await User.updateUser(user.id, { email, full_name, role: user.role });
 
             const role = user.role ? user.role.trim().toLowerCase() : 'user';
             const token = AuthController.createToken(user.id, user.username, role, full_name, email);
             res.cookie('jwt', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
-            const base = role === 'admin' ? '/admin/profile' : '/profile';
-            res.redirect(`${base}?success=Cập nhật thông tin thành công!`);
+            res.redirect(`${backURL}${backURL.includes('?') ? '&' : '?'}success=${encodeURIComponent('Cập nhật thông tin thành công!')}`);
         } catch (err) {
             console.error(err);
-            const base = res.locals.user.role && res.locals.user.role.trim().toLowerCase() === 'admin'
-                ? '/admin/profile'
-                : '/profile';
-            res.redirect(`${base}?error=Lỗi khi cập nhật thông tin!`);
+            res.redirect(`${backURL}${backURL.includes('?') ? '&' : '?'}error=${encodeURIComponent('Lỗi khi cập nhật thông tin!')}`);
         }
     }
 
@@ -220,26 +230,31 @@ class AuthController {
         if (!res.locals.user) return res.redirect('/?loginError=Vui lòng đăng nhập!');
         const { current_password, new_password, confirm_password } = req.body;
 
-        const role = res.locals.user.role ? res.locals.user.role.trim().toLowerCase() : 'user';
-        const base = role === 'admin' ? '/admin/change-password' : '/profile';
+        const backURL = req.header('Referer') || '/profile';
 
         if (new_password !== confirm_password) {
-            return res.redirect(`${base}?error=Mật khẩu xác nhận không khớp!`);
+            return res.redirect(`${backURL}${backURL.includes('?') ? '&' : '?'}error=${encodeURIComponent('Mật khẩu xác nhận không khớp!')}`);
+        }
+
+        const passwordError = AuthController.validatePassword(new_password);
+        if (passwordError) {
+            return res.redirect(`${backURL}${backURL.includes('?') ? '&' : '?'}error=${encodeURIComponent(passwordError)}`);
         }
 
         try {
             const user = await User.getUserById(res.locals.user.id);
-            const match = await bcrypt.compare(current_password, user.password);
 
+            const match = await bcrypt.compare(current_password, user.password);
             if (!match) {
-                return res.redirect(`${base}?error=Mật khẩu hiện tại không đúng!`);
+                return res.redirect(`${backURL}${backURL.includes('?') ? '&' : '?'}error=${encodeURIComponent('Mật khẩu hiện tại không đúng!')}`);
             }
 
             await User.resetPassword(user.id, new_password);
-            res.redirect(`${base}?success=Đổi mật khẩu thành công!`);
+
+            res.redirect(`${backURL}${backURL.includes('?') ? '&' : '?'}success=${encodeURIComponent('Cập nhật mật khẩu thành công!')}`);
         } catch (err) {
             console.error(err);
-            res.redirect(`${base}?error=Lỗi hệ thống!`);
+            res.redirect(`${backURL}${backURL.includes('?') ? '&' : '?'}error=${encodeURIComponent('Lỗi hệ thống khi đổi mật khẩu!')}`);
         }
     }
 }

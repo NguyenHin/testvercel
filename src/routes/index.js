@@ -9,6 +9,7 @@ const OrderController = require('../controllers/OrderController');
 const { requireLogin } = require('../middleware/auth');
 
 const adminRoutes = require('./admin');
+const apiRoutes = require('./api'); // THÊM DÒNG NÀY
 
 // --- CÁC TRANG TĨNH & HOME ---
 router.get('/', PageController.home);
@@ -73,6 +74,8 @@ router.get('/notifications', async (req, res) => {
     }
 });
 
+// SỬ DỤNG ROUTES
+router.use('/api', apiRoutes); // THÊM DÒNG NÀY ĐỂ CHẠY API
 router.use(adminRoutes);
 
 module.exports = router;

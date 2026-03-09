@@ -58,12 +58,17 @@ class AdminProductController {
                 return res.send(`<script>alert("Giá bán phải lớn hơn 0"); window.history.back();</script>`);
             }
 
-            if (req.file) data.image_url = req.file.filename;
-            else data.image_url = 'default.jpg';
+            if (!req.file) {
+                return res.send(`<script>alert("Vui lòng chọn ảnh"); window.history.back();</script>`);
+            }
+            data.image_url = req.file.filename;
 
             data.quantity = parseInt(data.quantity) || 0;
             data.pages = data.pages ? parseInt(data.pages) : null;
             data.publication_year = data.publication_year ? parseInt(data.publication_year) : null;
+            if (data.publication_year && data.publication_year > new Date().getFullYear()) {
+                return res.send(`<script>alert("NXB không hợp lệ"); window.history.back();</script>`);
+            }
             data.category_id = (data.category_id && parseInt(data.category_id) > 0) ? parseInt(data.category_id) : null;
             data.is_hidden = data.is_hidden ? parseInt(data.is_hidden) : 0;
 
@@ -113,6 +118,9 @@ class AdminProductController {
             data.quantity = parseInt(data.quantity) || 0;
             data.pages = data.pages ? parseInt(data.pages) : null;
             data.publication_year = data.publication_year ? parseInt(data.publication_year) : null;
+            if (data.publication_year && data.publication_year > new Date().getFullYear()) {
+                return res.send(`<script>alert("NXB không hợp lệ"); window.history.back();</script>`);
+            }
             data.category_id = (data.category_id && parseInt(data.category_id) > 0) ? parseInt(data.category_id) : null;
             data.is_hidden = data.is_hidden ? parseInt(data.is_hidden) : 0;
 

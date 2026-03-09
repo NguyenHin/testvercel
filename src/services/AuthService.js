@@ -14,7 +14,7 @@ class AuthService {
     static async authenticateUser(username, password) {
         const user = await User.login(username, password);
         if (!user) {
-            throw new Error("Sai tài khoản hoặc mật khẩu!");
+            throw new Error("Sai tên đăng nhập hoặc mật khẩu!");
         }
 
         const role = user.role ? user.role.trim().toLowerCase() : 'user';
