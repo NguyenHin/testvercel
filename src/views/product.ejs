@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title><%= title || 'Sản phẩm' %> - BookTotal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .page-header {
+            background-color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .page-title {
+            font-weight: 800;
+            color: #1a1a2e;
+            text-transform: uppercase;
+            margin: 0;
+            position: relative;
+            display: inline-block;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: #C92127;
+        }
+
+        .product-card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: white;
+            height: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .product-img-wrapper {
+            position: relative;
+            padding-top: 140%; /* Tỷ lệ khung hình sách */
+            overflow: hidden;
+            background-color: #f9f9f9;
+        }
+
+        .product-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-img {
+            transform: scale(1.05);
+        }
+
+        .product-body {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 140%); /* Phần còn lại sau ảnh */
+        }
+
+        .product-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 2.8em; /* Giới hạn chiều cao tiêu đề */
+            text-decoration: none;
+        }
+
+        .product-title:hover {
+            color: #C92127;
+        }
+
+        .product-author {
+            font-size: 0.85rem;
+            color: #777;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #C92127;
+            margin-top: auto; /* Đẩy giá xuống đáy */
+        }
+
+        .btn-add-cart {
+            width: 100%;
+            background-color: white;
+            color: #C92127;
+            border: 1px solid #C92127;
+            font-weight: 600;
+            padding: 8px;
+            border-radius: 5px;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-add-cart:hover {
+            background-color: #C92127;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 0;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+
+        /* Popup */
+        .center-success-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-width: 300px;
+        }
+
+        .center-success-popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .center-success-popup i {
+            font-size: 3.5rem;
+            color: #2ecc71;
+            margin-bottom: 15px;
+        }
+
+        .center-success-popup span {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2ecc71;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('partials/menu') %>
+
+    <!-- POPUP THÔNG BÁO -->
+    <div id="centerSuccessPopup" class="center-success-popup">
+        <i class="fas fa-check-circle"></i>
+        <span>Đã thêm vào giỏ hàng thành công!</span>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h2 class="page-title"><%= title %></h2>
+            <% if (locals.keyword) { %>
+                <p class="text-muted mt-2 mb-0">Tìm thấy <%= products.length %> kết quả cho từ khóa "<strong><%= keyword %></strong>"</p>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Product List -->
+    <div class="container mb-5">
+        <% if (products && products.length > 0) { %>
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+                <% products.forEach(product => { %>
+                    <div class="col">
+                        <div class="product-card">
+                            <a href="/product/<%= product.id %>" class="product-img-wrapper d-block">
+                                <%
+                                    let imgSrc = product.image_url;
+                                    if (imgSrc && !imgSrc.startsWith('http')) imgSrc = '/images/' + imgSrc;
+                                %>
+                                <img src="<%= imgSrc || '/images/default.jpg' %>" class="product-img" alt="<%= product.name %>" onerror="this.src='https://picsum.photos/300/400'">
+                            </a>
+                            <div class="product-body">
+                                <a href="/product/<%= product.id %>" class="product-title" title="<%= product.name %>"><%= product.name %></a>
+                                <div class="product-author"><%= product.author_name || 'Đang cập nhật' %></div>
+                                <div class="product-price"><%= Number(product.price).toLocaleString('vi-VN') %> đ</div>
+
+                                <form class="add-to-cart-form" action="/cart/add/<%= product.id %>" method="POST">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="btn btn-add-cart">
+                                        <i class="fas fa-cart-plus me-1"></i> Thêm vào giỏ
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <h4>Không tìm thấy sản phẩm nào</h4>
+                <p>Vui lòng thử lại với từ khóa khác hoặc quay lại trang chủ.</p>
+                <a href="/" class="btn btn-primary mt-3">Về trang chủ</a>
+            </div>
+        <% } %>
+    </div>
+
+    <%- include('partials/footer') %>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelectorAll('.add-to-cart-form').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const action = this.action;
+                const formData = new FormData(this);
+                const quantity = formData.get('quantity');
+
+                fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ quantity: quantity })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success popup
+                        const popup = document.getElementById('centerSuccessPopup');
+                        popup.classList.add('show');
+                        setTimeout(() => {
+                            popup.classList.remove('show');
+                        }, 2000);
+                        // Update cart count in header
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            cartCount.textContent = data.totalQty;
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

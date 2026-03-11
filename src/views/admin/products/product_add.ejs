@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm Mới Sách - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid #eee;
+            padding: 20px 30px;
+            border-radius: 12px 12px 0 0 !important;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .form-control,
+        .form-select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .form-control:focus {
+            border-color: #C92127;
+            box-shadow: 0 0 0 3px rgba(201, 33, 39, 0.1);
+        }
+
+        .btn-save {
+            background-color: #C92127;
+            color: white;
+            font-weight: 600;
+            padding: 10px 30px;
+            border-radius: 8px;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .btn-save:hover {
+            background-color: #a11b20;
+            transform: translateY(-2px);
+        }
+
+        .upload-box {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            background: #fff;
+        }
+
+        .upload-box:hover {
+            border-color: #C92127;
+            background: #fff5f5;
+        }
+
+        #previewImg {
+            max-height: 200px;
+            border-radius: 8px;
+            display: none;
+            margin: 0 auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- TIPTAP EDITOR STYLES --- */
+        .editor-container {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .editor-toolbar {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 8px;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .editor-toolbar button {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #333;
+            transition: 0.2s;
+        }
+
+        .editor-toolbar button:hover {
+            background: #e9ecef;
+        }
+
+        .editor-toolbar button.is-active {
+            background: #C92127;
+            color: white;
+            border-color: #C92127;
+        }
+
+        .ProseMirror {
+            padding: 15px;
+            min-height: 250px;
+            outline: none;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .ProseMirror p { margin-bottom: 10px; }
+        .ProseMirror ul, .ProseMirror ol { padding-left: 20px; }
+        .ProseMirror blockquote {
+            border-left: 3px solid #ddd;
+            padding-left: 10px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Placeholder style */
+        .ProseMirror p.is-editor-empty:first-child::before {
+            color: #adb5bd;
+            content: attr(data-placeholder);
+            float: left;
+            height: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold text-dark"><i class="fas fa-plus-circle text-danger me-2"></i> Thêm Sách Mới</h3>
+            <a href="/admin/products" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i> Quay lại</a>
+        </div>
+
+        <form action="/admin/products/add" method="POST" enctype="multipart/form-data" id="productForm">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Thông tin chung</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="mb-3">
+                                <label class="form-label">Tên sách <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control" placeholder="Nhập tên sách..." required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Tác giả <span class="text-danger">*</span></label>
+                                    <input type="text" name="author_name" class="form-control" placeholder="Nhập tên tác giả..." required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Danh mục <span class="text-danger">*</span></label>
+                                    <select name="category_id" class="form-select" required>
+                                        <option value="">-- Chọn Danh mục --</option>
+                                        <% if (locals.categories) { %>
+                                            <% categories.forEach(c=> { %>
+                                                <option value="<%= c.id %>"><%= c.name %></option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Mô tả sản phẩm</label>
+                                <!-- TipTap Editor Container -->
+                                <div class="editor-container">
+                                    <div class="editor-toolbar">
+                                        <button type="button" id="boldBtn" title="In đậm"><i class="fas fa-bold"></i></button>
+                                        <button type="button" id="italicBtn" title="In nghiêng"><i class="fas fa-italic"></i></button>
+                                        <button type="button" id="strikeBtn" title="Gạch ngang"><i class="fas fa-strikethrough"></i></button>
+                                        <div style="width: 1px; background: #ddd; margin: 0 5px;"></div>
+                                        <button type="button" id="h1Btn" title="Tiêu đề 1">H1</button>
+                                        <button type="button" id="h2Btn" title="Tiêu đề 2">H2</button>
+                                        <button type="button" id="bulletListBtn" title="Danh sách chấm"><i class="fas fa-list-ul"></i></button>
+                                        <button type="button" id="orderedListBtn" title="Danh sách số"><i class="fas fa-list-ol"></i></button>
+                                        <div style="width: 1px; background: #ddd; margin: 0 5px;"></div>
+                                        <button type="button" id="blockquoteBtn" title="Trích dẫn"><i class="fas fa-quote-right"></i></button>
+                                        <button type="button" id="undoBtn" title="Hoàn tác"><i class="fas fa-undo"></i></button>
+                                        <button type="button" id="redoBtn" title="Làm lại"><i class="fas fa-redo"></i></button>
+                                    </div>
+                                    <div id="editor"></div>
+                                </div>
+                                <!-- Input ẩn để chứa dữ liệu gửi về server -->
+                                <input type="hidden" name="description" id="descriptionInput">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Chi tiết xuất bản</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nhà cung cấp</label>
+                                    <input type="text" name="supplier_name" class="form-control" placeholder="Nhập tên Nhà cung cấp...">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nhà xuất bản</label>
+                                    <input type="text" name="publisher_name" class="form-control" placeholder="Nhập tên NXB...">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Năm xuất bản</label>
+                                    <input type="number" name="publication_year" class="form-control" placeholder="VD: 2024" min="1900" max="<%= new Date().getFullYear() %>">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Số trang</label>
+                                    <input type="number" name="pages" class="form-control" placeholder="VD: 300" min="1">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Loại bìa</label>
+                                    <select name="cover_type" class="form-select">
+                                        <option value="Bìa mềm">Bìa mềm</option>
+                                        <option value="Bìa cứng">Bìa cứng</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Ngôn ngữ</label>
+                                    <select name="language" class="form-select">
+                                        <option value="Tiếng Việt">Tiếng Việt</option>
+                                        <option value="Tiếng Anh">Tiếng Anh</option>
+                                        <option value="Khác">Khác</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Kích thước bao bì</label>
+                                    <input type="text" name="dimensions" class="form-control" placeholder="VD: 13 x 20 cm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Giá & Kho hàng</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="mb-3">
+                                <label class="form-label">Giá bán (VNĐ) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="price" class="form-control fw-bold text-danger" placeholder="0" required min="0">
+                                    <span class="input-group-text">₫</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Số lượng nhập <span class="text-danger">*</span></label>
+                                <input type="number" name="quantity" class="form-control" value="100" required min="0">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Trạng thái hiển thị</label>
+                                <select name="is_hidden" class="form-select">
+                                    <option value="0">Hiển thị (Khách hàng có thể thấy)</option>
+                                    <option value="1">Đang ẩn (Tạm khóa/Hết hàng)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Hình ảnh</h5>
+                        </div>
+                        <div class="card-body p-4 text-center">
+                            <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+                                <img id="previewImg" src="#" alt="Preview">
+                                <div id="uploadPlaceholder">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-secondary mb-2"></i>
+                                    <p class="text-muted small mb-0">Click để tải ảnh lên</p>
+                                </div>
+                            </div>
+                            <input type="file" name="image" id="fileInput" class="d-none" accept="image/*" onchange="previewFile()">
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-save w-100 py-3">
+                            <i class="fas fa-save me-2"></i> LƯU SẢN PHẨM
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function previewFile() {
+            const preview = document.getElementById('previewImg');
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const file = document.getElementById('fileInput').files[0];
+            const reader = new FileReader();
+
+            reader.onloadend = function () {
+                preview.src = reader.result;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById('productForm').addEventListener('submit', function(event) {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) {
+                alert('Vui lòng chọn hình ảnh');
+                event.preventDefault();
+            }
+        });
+    </script>
+
+    <!-- TIPTAP INTEGRATION (ESM) -->
+    <script type="module">
+        import { Editor } from 'https://esm.sh/@tiptap/core';
+        import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
+        import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder';
+
+        const editor = new Editor({
+            element: document.querySelector('#editor'),
+            extensions: [
+                StarterKit,
+                Placeholder.configure({
+                    placeholder: 'Nhập mô tả sản phẩm...',
+                }),
+            ],
+            content: '', // Để trống nội dung ban đầu
+            onUpdate: ({ editor }) => {
+                // Cập nhật dữ liệu vào input hidden mỗi khi nội dung thay đổi
+                document.getElementById('descriptionInput').value = editor.getHTML();
+                updateToolbar(editor);
+            },
+            onSelectionUpdate: ({ editor }) => {
+                updateToolbar(editor);
+            }
+        });
+
+        // Hàm cập nhật trạng thái active của toolbar
+        function updateToolbar(editor) {
+            document.getElementById('boldBtn').classList.toggle('is-active', editor.isActive('bold'));
+            document.getElementById('italicBtn').classList.toggle('is-active', editor.isActive('italic'));
+            document.getElementById('strikeBtn').classList.toggle('is-active', editor.isActive('strike'));
+            document.getElementById('h1Btn').classList.toggle('is-active', editor.isActive('heading', { level: 1 }));
+            document.getElementById('h2Btn').classList.toggle('is-active', editor.isActive('heading', { level: 2 }));
+            document.getElementById('bulletListBtn').classList.toggle('is-active', editor.isActive('bulletList'));
+            document.getElementById('orderedListBtn').classList.toggle('is-active', editor.isActive('orderedList'));
+            document.getElementById('blockquoteBtn').classList.toggle('is-active', editor.isActive('blockquote'));
+        }
+
+        // Gắn sự kiện cho các nút Toolbar
+        document.getElementById('boldBtn').addEventListener('click', () => editor.chain().focus().toggleBold().run());
+        document.getElementById('italicBtn').addEventListener('click', () => editor.chain().focus().toggleItalic().run());
+        document.getElementById('strikeBtn').addEventListener('click', () => editor.chain().focus().toggleStrike().run());
+
+        document.getElementById('h1Btn').addEventListener('click', () => editor.chain().focus().toggleHeading({ level: 1 }).run());
+        document.getElementById('h2Btn').addEventListener('click', () => editor.chain().focus().toggleHeading({ level: 2 }).run());
+
+        document.getElementById('bulletListBtn').addEventListener('click', () => editor.chain().focus().toggleBulletList().run());
+        document.getElementById('orderedListBtn').addEventListener('click', () => editor.chain().focus().toggleOrderedList().run());
+        document.getElementById('blockquoteBtn').addEventListener('click', () => editor.chain().focus().toggleBlockquote().run());
+
+        document.getElementById('undoBtn').addEventListener('click', () => editor.chain().focus().undo().run());
+        document.getElementById('redoBtn').addEventListener('click', () => editor.chain().focus().redo().run());
+
+        // Gán giá trị ban đầu vào input hidden
+        document.getElementById('descriptionInput').value = editor.getHTML();
+    </script>
+</body>
+
+</html>
