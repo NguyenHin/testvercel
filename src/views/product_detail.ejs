@@ -494,7 +494,11 @@
                             <div class="input-group input-group-sm" style="width: 120px;">
                                 <button class="btn btn-outline-secondary" type="button"
                                     onclick="decreaseQty()">-</button>
+<<<<<<< HEAD
                                 <input type="number" class="form-control text-center fw-bold" value="1" id="qtyInput" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+=======
+                                <input type="number" class="form-control text-center fw-bold" value="1" id="qtyInput" min="1" step="1">
+>>>>>>> 1993e744b25b56f5aa013f20d131041aef49dbef
                                 <button class="btn btn-outline-secondary" type="button"
                                     onclick="increaseQty()">+</button>
                             </div>
@@ -764,10 +768,17 @@
                             setTimeout(() => {
                                 popup.classList.remove('show');
                             }, 2000);
+<<<<<<< HEAD
 
                             // Update cart dropdown
                             if (window.updateCartDropdown) {
                                 window.updateCartDropdown();
+=======
+                            // Update cart count in header
+                            const cartCount = document.querySelector('.cart-count');
+                            if (cartCount) {
+                                cartCount.textContent = data.totalQty;
+>>>>>>> 1993e744b25b56f5aa013f20d131041aef49dbef
                             }
                         } else {
                             alert(data.message);

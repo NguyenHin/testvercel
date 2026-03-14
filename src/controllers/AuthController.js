@@ -107,6 +107,10 @@ class AuthController {
             }
 
             await User.addUser(req.body);
+<<<<<<< HEAD
+=======
+            // Bỏ sendWelcomeEmail nếu không tồn tại hoặc lỗi
+>>>>>>> 1993e744b25b56f5aa013f20d131041aef49dbef
             return res.redirect('/?registerSuccess=Đăng ký thành công! Vui lòng đăng nhập.');
         } catch (err) {
             console.error('Lỗi đăng ký:', err);
