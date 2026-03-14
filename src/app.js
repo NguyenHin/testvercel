@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
@@ -52,14 +53,20 @@ app.use("/api", apiRoutes);
 app.use(async (req, res, next) => {
     // Giỏ hàng
     let cart = [];
-    if (req.cookies.cart) {
-        try { cart = JSON.parse(req.cookies.cart); } catch (e) { cart = []; }
+    const cartCookieName = res.locals.user ? `cart_${res.locals.user.id}` : 'cart_guest';
+
+    if (req.cookies[cartCookieName]) {
+        try {
+            cart = JSON.parse(req.cookies[cartCookieName]);
+        } catch (e) {
+            cart = [];
+        }
     }
     req.cart = cart;
     res.locals.cart = cart;
 
-    const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
-    res.locals.cartCount = totalQty;
+    // SỬA: Đếm số lượng loại sản phẩm thay vì tổng số lượng
+    res.locals.cartCount = cart.length;
 
     // Danh mục
     try {
@@ -101,15 +108,20 @@ app.use((req, res, next) => {
 
 // 6. Xử lý lỗi 500
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).render('page', {
-        title: '500 - Lỗi Server',
-        content: '<div class="text-center py-5"><h3>Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.</h3></div>'
-    });
+    console.error('SERVER ERROR:', err);
+    res.status(500).send(`
+        <div style="text-align: center; padding: 50px; font-family: sans-serif;">
+            <h1 style="color: #C92127;">500 - Lỗi Server</h1>
+            <p>Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.</p>
+            <pre style="text-align: left; background: #f4f4f4; padding: 15px; display: inline-block; border-radius: 5px;">${err.message}</pre>
+            <br><br>
+            <a href="/" style="color: #1a1a2e; font-weight: bold;">Quay lại trang chủ</a>
+        </div>
+    `);
 });
 
 // SỬA LẠI CỔNG CHẠY SERVER
-const PORT = 3000;
+const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);

@@ -53,7 +53,34 @@ class User {
     }
 
     static async deleteUser(id) {
-        await db.query('DELETE FROM users WHERE id = ?', [id]);
+        const connection = await db.getConnection();
+        try {
+            await connection.beginTransaction();
+
+            // 1. Xóa thông báo
+            await connection.query('DELETE FROM notifications WHERE user_id = ?', [id]);
+
+            // 2. Xóa đánh giá
+            await connection.query('DELETE FROM reviews WHERE user_id = ?', [id]);
+
+            // 3. Xử lý đơn hàng:
+            // Cách A: Xóa sạch đơn hàng và chi tiết đơn hàng (Triệt để nhất)
+            const [orders] = await connection.query('SELECT id FROM orders WHERE user_id = ?', [id]);
+            for (const order of orders) {
+                await connection.query('DELETE FROM order_details WHERE order_id = ?', [order.id]);
+                await connection.query('DELETE FROM orders WHERE id = ?', [order.id]);
+            }
+
+            // 4. Cuối cùng mới xóa user
+            await connection.query('DELETE FROM users WHERE id = ?', [id]);
+
+            await connection.commit();
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
     }
 
     // --- CÁC HÀM MỚI CHO QUÊN MẬT KHẨU ---

@@ -494,7 +494,7 @@
                             <div class="input-group input-group-sm" style="width: 120px;">
                                 <button class="btn btn-outline-secondary" type="button"
                                     onclick="decreaseQty()">-</button>
-                                <input type="text" class="form-control text-center fw-bold" value="1" id="qtyInput">
+                                <input type="number" class="form-control text-center fw-bold" value="1" id="qtyInput" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                 <button class="btn btn-outline-secondary" type="button"
                                     onclick="increaseQty()">+</button>
                             </div>
@@ -738,6 +738,47 @@
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
             <script src="/js/product-detail.js"></script>
             <script>
+                document.getElementById('btnAddToCart').addEventListener('click', function() {
+                    const productId = this.dataset.id;
+                    const quantityInput = document.getElementById('qtyInput');
+                    const quantity = quantityInput.value;
+
+                    if (quantity % 1 !== 0 || quantity <= 0) {
+                        alert('Số lượng phải là số nguyên dương lớn hơn 0');
+                        return;
+                    }
+
+                    fetch('/cart/add/' + productId, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ quantity: quantity })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success popup
+                            const popup = document.getElementById('centerSuccessPopup');
+                            popup.classList.add('show');
+                            setTimeout(() => {
+                                popup.classList.remove('show');
+                            }, 2000);
+
+                            // Update cart dropdown
+                            if (window.updateCartDropdown) {
+                                window.updateCartDropdown();
+                            }
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+                    });
+                });
+
                 function openLoginModal() {
                     const currentUrl = window.location.pathname;
                     const loginForm = document.querySelector('#loginModal form');

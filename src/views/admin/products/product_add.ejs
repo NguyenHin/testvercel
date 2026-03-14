@@ -296,7 +296,7 @@
                                     <p class="text-muted small mb-0">Click để tải ảnh lên</p>
                                 </div>
                             </div>
-                            <input type="file" name="image" id="fileInput" class="d-none" accept="image/*" onchange="previewFile()" required>
+                            <input type="file" name="image" id="fileInput" class="d-none" accept="image/*" onchange="previewFile()">
                         </div>
                     </div>
 
@@ -323,8 +323,18 @@
                 placeholder.style.display = 'none';
             }
 
-            if (file) reader.readAsDataURL(file);
+            if (file) {
+                reader.readAsDataURL(file);
+            }
         }
+
+        document.getElementById('productForm').addEventListener('submit', function(event) {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) {
+                alert('Vui lòng chọn hình ảnh');
+                event.preventDefault();
+            }
+        });
     </script>
 
     <!-- TIPTAP INTEGRATION (ESM) -->

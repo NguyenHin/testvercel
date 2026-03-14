@@ -4,7 +4,11 @@ class AdminUserController {
     static async getList(req, res) {
         try {
             const users = await User.getAllUsers();
-            res.render('admin/user/user_list', { users: users });
+            res.render('admin/user/user_list', {
+                users: users,
+                error: req.query.error,
+                success: req.query.success
+            });
         } catch (err) {
             res.status(500).send("Lỗi lấy danh sách user");
         }
@@ -34,7 +38,7 @@ class AdminUserController {
             }
 
             await User.addUser(req.body);
-            res.redirect('/admin/user');
+            res.redirect('/admin/user?success=' + encodeURIComponent('Thêm người dùng thành công!'));
         } catch (err) {
             console.error(err);
             if (err.code === 'ER_DUP_ENTRY') {
@@ -72,8 +76,6 @@ class AdminUserController {
             const { email, full_name, password, role } = req.body;
             let errors = {};
 
-            // We can optionally check if email changed to an existing one, but for simplicity skip here or rely on duplicate error
-
             if (Object.keys(errors).length > 0) {
                 req.flash('errors', errors);
                 req.flash('formData', req.body);
@@ -81,7 +83,7 @@ class AdminUserController {
             }
 
             await User.updateUser(id, req.body);
-            res.redirect('/admin/user');
+            res.redirect('/admin/user?success=' + encodeURIComponent('Cập nhật người dùng thành công!'));
         } catch (err) {
             console.error(err);
             if (err.code === 'ER_DUP_ENTRY') {
@@ -98,14 +100,23 @@ class AdminUserController {
 
     static async delete(req, res) {
         try {
-            await User.deleteUser(req.params.id);
-            res.redirect('/admin/user');
+            const id = req.params.id;
+
+            // Không cho phép admin tự xóa chính mình (tùy chọn)
+            if (res.locals.user && res.locals.user.id == id) {
+                return res.redirect('/admin/user?error=' + encodeURIComponent('Bạn không thể tự xóa tài khoản của chính mình!'));
+            }
+
+            await User.deleteUser(id);
+            res.redirect('/admin/user?success=' + encodeURIComponent('Xóa người dùng thành công!'));
         } catch (err) {
-            res.status(500).send("Lỗi khi xóa user");
+            console.error('LỖI XÓA USER:', err);
+            if (err.code === 'ER_ROW_IS_REFERENCED_2') {
+                return res.redirect('/admin/user?error=' + encodeURIComponent('Không thể xóa người dùng này vì họ đã có đơn hàng hoặc dữ liệu liên quan khác!'));
+            }
+            res.redirect('/admin/user?error=' + encodeURIComponent('Đã xảy ra lỗi khi xóa người dùng!'));
         }
     }
 }
 
 module.exports = AdminUserController;
-
-

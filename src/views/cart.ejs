@@ -57,6 +57,14 @@
     <%- include('partials/menu') %>
 
     <div class="container mb-5 main-content">
+        <% if (locals.error) { %>
+            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <%= error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+
         <div id="loginRequiredBlock" class="login-required-container">
             <i class="fas fa-user-lock login-required-icon"></i>
             <h4 class="text-muted mb-3">Bạn cần đăng nhập để thanh toán</h4>

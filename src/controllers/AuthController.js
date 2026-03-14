@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { sendWelcomeEmail, sendResetPasswordEmail } = require('../utils/mailer');
+const { sendResetPasswordEmail } = require('../utils/mailer');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
@@ -17,27 +17,33 @@ class AuthController {
         const minLength = 6;
         const hasUpperCase = /[A-Z]/.test(password);
         const hasLowerCase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
         if (password.length < minLength) return "Mật khẩu phải có ít nhất 6 ký tự.";
         if (!hasUpperCase) return "Mật khẩu phải chứa ít nhất một chữ cái viết hoa.";
         if (!hasLowerCase) return "Mật khẩu phải chứa ít nhất một chữ cái viết thường.";
+        if (!hasNumber) return "Mật khẩu phải chứa ít nhất một chữ số.";
         if (!hasSpecialChar) return "Mật khẩu phải chứa ít nhất một ký tự đặc biệt.";
 
         return null;
     }
 
     static async login(req, res) {
-        const { username, password, returnUrl } = req.body;
+        let { username, password, returnUrl } = req.body;
+        if (username) username = username.trim();
+
         try {
             // 1. Tìm user theo username trước
             const user = await User.getUserByUsername(username);
 
+            const genericError = encodeURIComponent("Sai tên đăng nhập hoặc mật khẩu!");
+
             if (!user) {
                 // Trường hợp sai tài khoản
                 const redirectUrl = returnUrl
-                    ? `${returnUrl}?loginError=Tài khoản không tồn tại!&username=${encodeURIComponent(username)}`
-                    : `/?loginError=Tài khoản không tồn tại!&username=${encodeURIComponent(username)}`;
+                    ? `${returnUrl}?loginError=${genericError}&username=${encodeURIComponent(username)}`
+                    : `/?loginError=${genericError}&username=${encodeURIComponent(username)}`;
                 return res.redirect(redirectUrl);
             }
 
@@ -46,8 +52,8 @@ class AuthController {
             if (!match) {
                 // Trường hợp sai mật khẩu
                 const redirectUrl = returnUrl
-                    ? `${returnUrl}?loginError=Mật khẩu không đúng!&username=${encodeURIComponent(username)}`
-                    : `/?loginError=Mật khẩu không đúng!&username=${encodeURIComponent(username)}`;
+                    ? `${returnUrl}?loginError=${genericError}&username=${encodeURIComponent(username)}`
+                    : `/?loginError=${genericError}&username=${encodeURIComponent(username)}`;
                 return res.redirect(redirectUrl);
             }
 
@@ -61,7 +67,7 @@ class AuthController {
 
         } catch (err) {
             console.error(err);
-            return res.redirect('/?loginError=Lỗi hệ thống!');
+            return res.redirect('/?loginError=' + encodeURIComponent("Lỗi hệ thống!"));
         }
     }
 
@@ -70,8 +76,13 @@ class AuthController {
             const { username, email, full_name, password } = req.body;
             let errors = [];
 
-            if (/\s/.test(username)) errors.push('Tên đăng nhập không được chứa khoảng trắng!');
-            if (username && username.length > 50) errors.push('Username tối đa 50 ký tự.');
+            if (username) {
+                if (/\s/.test(username)) errors.push('Tên đăng nhập không được chứa khoảng trắng!');
+                if (!/^[a-zA-Z0-9_]+$/.test(username)) errors.push('Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới (_)!');
+                if (username.length > 50) errors.push('Username tối đa 50 ký tự.');
+            } else {
+                errors.push('Tên đăng nhập không được để trống!');
+            }
 
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) errors.push('Email không hợp lệ!');
@@ -96,16 +107,16 @@ class AuthController {
             }
 
             await User.addUser(req.body);
-            sendWelcomeEmail(email, full_name || username);
-            return res.redirect('/?registerSuccess=Đăng ký thành công! Vui lòng kiểm tra email.');
+            return res.redirect('/?registerSuccess=Đăng ký thành công! Vui lòng đăng nhập.');
         } catch (err) {
-            console.error(err);
+            console.error('Lỗi đăng ký:', err);
             return res.redirect('/?registerError=Lỗi khi đăng ký!');
         }
     }
 
     static logout(req, res) {
         res.cookie('jwt', '', { maxAge: 1 });
+        res.cookie('cart', '', { maxAge: 1 }); // Clear cart cookie on logout
         res.redirect('/');
     }
 
@@ -216,7 +227,7 @@ class AuthController {
             await User.updateUser(user.id, { email, full_name, role: user.role });
 
             const role = user.role ? user.role.trim().toLowerCase() : 'user';
-            const token = AuthController.createToken(user.id, user.username, role, full_name, email);
+            const token = AuthController.createToken(user.id, user.username, role, user.full_name, email);
             res.cookie('jwt', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
             res.redirect(`${backURL}${backURL.includes('?') ? '&' : '?'}success=${encodeURIComponent('Cập nhật thông tin thành công!')}`);

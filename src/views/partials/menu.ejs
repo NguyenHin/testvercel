@@ -290,7 +290,7 @@
                             <i class="far fa-bell"></i>
                             <span>Thông báo</span>
                             <% if (locals.unreadNotifications && unreadNotifications > 0) { %>
-                                <span class="cart-badge bg-danger"><%= unreadNotifications %></span>
+                                <span class="cart-badge bg-danger"><%= unreadNotifications > 99 ? '99+' : unreadNotifications %></span>
                             <% } %>
                         </a>
                         <div class="dropdown-menu-custom notif-dropdown">
@@ -331,13 +331,13 @@
                     <a href="/cart" class="text-decoration-none text-dark d-flex flex-column align-items-center">
                         <i class="fas fa-shopping-bag"></i>
                         <span>Giỏ hàng</span>
-                        <% if (locals.cartCount && cartCount > 0) { %>
-                            <span class="cart-badge"><%= cartCount %></span>
-                        <% } %>
+                        <span class="cart-badge" id="cartBadgeCount" style="<%= (locals.cartCount && cartCount > 0) ? '' : 'display: none;' %>">
+                            <%= (locals.cartCount && cartCount > 99) ? '99+' : (locals.cartCount || 0) %>
+                        </span>
                     </a>
-                    <div class="dropdown-menu-custom cart-dropdown">
+                    <div class="dropdown-menu-custom cart-dropdown" id="cartDropdownContent">
                         <% if (locals.cart && cart.length > 0) { %>
-                            <div class="cart-list">
+                            <div class="cart-list" id="cartDropdownList">
                                 <% cart.slice(0, 5).forEach(item => { %>
                                     <div class="cart-item-row">
                                         <%
@@ -361,7 +361,7 @@
                                     <%
                                         let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
                                     %>
-                                    <span class="cart-total-val"><%= total.toLocaleString('vi-VN') %> đ</span>
+                                    <span class="cart-total-val" id="cartDropdownTotal"><%= total.toLocaleString('vi-VN') %> đ</span>
                                 </div>
                                 <% if (locals.user && user.role === 'admin') { %>
                                     <button class="btn-view-cart bg-secondary" disabled>Admin không thể mua hàng</button>
@@ -609,4 +609,65 @@
             });
         });
     });
+
+    // Hàm global để cập nhật dropdown giỏ hàng từ trang bất kỳ (ajax)
+    window.updateCartDropdown = function() {
+        fetch('/api/cart-data') // Cần tạo thêm route này
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const badge = document.getElementById('cartBadgeCount');
+                    const dropdownContent = document.getElementById('cartDropdownContent');
+
+                    // 1. Cập nhật Badge
+                    const count = data.cart.length;
+                    if (count > 0) {
+                        badge.textContent = count > 99 ? '99+' : count;
+                        badge.style.display = 'block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+
+                    // 2. Cập nhật Dropdown
+                    if (count > 0) {
+                        let html = '<div class="cart-list" id="cartDropdownList">';
+                        data.cart.slice(0, 5).forEach(item => {
+                            let imgSrc = item.image_url;
+                            if (imgSrc && !imgSrc.startsWith('http')) imgSrc = '/images/' + imgSrc;
+                            html += `
+                                <div class="cart-item-row">
+                                    <img src="${imgSrc || '/images/default.jpg'}" class="cart-img" onerror="this.src='https://picsum.photos/50/70'">
+                                    <div class="cart-info">
+                                        <div class="cart-name">${item.name}</div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="small text-muted">x${item.quantity}</span>
+                                            <span class="cart-price">${item.price.toLocaleString('vi-VN')} đ</span>
+                                        </div>
+                                    </div>
+                                </div>`;
+                        });
+                        html += '</div>';
+
+                        const total = data.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                        const isAdmin = <%= (locals.user && user.role === 'admin') ? 'true' : 'false' %>;
+
+                        html += `
+                            <div class="cart-footer">
+                                <div class="cart-total-row">
+                                    <span>Tổng cộng:</span>
+                                    <span class="cart-total-val">${total.toLocaleString('vi-VN')} đ</span>
+                                </div>
+                                ${isAdmin ? '<button class="btn-view-cart bg-secondary" disabled>Admin không thể mua hàng</button>' : '<a href="/cart" class="btn-view-cart">Xem giỏ hàng</a>'}
+                            </div>`;
+                        dropdownContent.innerHTML = html;
+                    } else {
+                        dropdownContent.innerHTML = `
+                            <div class="text-center py-5">
+                                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                                <p class="text-muted small mb-0">Giỏ hàng trống</p>
+                            </div>`;
+                    }
+                }
+            });
+    };
 </script>

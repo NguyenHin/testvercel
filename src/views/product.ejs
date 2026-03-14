@@ -47,6 +47,8 @@
             background: white;
             height: 100%;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
         }
 
         .product-card:hover {
@@ -79,7 +81,7 @@
             padding: 15px;
             display: flex;
             flex-direction: column;
-            height: calc(100% - 140%); /* Phần còn lại sau ảnh */
+            flex-grow: 1;
         }
 
         .product-title {
@@ -93,6 +95,7 @@
             overflow: hidden;
             height: 2.8em; /* Giới hạn chiều cao tiêu đề */
             text-decoration: none;
+            line-height: 1.4;
         }
 
         .product-title:hover {
@@ -143,11 +146,56 @@
             margin-bottom: 20px;
             color: #dee2e6;
         }
+
+        /* Popup */
+        .center-success-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-width: 300px;
+        }
+
+        .center-success-popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .center-success-popup i {
+            font-size: 3.5rem;
+            color: #2ecc71;
+            margin-bottom: 15px;
+        }
+
+        .center-success-popup span {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2ecc71;
+        }
     </style>
 </head>
 
 <body>
     <%- include('partials/menu') %>
+
+    <!-- POPUP THÔNG BÁO -->
+    <div id="centerSuccessPopup" class="center-success-popup">
+        <i class="fas fa-check-circle"></i>
+        <span>Đã thêm vào giỏ hàng thành công!</span>
+    </div>
 
     <!-- Page Header -->
     <div class="page-header">
@@ -178,7 +226,8 @@
                                 <div class="product-author"><%= product.author_name || 'Đang cập nhật' %></div>
                                 <div class="product-price"><%= Number(product.price).toLocaleString('vi-VN') %> đ</div>
 
-                                <form action="/cart/add/<%= product.id %>" method="POST">
+                                <form class="add-to-cart-form" action="/cart/add/<%= product.id %>" method="POST">
+                                    <input type="hidden" name="quantity" value="1">
                                     <button type="submit" class="btn btn-add-cart">
                                         <i class="fas fa-cart-plus me-1"></i> Thêm vào giỏ
                                     </button>
@@ -200,6 +249,47 @@
 
     <%- include('partials/footer') %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelectorAll('.add-to-cart-form').forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const action = this.action;
+                const formData = new FormData(this);
+                const quantity = formData.get('quantity');
+
+                fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ quantity: quantity })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success popup
+                        const popup = document.getElementById('centerSuccessPopup');
+                        popup.classList.add('show');
+                        setTimeout(() => {
+                            popup.classList.remove('show');
+                        }, 2000);
+                        // Update cart count in header
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            cartCount.textContent = data.totalQty;
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

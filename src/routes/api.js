@@ -6,6 +6,7 @@ const ApiUserController = require('../controllers/api/ApiUserController');
 const ApiCouponController = require('../controllers/api/ApiCouponController');
 const ApiOrderController = require('../controllers/api/ApiOrderController');
 const ApiAuthController = require('../controllers/api/ApiAuthController');
+const CartController = require('../controllers/CartController');
 const { verifyApiToken } = require('../middleware/verifyJwt');
 
 // --- API AUTHENTICATION (CHO MOBILE/JAVA CLIENT) ---
@@ -25,6 +26,9 @@ router.post('/coupon/check', ApiCouponController.checkCoupon);
 
 // --- API ĐƠN HÀNG ---
 router.get('/orders/:id', ApiOrderController.getOrderDetails);
+
+// --- API GIỎ HÀNG ---
+router.get('/cart-data', CartController.getCartData);
 
 // --- API ĐỊA CHÍNH ---
 router.get('/location/provinces', ApiOrderController.getProvinces);
