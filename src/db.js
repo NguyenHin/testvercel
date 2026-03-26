@@ -6,10 +6,9 @@ const pool = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    port: process.env.DB_PORT || 3306, // THÊM DÒNG NÀY
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    charset: 'utf8mb4' // THÊM DÒNG NÀY ĐỂ SỬA LỖI FONT TIẾNG VIỆT
+    charset: 'utf8mb4'
 });
-
-module.exports = pool.promise();
