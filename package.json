@@ -2,20 +2,20 @@
   "name": "bookstore-nodejs",
   "version": "1.0.0",
   "description": "Website bán sách trực tuyến sử dụng Node.js và Express",
+  "main": "src/app.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "build": "echo 'No build step required'"
+  },
   "keywords": [
     "nodejs",
     "express",
     "bookstore"
   ],
+  "author": "Nguyen Hien",
   "license": "ISC",
-  "author": "Tran Trung Tin",
-  "type": "commonjs",
-  "main": "src/app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
-  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "body-parser": "^1.20.2",
@@ -35,11 +35,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trungtin10/WebBookStore.git"
-  },
-  "bugs": {
-    "url": "https://github.com/trungtin10/WebBookStore/issues"
-  },
-  "homepage": "https://github.com/trungtin10/WebBookStore#readme"
-  
+    "url": "git+https://github.com/NguyenHin/testvercel.git"
+  }
 }
