@@ -57,7 +57,13 @@ class Product {
             queryParams.push(Number(filters.limit), Number(filters.offset) || 0);
         }
 
-        const [rows] = await db.query(query, queryParams);
+        try {
+            const [rows] = await db.query(query, queryParams);
+            return rows;
+        } catch (error) {
+            console.error("Lỗi truy vấn database:", error);
+            throw error;
+        }
         return rows;
     }
 
